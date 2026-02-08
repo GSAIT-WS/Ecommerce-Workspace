@@ -190,8 +190,11 @@ const CartPage = () => {
 
                 {/* CTA Buttons */}
                 <div className="mt-8 space-y-3">
-                  <Button className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground hover:bg-primary/90">
-                    Proceed to Checkout
+                  <Button 
+                    asChild
+                    className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground hover:bg-primary/90"
+                  >
+                    <Link to="/checkout">Proceed to Checkout</Link>
                   </Button>
                   <Button
                     asChild
@@ -234,8 +237,11 @@ const CartPage = () => {
       {/* Mobile Sticky CTA (visible only on mobile for empty cart scenario) */}
       {cartItems.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 lg:hidden">
-          <Button className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground hover:bg-primary/90">
-            Proceed to Checkout
+          <Button 
+            asChild
+            className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground hover:bg-primary/90"
+          >
+            <Link to="/checkout">Proceed to Checkout</Link>
           </Button>
         </div>
       )}
