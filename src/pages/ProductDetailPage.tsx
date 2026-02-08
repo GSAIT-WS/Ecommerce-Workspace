@@ -20,50 +20,74 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { allProducts } from "@/data/products";
 
-// Import product images
+// Import product images for gallery
 import productProteinBar from "@/assets/product-protein-bar.jpg";
 import productMilletBar from "@/assets/product-millet-bar.jpg";
 import productHealthyMix from "@/assets/product-healthy-mix.jpg";
 import productChikki from "@/assets/product-chikki.jpg";
 
-// Dummy product data
-const productData = {
-  id: "1",
-  name: "Premium Multigrain Protein Bar",
-  subtitle: "High Protein | Low Sugar | Natural Ingredients",
-  price: 149,
-  originalPrice: 199,
-  rating: 4.6,
-  reviewCount: 2847,
-  images: [productProteinBar, productMilletBar, productHealthyMix, productChikki],
-  tags: ["High Protein", "Multigrain", "No Added Sugar"],
-  description: "Our Premium Multigrain Protein Bar is crafted with a blend of ancient Indian grains including ragi, jowar, and bajra. Each bar delivers 15g of plant-based protein, making it perfect for your active lifestyle. Made with natural jaggery and zero artificial sweeteners.",
-  highlights: [
-    "15g Plant-Based Protein",
-    "Made with Ancient Indian Grains",
-    "No Artificial Sweeteners",
-    "Rich in Fiber & Iron",
-    "Gluten-Free Formula"
-  ],
+// Extended product details (for PDP display)
+const productDetails: Record<string, {
+  subtitle: string;
+  reviewCount: number;
+  images: string[];
+  tags: string[];
+  description: string;
+  highlights: string[];
   nutrition: {
-    servingSize: "40g (1 bar)",
-    calories: 180,
-    protein: "15g",
-    carbs: "18g",
-    fiber: "4g",
-    sugar: "3g",
-    fat: "6g",
-    sodium: "80mg",
-    iron: "15%",
-    calcium: "10%"
-  },
-  ingredients: "Rolled Oats, Whey Protein, Almonds, Dates, Jaggery, Ragi Flour, Jowar Flakes, Bajra Puffs, Coconut Oil, Chia Seeds, Flax Seeds, Natural Vanilla, Pink Salt.",
+    servingSize: string;
+    calories: number;
+    protein: string;
+    carbs: string;
+    fiber: string;
+    sugar: string;
+    fat: string;
+    sodium: string;
+    iron: string;
+    calcium: string;
+  };
+  ingredients: string;
   dietInfo: {
-    isVegan: false,
-    isGlutenFree: true,
-    isNutFree: false,
-    isDairyFree: false
+    isVegan: boolean;
+    isGlutenFree: boolean;
+    isNutFree: boolean;
+    isDairyFree: boolean;
+  };
+}> = {
+  default: {
+    subtitle: "High Protein | Low Sugar | Natural Ingredients",
+    reviewCount: 2847,
+    images: [productProteinBar, productMilletBar, productHealthyMix, productChikki],
+    tags: ["High Protein", "Multigrain", "No Added Sugar"],
+    description: "Our Premium Multigrain Protein Bar is crafted with a blend of ancient Indian grains including ragi, jowar, and bajra. Each bar delivers 15g of plant-based protein, making it perfect for your active lifestyle. Made with natural jaggery and zero artificial sweeteners.",
+    highlights: [
+      "15g Plant-Based Protein",
+      "Made with Ancient Indian Grains",
+      "No Artificial Sweeteners",
+      "Rich in Fiber & Iron",
+      "Gluten-Free Formula"
+    ],
+    nutrition: {
+      servingSize: "40g (1 bar)",
+      calories: 180,
+      protein: "15g",
+      carbs: "18g",
+      fiber: "4g",
+      sugar: "3g",
+      fat: "6g",
+      sodium: "80mg",
+      iron: "15%",
+      calcium: "10%"
+    },
+    ingredients: "Rolled Oats, Whey Protein, Almonds, Dates, Jaggery, Ragi Flour, Jowar Flakes, Bajra Puffs, Coconut Oil, Chia Seeds, Flax Seeds, Natural Vanilla, Pink Salt.",
+    dietInfo: {
+      isVegan: false,
+      isGlutenFree: true,
+      isNutFree: false,
+      isDairyFree: false
+    }
   }
 };
 
@@ -128,8 +152,21 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const product = productData;
-  const discount = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+  // Find product from shared data
+  const baseProduct = allProducts.find((p) => p.id === id) || allProducts[0];
+  const details = productDetails.default;
+  
+  // Combine base product with extended details
+  const product = {
+    ...baseProduct,
+    ...details,
+    images: [baseProduct.image, productMilletBar, productHealthyMix, productChikki],
+    tags: [baseProduct.tag, ...details.tags.slice(1)],
+  };
+
+  const discount = product.originalPrice 
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
 
   return (
     <div className="min-h-screen bg-background">

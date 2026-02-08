@@ -15,15 +15,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import ProductListCard from "@/components/ProductListCard";
 import ProductFilters from "@/components/ProductFilters";
-
-// Import product images
-import productProteinBar from "@/assets/product-protein-bar.jpg";
-import productMilletBar from "@/assets/product-millet-bar.jpg";
-import productHealthyMix from "@/assets/product-healthy-mix.jpg";
-import productMultigrainSnack from "@/assets/product-multigrain-snack.jpg";
-import productChikki from "@/assets/product-chikki.jpg";
-import productCombo from "@/assets/product-combo.jpg";
-import productShilajitBar from "@/assets/product-shilajit-bar.jpg";
+import { allProducts, getProductsByCategory } from "@/data/products";
 
 // Category metadata
 const categoryData: Record<string, { title: string; subtitle: string }> = {
@@ -31,7 +23,7 @@ const categoryData: Record<string, { title: string; subtitle: string }> = {
     title: "Protein Bars",
     subtitle: "Power-packed nutrition bars with 20g+ protein for your active lifestyle",
   },
-  "multigrain-snacks": {
+  "multigrain": {
     title: "Multigrain Snacks",
     subtitle: "Wholesome snacks made with 7+ ancient grains for guilt-free munching",
   },
@@ -39,118 +31,11 @@ const categoryData: Record<string, { title: string; subtitle: string }> = {
     title: "Healthy Foods",
     subtitle: "Nutrient-rich superfoods sourced from Indian farms",
   },
-  combos: {
+  "combos": {
     title: "Value Combos",
     subtitle: "Curated bundles for maximum savings and variety",
   },
 };
-
-// Dummy products
-const products = [
-  {
-    id: 1,
-    name: "Peanut Butter Protein Bar",
-    tag: "High Protein",
-    price: 199,
-    originalPrice: 249,
-    rating: 4.5,
-    image: productProteinBar,
-    protein: "20g",
-    calories: "220 kcal",
-    dietType: "Vegetarian",
-    packType: "Pack of 6",
-  },
-  {
-    id: 2,
-    name: "Millet Energy Bar",
-    tag: "Multigrain",
-    price: 149,
-    originalPrice: 179,
-    rating: 4.3,
-    image: productMilletBar,
-    protein: "8g",
-    calories: "160 kcal",
-    dietType: "Vegan",
-    packType: "Single Pack",
-  },
-  {
-    id: 3,
-    name: "Mixed Nuts & Seeds",
-    tag: "Low Sugar",
-    price: 349,
-    originalPrice: 429,
-    rating: 4.7,
-    image: productHealthyMix,
-    protein: "15g",
-    calories: "280 kcal",
-    dietType: "Keto Friendly",
-    packType: "250g Pack",
-  },
-  {
-    id: 4,
-    name: "Ragi Multigrain Chips",
-    tag: "Gluten-Free",
-    price: 129,
-    rating: 4.2,
-    image: productMultigrainSnack,
-    protein: "6g",
-    calories: "140 kcal",
-    dietType: "Gluten-Free",
-    packType: "Pack of 3",
-  },
-  {
-    id: 5,
-    name: "Traditional Groundnut Chikki",
-    tag: "No Added Sugar",
-    price: 99,
-    originalPrice: 129,
-    rating: 4.6,
-    image: productChikki,
-    protein: "10g",
-    calories: "180 kcal",
-    dietType: "Vegetarian",
-    packType: "200g Pack",
-  },
-  {
-    id: 6,
-    name: "Healthy Snacks Combo",
-    tag: "Best Value",
-    price: 599,
-    originalPrice: 799,
-    rating: 4.8,
-    image: productCombo,
-    protein: "12g avg",
-    calories: "200 kcal avg",
-    dietType: "Mixed",
-    packType: "Combo Pack",
-  },
-  {
-    id: 7,
-    name: "Shilajit Power Bar",
-    tag: "Ayurvedic",
-    price: 279,
-    originalPrice: 349,
-    rating: 4.4,
-    image: productShilajitBar,
-    protein: "18g",
-    calories: "210 kcal",
-    dietType: "Vegetarian",
-    packType: "Pack of 4",
-  },
-  {
-    id: 8,
-    name: "Quinoa Crunch Bites",
-    tag: "High Fiber",
-    price: 189,
-    originalPrice: 229,
-    rating: 4.1,
-    image: productMilletBar,
-    protein: "9g",
-    calories: "150 kcal",
-    dietType: "Vegan",
-    packType: "Single Pack",
-  },
-];
 
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -159,6 +44,28 @@ const CategoryPage = () => {
   const [sortBy, setSortBy] = useState("popularity");
 
   const category = categoryData[slug || "protein-bars"] || categoryData["protein-bars"];
+  
+  // Get products for this category from shared data
+  let products = slug ? getProductsByCategory(slug) : allProducts;
+  
+  // If no products found for category, show all products
+  if (products.length === 0) {
+    products = allProducts;
+  }
+
+  // Apply sorting
+  const sortedProducts = [...products].sort((a, b) => {
+    switch (sortBy) {
+      case "price-low":
+        return a.price - b.price;
+      case "price-high":
+        return b.price - a.price;
+      case "rating":
+        return b.rating - a.rating;
+      default:
+        return 0;
+    }
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -200,7 +107,7 @@ const CategoryPage = () => {
               <span className="hidden sm:inline">Filters</span>
             </Button>
             <span className="font-body text-sm text-muted-foreground">
-              {products.length} products
+              {sortedProducts.length} products
             </span>
           </div>
 
@@ -265,7 +172,7 @@ const CategoryPage = () => {
               }}
               className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4"
             >
-              {products.map((product, index) => (
+              {sortedProducts.map((product) => (
                 <motion.div
                   key={product.id}
                   variants={{
@@ -273,14 +180,7 @@ const CategoryPage = () => {
                     visible: { opacity: 1, y: 0 },
                   }}
                 >
-                  <ProductCard
-                    name={product.name}
-                    tag={product.tag}
-                    price={product.price}
-                    originalPrice={product.originalPrice}
-                    rating={product.rating}
-                    image={product.image}
-                  />
+                  <ProductCard {...product} />
                 </motion.div>
               ))}
             </motion.div>
@@ -297,7 +197,7 @@ const CategoryPage = () => {
               }}
               className="flex flex-col gap-4"
             >
-              {products.map((product) => (
+              {sortedProducts.map((product) => (
                 <motion.div
                   key={product.id}
                   variants={{
@@ -305,18 +205,7 @@ const CategoryPage = () => {
                     visible: { opacity: 1, x: 0 },
                   }}
                 >
-                  <ProductListCard
-                    name={product.name}
-                    tag={product.tag}
-                    price={product.price}
-                    originalPrice={product.originalPrice}
-                    rating={product.rating}
-                    image={product.image}
-                    protein={product.protein}
-                    calories={product.calories}
-                    dietType={product.dietType}
-                    packType={product.packType}
-                  />
+                  <ProductListCard {...product} />
                 </motion.div>
               ))}
             </motion.div>

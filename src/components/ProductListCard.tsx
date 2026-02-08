@@ -1,8 +1,10 @@
+import { Link } from "react-router-dom";
 import { Star, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 interface ProductListCardProps {
+  id?: string;
   name: string;
   tag: string;
   price: number;
@@ -10,12 +12,13 @@ interface ProductListCardProps {
   rating: number;
   image: string;
   protein?: string;
-  calories?: string;
+  calories?: number | string;
   dietType?: string;
   packType?: string;
 }
 
 const ProductListCard = ({
+  id = "1",
   name,
   tag,
   price,
@@ -23,11 +26,14 @@ const ProductListCard = ({
   rating,
   image,
   protein = "12g",
-  calories = "180 kcal",
+  calories = 180,
   dietType = "Vegetarian",
-  packType = "Single Pack",
+  packType = "Single",
 }: ProductListCardProps) => (
-  <div className="group flex gap-4 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:shadow-md md:gap-6">
+  <Link 
+    to={`/product/${id}`}
+    className="group flex gap-4 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:shadow-md md:gap-6"
+  >
     {/* Product Image */}
     <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl bg-muted md:h-36 md:w-36">
       <img
@@ -70,7 +76,7 @@ const ProductListCard = ({
             <span className="font-medium text-foreground">Protein:</span> {protein}
           </div>
           <div className="font-body text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">Calories:</span> {calories}
+            <span className="font-medium text-foreground">Calories:</span> {typeof calories === 'number' ? `${calories} kcal` : calories}
           </div>
           <div className="font-body text-xs text-muted-foreground">
             <span className="font-medium text-foreground">Diet:</span> {dietType}
@@ -99,13 +105,14 @@ const ProductListCard = ({
         <Button
           size="sm"
           className="rounded-full bg-primary px-4 text-primary-foreground hover:bg-primary/90"
+          onClick={(e) => e.preventDefault()}
         >
           <ShoppingCart className="mr-1.5 h-4 w-4" />
           <span className="font-body text-sm">Add to Cart</span>
         </Button>
       </div>
     </div>
-  </div>
+  </Link>
 );
 
 export default ProductListCard;

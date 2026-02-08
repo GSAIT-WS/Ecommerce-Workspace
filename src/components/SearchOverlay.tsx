@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, X, Clock, TrendingUp, ArrowRight } from "lucide-react";
+import { Search, X, Clock, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import proteinBarImg from "@/assets/product-protein-bar.jpg";
-import multigainImg from "@/assets/product-multigrain-snack.jpg";
-import chikkiImg from "@/assets/product-chikki.jpg";
+import { allProducts, searchProducts } from "@/data/products";
+
 // Category images
 import categoryProteinImg from "@/assets/category-protein-bars.jpg";
 import categoryMultigrainImg from "@/assets/category-multigrain.jpg";
@@ -23,37 +22,28 @@ interface SearchOverlayProps {
   onClose: () => void;
 }
 
-const suggestedProducts = [
-  { name: "Protein Bar - Peanut Butter", category: "Protein Bars", image: proteinBarImg },
-  { name: "Protein Crunch Bites", category: "Protein Bars", image: proteinBarImg },
-  { name: "Multigrain Millet Cookies", category: "Multigrain Snacks", image: multigainImg },
-  { name: "Quinoa Energy Balls", category: "Healthy Foods", image: chikkiImg },
-  { name: "Ragi Protein Ladoo", category: "Healthy Foods", image: chikkiImg },
-  { name: "Oats & Honey Bar", category: "Protein Bars", image: proteinBarImg },
-];
-
 const categories = [
-  { name: "Protein Bars", count: 24, image: categoryProteinImg },
-  { name: "Multigrain Snacks", count: 18, image: categoryMultigrainImg },
-  { name: "Healthy Foods", count: 32, image: categoryHealthyImg },
-  { name: "Combos & Value Packs", count: 12, image: categoryCombosImg },
+  { name: "Protein Bars", slug: "protein-bars", count: 24, image: categoryProteinImg },
+  { name: "Multigrain Snacks", slug: "multigrain", count: 18, image: categoryMultigrainImg },
+  { name: "Healthy Foods", slug: "healthy-foods", count: 32, image: categoryHealthyImg },
+  { name: "Combos & Value Packs", slug: "combos", count: 12, image: categoryCombosImg },
 ];
 
 const healthKeywords = [
-  "High Protein",
-  "Sugar Free",
-  "Multigrain",
-  "Gluten Free",
-  "No Preservatives",
-  "Vegan",
+  { label: "High Protein", filter: "high-protein" },
+  { label: "Sugar Free", filter: "sugar-free" },
+  { label: "Multigrain", filter: "multigrain" },
+  { label: "Gluten Free", filter: "gluten-free" },
+  { label: "No Preservatives", filter: "natural" },
+  { label: "Vegan", filter: "vegan" },
 ];
 
 const trendingSearches = [
-  { name: "Millet snacks", image: trendingMilletImg },
-  { name: "Protein bars", image: proteinBarImg },
-  { name: "Sugar free", image: trendingSugarfreeImg },
-  { name: "Healthy breakfast", image: trendingBreakfastImg },
-  { name: "Ragi cookies", image: trendingRagiImg },
+  { name: "Millet snacks", query: "millet", image: trendingMilletImg },
+  { name: "Protein bars", query: "protein", image: categoryProteinImg },
+  { name: "Sugar free", query: "sugar free", image: trendingSugarfreeImg },
+  { name: "Healthy breakfast", query: "breakfast", image: trendingBreakfastImg },
+  { name: "Ragi cookies", query: "ragi", image: trendingRagiImg },
 ];
 
 const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
@@ -97,6 +87,12 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
     }
   };
 
+  const handleCategoryClick = (slug: string) => {
+    navigate(`/search?category=${slug}`);
+    onClose();
+    setQuery("");
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       handleSearch(query);
@@ -107,11 +103,8 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
     setRecentSearches([]);
   };
 
-  const filteredProducts = query
-    ? suggestedProducts.filter((p) =>
-        p.name.toLowerCase().includes(query.toLowerCase())
-      )
-    : [];
+  // Filter products using the shared search function
+  const filteredProducts = query ? searchProducts(query).slice(0, 6) : [];
 
   const filteredCategories = query
     ? categories.filter((c) =>
@@ -121,7 +114,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
 
   const filteredKeywords = query
     ? healthKeywords.filter((k) =>
-        k.toLowerCase().includes(query.toLowerCase())
+        k.label.toLowerCase().includes(query.toLowerCase())
       )
     : [];
 
@@ -135,7 +128,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
         >
-          {/* Backdrop - Soft fade dim */}
+          {/* Backdrop */}
           <motion.div
             className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
             onClick={onClose}
@@ -145,7 +138,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
             transition={{ duration: 0.2 }}
           />
 
-          {/* Search Container - Slide down animation */}
+          {/* Search Container */}
           <motion.div
             className="relative z-10 bg-background"
             initial={{ y: -30, opacity: 0 }}
@@ -178,7 +171,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
               </div>
             </div>
 
-            {/* Dropdown Panel - Staggered content animation */}
+            {/* Dropdown Panel */}
             <motion.div
               className="max-h-[calc(100vh-100px)] overflow-y-auto border-t border-border bg-card shadow-xl"
               initial={{ opacity: 0 }}
@@ -204,8 +197,12 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                         <div className="space-y-1">
                           {filteredProducts.map((product, index) => (
                             <motion.button
-                              key={index}
-                              onClick={() => handleSearch(product.name)}
+                              key={product.id}
+                              onClick={() => {
+                                navigate(`/product/${product.id}`);
+                                onClose();
+                                setQuery("");
+                              }}
                               className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-muted"
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
@@ -222,8 +219,8 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                                   {product.name}
                                 </span>
                               </div>
-                              <span className="font-body text-xs text-muted-foreground">
-                                {product.category}
+                              <span className="font-body text-sm font-semibold text-primary">
+                                ₹{product.price}
                               </span>
                             </motion.button>
                           ))}
@@ -240,8 +237,8 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
                           {filteredCategories.map((cat, index) => (
                             <motion.button
-                              key={index}
-                              onClick={() => handleSearch(cat.name)}
+                              key={cat.slug}
+                              onClick={() => handleCategoryClick(cat.slug)}
                               className="flex items-center gap-3 rounded-xl border border-border bg-background p-3 transition-all hover:border-primary/30 hover:shadow-md"
                               initial={{ opacity: 0, scale: 0.95 }}
                               animate={{ opacity: 1, scale: 1 }}
@@ -276,7 +273,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                         <div className="flex flex-wrap gap-2">
                           {filteredKeywords.map((keyword, index) => (
                             <motion.div
-                              key={index}
+                              key={keyword.filter}
                               initial={{ opacity: 0, scale: 0.9 }}
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ duration: 0.15, delay: index * 0.03 }}
@@ -284,9 +281,9 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                               <Badge
                                 variant="outline"
                                 className="cursor-pointer rounded-full border-primary/30 px-4 py-1.5 font-body text-sm transition-colors hover:bg-primary hover:text-primary-foreground"
-                                onClick={() => handleSearch(keyword)}
+                                onClick={() => handleSearch(keyword.label)}
                               >
-                                {keyword}
+                                {keyword.label}
                               </Badge>
                             </motion.div>
                           ))}
@@ -294,7 +291,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                       </div>
                     )}
 
-                    {/* No results */}
+                    {/* No results but still searchable */}
                     {filteredProducts.length === 0 &&
                       filteredCategories.length === 0 &&
                       filteredKeywords.length === 0 && (
@@ -377,7 +374,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                           >
                             <button
                               className="flex items-center gap-2 rounded-full border border-accent/50 bg-accent/10 px-3 py-1.5 font-body text-sm text-foreground transition-colors hover:bg-accent/20"
-                              onClick={() => handleSearch(search.name)}
+                              onClick={() => handleSearch(search.query)}
                             >
                               <img
                                 src={search.image}
@@ -399,51 +396,46 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
                         {categories.map((cat, index) => (
                           <motion.button
-                            key={index}
-                            onClick={() => handleSearch(cat.name)}
-                            className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-background p-4 transition-all hover:border-primary/30 hover:shadow-lg"
-                            initial={{ opacity: 0, y: 20 }}
+                            key={cat.slug}
+                            onClick={() => handleCategoryClick(cat.slug)}
+                            className="group flex flex-col items-center gap-3 rounded-xl border border-border bg-background p-4 transition-all hover:border-primary/30 hover:shadow-md"
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.3, delay: index * 0.07 }}
-                            whileHover={{ y: -8 }}
+                            transition={{ duration: 0.2, delay: index * 0.05 }}
+                            whileHover={{ y: -4 }}
                           >
-                            <div className="h-16 w-16 overflow-hidden rounded-full shadow-md">
-                              <img
-                                src={cat.image}
-                                alt={cat.name}
-                                className="h-full w-full object-cover transition-transform group-hover:scale-110"
-                              />
-                            </div>
-                            <span className="font-body text-sm font-semibold text-foreground text-center">
+                            <img
+                              src={cat.image}
+                              alt={cat.name}
+                              className="h-16 w-16 rounded-full object-cover shadow-sm transition-transform group-hover:scale-110"
+                            />
+                            <span className="font-body text-sm font-medium text-foreground text-center">
                               {cat.name}
-                            </span>
-                            <span className="font-body text-xs text-muted-foreground">
-                              {cat.count} products
                             </span>
                           </motion.button>
                         ))}
                       </div>
                     </div>
 
-                    {/* Health Keywords */}
+                    {/* Quick Links */}
                     <div>
                       <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                        Shop by Health Goal
+                        Quick Filters
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {healthKeywords.map((keyword, index) => (
                           <motion.div
-                            key={index}
+                            key={keyword.filter}
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.15, delay: index * 0.04 }}
+                            transition={{ duration: 0.15, delay: index * 0.03 }}
                           >
                             <Badge
                               variant="outline"
-                              className="cursor-pointer rounded-full border-primary/30 px-4 py-2 font-body text-sm transition-colors hover:bg-primary hover:text-primary-foreground"
-                              onClick={() => handleSearch(keyword)}
+                              className="cursor-pointer rounded-full border-secondary/50 px-4 py-1.5 font-body text-sm transition-colors hover:bg-secondary hover:text-secondary-foreground"
+                              onClick={() => handleSearch(keyword.label)}
                             >
-                              {keyword}
+                              {keyword.label}
                             </Badge>
                           </motion.div>
                         ))}
