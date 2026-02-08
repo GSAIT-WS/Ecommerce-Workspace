@@ -61,8 +61,10 @@ const Navbar = () => {
               </span>
             </Link>
           </Button>
-          <Button variant="ghost" size="icon" className="hidden text-foreground/70 hover:text-primary md:flex">
-            <User className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="hidden text-foreground/70 hover:text-primary md:flex" asChild>
+            <Link to="/profile">
+              <User className="h-5 w-5" />
+            </Link>
           </Button>
           <Button
             variant="ghost"

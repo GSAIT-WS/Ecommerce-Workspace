@@ -17,6 +17,18 @@ import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import OrdersPage from "./pages/OrdersPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
+import ProfilePage from "./pages/ProfilePage";
+import EditProfilePage from "./pages/profile/EditProfilePage";
+import PreferencesPage from "./pages/profile/PreferencesPage";
+import AddressesPage from "./pages/profile/AddressesPage";
+import SavedProductsPage from "./pages/profile/SavedProductsPage";
+import RatingsPage from "./pages/profile/RatingsPage";
+import RecentlyViewedPage from "./pages/profile/RecentlyViewedPage";
+import PaymentMethodsPage from "./pages/profile/PaymentMethodsPage";
+import HelpCenterPage from "./pages/profile/HelpCenterPage";
+import AboutPage from "./pages/profile/AboutPage";
+import TermsPage from "./pages/profile/TermsPage";
+import PrivacyPage from "./pages/profile/PrivacyPage";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +52,18 @@ const App = () => (
           <Route path="/order-tracking" element={<OrderTrackingPage />} />
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/order/:orderId" element={<OrderDetailPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/edit" element={<EditProfilePage />} />
+          <Route path="/profile/preferences" element={<PreferencesPage />} />
+          <Route path="/profile/addresses" element={<AddressesPage />} />
+          <Route path="/profile/saved" element={<SavedProductsPage />} />
+          <Route path="/profile/ratings" element={<RatingsPage />} />
+          <Route path="/profile/recent" element={<RecentlyViewedPage />} />
+          <Route path="/profile/payments" element={<PaymentMethodsPage />} />
+          <Route path="/profile/help" element={<HelpCenterPage />} />
+          <Route path="/profile/about" element={<AboutPage />} />
+          <Route path="/profile/terms" element={<TermsPage />} />
+          <Route path="/profile/privacy" element={<PrivacyPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
