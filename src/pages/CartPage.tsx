@@ -4,30 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import productProteinBar from "@/assets/product-protein-bar.jpg";
-import productMilletBar from "@/assets/product-millet-bar.jpg";
+import { useCart } from "@/context/CartContext";
+import { toast } from "@/components/ui/sonner";
 import emptyCartIllustration from "@/assets/empty-cart-illustration.jpg";
-
-// Dummy cart items
-const cartItems = [
-  {
-    id: "1",
-    name: "Peanut Butter Protein Bar",
-    tag: "High Protein",
-    price: 149,
-    originalPrice: 199,
-    quantity: 2,
-    image: productProteinBar,
-  },
-  {
-    id: "5",
-    name: "Ragi Millet Energy Bar",
-    tag: "Multigrain",
-    price: 139,
-    quantity: 1,
-    image: productMilletBar,
-  },
-];
 
 const trustBadges = [
   { icon: Leaf, label: "100% Natural" },
@@ -37,10 +16,12 @@ const trustBadges = [
 ];
 
 const CartPage = () => {
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 499 ? 0 : 49;
-  const savings = cartItems.reduce((sum, item) => sum + ((item.originalPrice || 0) - item.price) * item.quantity, 0);
-  const total = subtotal + shipping;
+  const { items, updateQuantity, removeFromCart, getSubtotal, getDeliveryCharge, getSavings, getCartTotal } = useCart();
+
+  const subtotal = getSubtotal();
+  const shipping = getDeliveryCharge();
+  const savings = getSavings();
+  const total = getCartTotal();
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,11 +38,11 @@ const CartPage = () => {
           </h1>
         </div>
 
-        {cartItems.length > 0 ? (
+        {items.length > 0 ? (
           <div className="grid gap-6 lg:gap-8 lg:grid-cols-3">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
-              {cartItems.map((item) => (
+              {items.map((item) => (
                 <div
                   key={item.id}
                   className="flex gap-4 rounded-2xl border border-border bg-card p-4 md:p-6 shadow-sm transition-all hover:shadow-md"
@@ -110,17 +91,37 @@ const CartPage = () => {
                     {/* Quantity & Remove */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2">
-                        <button className="p-1 hover:bg-muted rounded transition-colors">
+                        <button 
+                          className="p-1 hover:bg-muted rounded transition-colors"
+                          onClick={() => {
+                            if (item.quantity > 1) {
+                              updateQuantity(item.id, item.quantity - 1);
+                              toast.success("Quantity updated");
+                            }
+                          }}
+                        >
                           <Minus className="h-4 w-4 text-muted-foreground" />
                         </button>
                         <span className="w-6 text-center font-body text-sm font-semibold text-foreground">
                           {item.quantity}
                         </span>
-                        <button className="p-1 hover:bg-muted rounded transition-colors">
+                        <button 
+                          className="p-1 hover:bg-muted rounded transition-colors"
+                          onClick={() => {
+                            updateQuantity(item.id, item.quantity + 1);
+                            toast.success("Quantity updated");
+                          }}
+                        >
                           <Plus className="h-4 w-4 text-muted-foreground" />
                         </button>
                       </div>
-                      <button className="p-2 hover:bg-red-50 rounded-lg transition-colors text-muted-foreground hover:text-red-500">
+                      <button 
+                        className="p-2 hover:bg-red-50 rounded-lg transition-colors text-muted-foreground hover:text-red-500"
+                        onClick={() => {
+                          removeFromCart(item.id);
+                          toast.success("Item removed from cart");
+                        }}
+                      >
                         <Trash2 className="h-5 w-5" />
                       </button>
                     </div>
@@ -235,7 +236,7 @@ const CartPage = () => {
       </main>
 
       {/* Mobile Sticky CTA (visible only on mobile for empty cart scenario) */}
-      {cartItems.length > 0 && (
+      {items.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 lg:hidden">
           <Button 
             asChild
@@ -246,7 +247,7 @@ const CartPage = () => {
         </div>
       )}
 
-      <div className={cartItems.length > 0 ? "h-24 lg:h-0" : ""} />
+      <div className={items.length > 0 ? "h-24 lg:h-0" : ""} />
 
       <Footer />
     </div>

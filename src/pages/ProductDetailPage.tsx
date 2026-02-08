@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Star, 
@@ -21,6 +21,8 @@ import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { allProducts } from "@/data/products";
+import { useCart } from "@/context/CartContext";
+import { toast } from "@/components/ui/sonner";
 
 // Import product images for gallery
 import productProteinBar from "@/assets/product-protein-bar.jpg";
@@ -148,6 +150,8 @@ const ratingBreakdown = [
 
 const ProductDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -167,6 +171,30 @@ const ProductDetailPage = () => {
   const discount = product.originalPrice 
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
+
+  const handleAddToCart = () => {
+    addToCart({ 
+      id: product.id, 
+      name: product.name, 
+      tag: product.tag, 
+      price: product.price, 
+      originalPrice: product.originalPrice, 
+      image: product.image 
+    });
+    toast.success(`Added ${quantity} item(s) to cart ✓`);
+  };
+
+  const handleBuyNow = () => {
+    addToCart({ 
+      id: product.id, 
+      name: product.name, 
+      tag: product.tag, 
+      price: product.price, 
+      originalPrice: product.originalPrice, 
+      image: product.image 
+    });
+    navigate("/checkout");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -333,9 +361,19 @@ const ProductDetailPage = () => {
                 </Button>
               </div>
 
-              <Button className="flex-1 rounded-full bg-primary px-8 py-6 font-body text-base font-semibold text-primary-foreground hover:bg-primary/90 sm:flex-none">
+              <Button 
+                className="flex-1 rounded-full bg-primary px-8 py-6 font-body text-base font-semibold text-primary-foreground hover:bg-primary/90 sm:flex-none"
+                onClick={handleAddToCart}
+              >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Add to Cart
+              </Button>
+
+              <Button
+                className="flex-1 rounded-full bg-secondary px-8 py-6 font-body text-base font-semibold text-secondary-foreground hover:bg-secondary/90 sm:flex-none"
+                onClick={handleBuyNow}
+              >
+                Buy Now
               </Button>
 
               <Button
