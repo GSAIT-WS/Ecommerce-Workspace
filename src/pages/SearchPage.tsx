@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,117 +7,15 @@ import ProductCard from "@/components/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-// Import product images
-import productProteinBar from "@/assets/product-protein-bar.jpg";
-import productMultigrainSnack from "@/assets/product-multigrain-snack.jpg";
-import productChikki from "@/assets/product-chikki.jpg";
-import productCombo from "@/assets/product-combo.jpg";
-import productMilletBar from "@/assets/product-millet-bar.jpg";
-import productHealthyMix from "@/assets/product-healthy-mix.jpg";
-import productShilajitBar from "@/assets/product-shilajit-bar.jpg";
-
-const allProducts = [
-  {
-    name: "Peanut Butter Protein Bar",
-    tag: "High Protein",
-    price: 149,
-    originalPrice: 199,
-    rating: 4.8,
-    image: productProteinBar,
-  },
-  {
-    name: "Multigrain Millet Crunch",
-    tag: "Multigrain",
-    price: 129,
-    originalPrice: 179,
-    rating: 4.6,
-    image: productMultigrainSnack,
-  },
-  {
-    name: "Traditional Groundnut Chikki",
-    tag: "No Sugar",
-    price: 99,
-    rating: 4.5,
-    image: productChikki,
-  },
-  {
-    name: "Healthy Snack Combo Pack",
-    tag: "Best Value",
-    price: 449,
-    originalPrice: 599,
-    rating: 4.9,
-    image: productCombo,
-  },
-  {
-    name: "Ragi Millet Energy Bar",
-    tag: "High Fiber",
-    price: 139,
-    rating: 4.7,
-    image: productMilletBar,
-  },
-  {
-    name: "Mixed Nuts & Seeds Trail Mix",
-    tag: "Healthy",
-    price: 249,
-    originalPrice: 299,
-    rating: 4.4,
-    image: productHealthyMix,
-  },
-  {
-    name: "Shilajit Power Bar",
-    tag: "Energy Boost",
-    price: 199,
-    originalPrice: 249,
-    rating: 4.8,
-    image: productShilajitBar,
-  },
-  {
-    name: "Quinoa Crunch Bites",
-    tag: "Gluten Free",
-    price: 179,
-    rating: 4.6,
-    image: productMultigrainSnack,
-  },
-  {
-    name: "Oats & Honey Bar",
-    tag: "Breakfast",
-    price: 119,
-    originalPrice: 149,
-    rating: 4.5,
-    image: productProteinBar,
-  },
-  {
-    name: "Amaranth Ladoo",
-    tag: "Traditional",
-    price: 159,
-    rating: 4.7,
-    image: productChikki,
-  },
-  {
-    name: "Jowar Puffs",
-    tag: "Light Snack",
-    price: 89,
-    rating: 4.3,
-    image: productMilletBar,
-  },
-  {
-    name: "Super Seeds Mix",
-    tag: "Omega Rich",
-    price: 299,
-    originalPrice: 349,
-    rating: 4.8,
-    image: productHealthyMix,
-  },
-];
+import { allProducts, searchProducts, getProductsByCategory, getPopularProducts, categories } from "@/data/products";
 
 const filterTags = [
-  "All",
-  "High Protein",
-  "Multigrain",
-  "Sugar Free",
-  "Gluten Free",
-  "Vegan",
+  { label: "All", value: "all" },
+  { label: "High Protein", value: "high-protein" },
+  { label: "Multigrain", value: "multigrain" },
+  { label: "Sugar Free", value: "sugar-free" },
+  { label: "Gluten Free", value: "gluten-free" },
+  { label: "Vegan", value: "vegan" },
 ];
 
 const sortOptions = [
@@ -131,33 +29,88 @@ const sortOptions = [
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
+  const categoryParam = searchParams.get("category") || "";
   const [localQuery, setLocalQuery] = useState(query);
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [activeFilter, setActiveFilter] = useState("all");
   const [activeSort, setActiveSort] = useState("Relevance");
   const [showFilters, setShowFilters] = useState(false);
 
-  // Filter products based on query (dummy filtering)
-  const filteredProducts = allProducts.filter((product) => {
-    const matchesQuery =
-      !query ||
-      product.name.toLowerCase().includes(query.toLowerCase()) ||
-      product.tag.toLowerCase().includes(query.toLowerCase());
-    const matchesFilter =
-      activeFilter === "All" ||
-      product.tag.toLowerCase().includes(activeFilter.toLowerCase());
-    return matchesQuery && matchesFilter;
-  });
+  // Sync local query with URL
+  useEffect(() => {
+    setLocalQuery(query);
+  }, [query]);
+
+  // Get filtered products based on query or category
+  const getFilteredProducts = () => {
+    let products = allProducts;
+
+    // Filter by category if specified
+    if (categoryParam) {
+      products = getProductsByCategory(categoryParam);
+    }
+
+    // Filter by search query
+    if (query) {
+      products = searchProducts(query);
+    }
+
+    // Apply additional tag filter
+    if (activeFilter !== "all") {
+      products = products.filter((product) => {
+        const tagMatch = product.tag.toLowerCase().includes(activeFilter.replace("-", " "));
+        const dietMatch = product.dietType?.toLowerCase().includes(activeFilter.replace("-", " "));
+        return tagMatch || dietMatch;
+      });
+    }
+
+    // Apply sorting
+    switch (activeSort) {
+      case "Price: Low to High":
+        products = [...products].sort((a, b) => a.price - b.price);
+        break;
+      case "Price: High to Low":
+        products = [...products].sort((a, b) => b.price - a.price);
+        break;
+      case "Rating":
+        products = [...products].sort((a, b) => b.rating - a.rating);
+        break;
+      default:
+        break;
+    }
+
+    return products;
+  };
+
+  const filteredProducts = getFilteredProducts();
+  const popularProducts = getPopularProducts();
+
+  // Get category name for display
+  const getCategoryName = () => {
+    if (categoryParam) {
+      const cat = categories.find((c) => c.slug === categoryParam);
+      return cat?.name || categoryParam;
+    }
+    return null;
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (localQuery.trim()) {
       setSearchParams({ q: localQuery });
+    } else {
+      setSearchParams({});
     }
   };
 
   const clearSearch = () => {
     setLocalQuery("");
     setSearchParams({});
+  };
+
+  const clearCategory = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("category");
+    setSearchParams(newParams);
   };
 
   return (
@@ -189,19 +142,41 @@ const SearchPage = () => {
             </div>
           </form>
 
-          {/* Results count and query */}
-          {query && (
-            <div className="text-center">
-              <p className="font-body text-muted-foreground">
-                Showing{" "}
-                <span className="font-semibold text-foreground">
-                  {filteredProducts.length} results
-                </span>{" "}
-                for "
-                <span className="font-semibold text-foreground">{query}</span>"
-              </p>
-            </div>
-          )}
+          {/* Results count and query/category */}
+          <div className="text-center">
+            {getCategoryName() && (
+              <div className="mb-2 flex items-center justify-center gap-2">
+                <Badge variant="secondary" className="rounded-full px-3 py-1">
+                  {getCategoryName()}
+                  <button onClick={clearCategory} className="ml-2 hover:text-primary">
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              </div>
+            )}
+            <p className="font-body text-muted-foreground">
+              {query || categoryParam ? (
+                <>
+                  Showing{" "}
+                  <span className="font-semibold text-foreground">
+                    {filteredProducts.length} results
+                  </span>
+                  {query && (
+                    <>
+                      {" "}for "<span className="font-semibold text-foreground">{query}</span>"
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  Showing{" "}
+                  <span className="font-semibold text-foreground">
+                    {filteredProducts.length} products
+                  </span>
+                </>
+              )}
+            </p>
+          </div>
         </div>
       </section>
 
@@ -209,21 +184,21 @@ const SearchPage = () => {
       <section className="sticky top-[73px] z-40 border-b border-border bg-background/95 py-3 backdrop-blur-sm">
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between gap-4">
-            {/* Filter Tags - Scrollable on mobile */}
+            {/* Filter Tags */}
             <div className="flex-1 overflow-x-auto scrollbar-hide">
               <div className="flex items-center gap-2">
                 {filterTags.map((tag) => (
                   <Badge
-                    key={tag}
-                    variant={activeFilter === tag ? "default" : "outline"}
+                    key={tag.value}
+                    variant={activeFilter === tag.value ? "default" : "outline"}
                     className={`cursor-pointer whitespace-nowrap rounded-full px-4 py-1.5 font-body text-sm transition-all ${
-                      activeFilter === tag
+                      activeFilter === tag.value
                         ? "bg-primary text-primary-foreground"
                         : "border-border hover:border-primary/50 hover:bg-primary/5"
                     }`}
-                    onClick={() => setActiveFilter(tag)}
+                    onClick={() => setActiveFilter(tag.value)}
                   >
-                    {tag}
+                    {tag.label}
                   </Badge>
                 ))}
               </div>
@@ -318,41 +293,53 @@ const SearchPage = () => {
         <div className="container mx-auto px-4 md:px-8">
           {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {filteredProducts.map((product, index) => (
-                <ProductCard key={index} {...product} />
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} {...product} />
               ))}
             </div>
           ) : (
-            /* No Results */
-            <div className="py-16 text-center">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-                <Search className="h-10 w-10 text-muted-foreground" />
-              </div>
-              <h3 className="mb-2 font-display text-xl font-bold text-foreground">
-                No products found
-              </h3>
-              <p className="mb-6 font-body text-muted-foreground">
-                We couldn't find any products matching "{query}"
-              </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                <span className="font-body text-sm text-muted-foreground">
-                  Try searching for:
-                </span>
-                {["Protein bars", "Multigrain", "Healthy snacks"].map(
-                  (suggestion) => (
-                    <Badge
-                      key={suggestion}
-                      variant="outline"
-                      className="cursor-pointer rounded-full border-primary/30 px-3 py-1 font-body text-sm hover:bg-primary hover:text-primary-foreground"
-                      onClick={() => {
-                        setLocalQuery(suggestion);
-                        setSearchParams({ q: suggestion });
-                      }}
+            /* No Results - Show suggestions and popular products */
+            <div className="py-8">
+              <div className="mb-8 text-center">
+                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+                  <Search className="h-10 w-10 text-muted-foreground" />
+                </div>
+                <h3 className="mb-2 font-display text-xl font-bold text-foreground">
+                  No exact matches found
+                </h3>
+                <p className="mb-6 font-body text-muted-foreground">
+                  {query ? `We couldn't find products matching "${query}"` : "Try browsing our categories"}
+                </p>
+                <div className="flex flex-wrap justify-center gap-2 mb-8">
+                  <span className="font-body text-sm text-muted-foreground">
+                    Browse categories:
+                  </span>
+                  {categories.map((cat) => (
+                    <Link
+                      key={cat.slug}
+                      to={`/search?category=${cat.slug}`}
                     >
-                      {suggestion}
-                    </Badge>
-                  )
-                )}
+                      <Badge
+                        variant="outline"
+                        className="cursor-pointer rounded-full border-primary/30 px-3 py-1 font-body text-sm hover:bg-primary hover:text-primary-foreground"
+                      >
+                        {cat.name}
+                      </Badge>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Popular Products */}
+              <div>
+                <h3 className="mb-4 text-center font-display text-lg font-bold text-foreground">
+                  Popular Products You Might Like
+                </h3>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+                  {popularProducts.map((product) => (
+                    <ProductCard key={product.id} {...product} />
+                  ))}
+                </div>
               </div>
             </div>
           )}

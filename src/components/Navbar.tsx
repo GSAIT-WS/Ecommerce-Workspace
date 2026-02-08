@@ -1,13 +1,21 @@
 import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SearchOverlay from "@/components/SearchOverlay";
 
-const navLinks = ["Home", "Shop", "Categories", "About", "Contact"];
+const navLinks = [
+  { label: "Home", href: "/" },
+  { label: "Shop", href: "/search" },
+  { label: "Categories", href: "/categories" },
+  { label: "About", href: "#" },
+  { label: "Contact", href: "#" },
+];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <>
@@ -15,20 +23,22 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 border-b border-border bg-card/90 backdrop-blur-md">
       <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-8">
         {/* Logo */}
-        <a href="/" className="font-display text-2xl font-extrabold tracking-tight text-primary">
+        <Link to="/" className="font-display text-2xl font-extrabold tracking-tight text-primary">
           CRUNCH<span className="text-secondary">X</span>
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
-            <a
-              key={link}
-              href="#"
-              className="font-body text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
+            <Link
+              key={link.label}
+              to={link.href}
+              className={`font-body text-sm font-medium transition-colors hover:text-primary ${
+                location.pathname === link.href ? "text-primary" : "text-foreground/70"
+              }`}
             >
-              {link}
-            </a>
+              {link.label}
+            </Link>
           ))}
         </nav>
 
@@ -42,11 +52,13 @@ const Navbar = () => {
           >
             <Search className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="relative text-foreground/70 hover:text-primary">
-            <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-              2
-            </span>
+          <Button variant="ghost" size="icon" className="relative text-foreground/70 hover:text-primary" asChild>
+            <Link to="/cart">
+              <ShoppingCart className="h-5 w-5" />
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                2
+              </span>
+            </Link>
           </Button>
           <Button variant="ghost" size="icon" className="hidden text-foreground/70 hover:text-primary md:flex">
             <User className="h-5 w-5" />
@@ -66,13 +78,16 @@ const Navbar = () => {
       {mobileOpen && (
         <nav className="border-t border-border bg-card px-4 py-4 md:hidden">
           {navLinks.map((link) => (
-            <a
-              key={link}
-              href="#"
-              className="block py-2 font-body text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
+            <Link
+              key={link.label}
+              to={link.href}
+              onClick={() => setMobileOpen(false)}
+              className={`block py-2 font-body text-sm font-medium transition-colors hover:text-primary ${
+                location.pathname === link.href ? "text-primary" : "text-foreground/70"
+              }`}
             >
-              {link}
-            </a>
+              {link.label}
+            </Link>
           ))}
         </nav>
       )}

@@ -1,8 +1,10 @@
+import { Link } from "react-router-dom";
 import { Star, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 interface ProductCardProps {
+  id?: string;
   name: string;
   tag: string;
   price: number;
@@ -11,8 +13,11 @@ interface ProductCardProps {
   image: string;
 }
 
-const ProductCard = ({ name, tag, price, originalPrice, rating, image }: ProductCardProps) => (
-  <div className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+const ProductCard = ({ id = "1", name, tag, price, originalPrice, rating, image }: ProductCardProps) => (
+  <Link 
+    to={`/product/${id}`}
+    className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+  >
     <div className="relative aspect-square overflow-hidden bg-muted">
       <img
         src={image}
@@ -41,13 +46,17 @@ const ProductCard = ({ name, tag, price, originalPrice, rating, image }: Product
             <span className="font-body text-sm text-muted-foreground line-through">₹{originalPrice}</span>
           )}
         </div>
-        <Button size="sm" className="rounded-full bg-primary px-3 text-primary-foreground hover:bg-primary/90">
+        <Button 
+          size="sm" 
+          className="rounded-full bg-primary px-3 text-primary-foreground hover:bg-primary/90"
+          onClick={(e) => e.preventDefault()}
+        >
           <ShoppingCart className="mr-1 h-3.5 w-3.5" />
           <span className="font-body text-xs">Add</span>
         </Button>
       </div>
     </div>
-  </div>
+  </Link>
 );
 
 export default ProductCard;
