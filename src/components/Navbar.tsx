@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SearchOverlay from "@/components/SearchOverlay";
 
 const navLinks = ["Home", "Shop", "Categories", "About", "Contact"];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
+    <>
+      <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     <header className="sticky top-0 z-50 border-b border-border bg-card/90 backdrop-blur-md">
       <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-8">
         {/* Logo */}
@@ -30,7 +34,12 @@ const Navbar = () => {
 
         {/* Icons */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="text-foreground/70 hover:text-primary">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-foreground/70 hover:text-primary"
+            onClick={() => setSearchOpen(true)}
+          >
             <Search className="h-5 w-5" />
           </Button>
           <Button variant="ghost" size="icon" className="relative text-foreground/70 hover:text-primary">
@@ -68,6 +77,7 @@ const Navbar = () => {
         </nav>
       )}
     </header>
+    </>
   );
 };
 
