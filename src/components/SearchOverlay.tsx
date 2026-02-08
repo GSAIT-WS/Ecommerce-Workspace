@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, X, Clock, TrendingUp, ArrowRight, Zap, Leaf, Shield, Flame } from "lucide-react";
+import { Search, X, Clock, TrendingUp, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import proteinBarImg from "@/assets/product-protein-bar.jpg";
 import multigainImg from "@/assets/product-multigrain-snack.jpg";
 import chikkiImg from "@/assets/product-chikki.jpg";
+// Category images
+import categoryProteinImg from "@/assets/category-protein-bars.jpg";
+import categoryMultigrainImg from "@/assets/category-multigrain.jpg";
+import categoryHealthyImg from "@/assets/category-healthy-foods.jpg";
+import categoryCombosImg from "@/assets/category-combos.jpg";
+// Trending images
+import trendingMilletImg from "@/assets/trending-millet.jpg";
+import trendingSugarfreeImg from "@/assets/trending-sugarfree.jpg";
+import trendingBreakfastImg from "@/assets/trending-breakfast.jpg";
+import trendingRagiImg from "@/assets/trending-ragi.jpg";
 
 interface SearchOverlayProps {
   isOpen: boolean;
@@ -23,10 +33,10 @@ const suggestedProducts = [
 ];
 
 const categories = [
-  { name: "Protein Bars", count: 24, icon: Zap },
-  { name: "Multigrain Snacks", count: 18, icon: Leaf },
-  { name: "Healthy Foods", count: 32, icon: Shield },
-  { name: "Combos & Value Packs", count: 12, icon: Flame },
+  { name: "Protein Bars", count: 24, image: categoryProteinImg },
+  { name: "Multigrain Snacks", count: 18, image: categoryMultigrainImg },
+  { name: "Healthy Foods", count: 32, image: categoryHealthyImg },
+  { name: "Combos & Value Packs", count: 12, image: categoryCombosImg },
 ];
 
 const healthKeywords = [
@@ -39,11 +49,11 @@ const healthKeywords = [
 ];
 
 const trendingSearches = [
-  { name: "Millet snacks", emoji: "🌾" },
-  { name: "Protein bars", emoji: "💪" },
-  { name: "Sugar free", emoji: "🚫" },
-  { name: "Healthy breakfast", emoji: "🥗" },
-  { name: "Ragi cookies", emoji: "🍪" },
+  { name: "Millet snacks", image: trendingMilletImg },
+  { name: "Protein bars", image: proteinBarImg },
+  { name: "Sugar free", image: trendingSugarfreeImg },
+  { name: "Healthy breakfast", image: trendingBreakfastImg },
+  { name: "Ragi cookies", image: trendingRagiImg },
 ];
 
 const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
@@ -228,28 +238,31 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                           Categories
                         </h3>
                         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-                          {filteredCategories.map((cat, index) => {
-                            const IconComponent = cat.icon;
-                            return (
-                              <motion.button
-                                key={index}
-                                onClick={() => handleSearch(cat.name)}
-                                className="flex items-center justify-between rounded-xl border border-border bg-background p-3 transition-all hover:border-primary/30 hover:shadow-md"
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.2, delay: index * 0.05 }}
-                                whileHover={{ y: -4 }}
-                              >
-                                <span className="flex flex-col items-start gap-1">
-                                  <IconComponent className="h-5 w-5 text-primary" />
-                                  <span className="font-body text-sm font-medium text-foreground">
-                                    {cat.name}
-                                  </span>
+                          {filteredCategories.map((cat, index) => (
+                            <motion.button
+                              key={index}
+                              onClick={() => handleSearch(cat.name)}
+                              className="flex items-center gap-3 rounded-xl border border-border bg-background p-3 transition-all hover:border-primary/30 hover:shadow-md"
+                              initial={{ opacity: 0, scale: 0.95 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.2, delay: index * 0.05 }}
+                              whileHover={{ y: -4 }}
+                            >
+                              <img
+                                src={cat.image}
+                                alt={cat.name}
+                                className="h-10 w-10 rounded-full object-cover shadow-sm"
+                              />
+                              <span className="flex flex-col items-start gap-0.5">
+                                <span className="font-body text-sm font-medium text-foreground">
+                                  {cat.name}
                                 </span>
-                                <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                              </motion.button>
-                            );
-                          })}
+                                <span className="font-body text-xs text-muted-foreground">
+                                  {cat.count} products
+                                </span>
+                              </span>
+                            </motion.button>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -362,14 +375,17 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.2, delay: index * 0.05 }}
                           >
-                            <Badge
-                              variant="outline"
-                              className="cursor-pointer rounded-full border-accent/50 bg-accent/10 px-4 py-1.5 font-body text-sm text-foreground transition-colors hover:bg-accent/20"
+                            <button
+                              className="flex items-center gap-2 rounded-full border border-accent/50 bg-accent/10 px-3 py-1.5 font-body text-sm text-foreground transition-colors hover:bg-accent/20"
                               onClick={() => handleSearch(search.name)}
                             >
-                              <span className="mr-1.5">{search.emoji}</span>
+                              <img
+                                src={search.image}
+                                alt={search.name}
+                                className="h-6 w-6 rounded-full object-cover"
+                              />
                               {search.name}
-                            </Badge>
+                            </button>
                           </motion.div>
                         ))}
                       </div>
@@ -381,30 +397,31 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                         Popular Categories
                       </h3>
                       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                        {categories.map((cat, index) => {
-                          const IconComponent = cat.icon;
-                          return (
-                            <motion.button
-                              key={index}
-                              onClick={() => handleSearch(cat.name)}
-                              className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-background p-4 transition-all hover:border-primary/30 hover:shadow-lg"
-                              initial={{ opacity: 0, y: 20 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3, delay: index * 0.07 }}
-                              whileHover={{ y: -8 }}
-                            >
-                              <div className="rounded-full bg-primary/10 p-3">
-                                <IconComponent className="h-6 w-6 text-primary" />
-                              </div>
-                              <span className="font-body text-sm font-semibold text-foreground">
-                                {cat.name}
-                              </span>
-                              <span className="font-body text-xs text-muted-foreground">
-                                {cat.count} products
-                              </span>
-                            </motion.button>
-                          );
-                        })}
+                        {categories.map((cat, index) => (
+                          <motion.button
+                            key={index}
+                            onClick={() => handleSearch(cat.name)}
+                            className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-background p-4 transition-all hover:border-primary/30 hover:shadow-lg"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.07 }}
+                            whileHover={{ y: -8 }}
+                          >
+                            <div className="h-16 w-16 overflow-hidden rounded-full shadow-md">
+                              <img
+                                src={cat.image}
+                                alt={cat.name}
+                                className="h-full w-full object-cover transition-transform group-hover:scale-110"
+                              />
+                            </div>
+                            <span className="font-body text-sm font-semibold text-foreground text-center">
+                              {cat.name}
+                            </span>
+                            <span className="font-body text-xs text-muted-foreground">
+                              {cat.count} products
+                            </span>
+                          </motion.button>
+                        ))}
                       </div>
                     </div>
 
