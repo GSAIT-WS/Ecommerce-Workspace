@@ -1,8 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, X, Clock, TrendingUp, ArrowRight } from "lucide-react";
+import { Search, X, Clock, TrendingUp, ArrowRight, Zap, Leaf, Shield, Flame } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import proteinBarImg from "@/assets/product-protein-bar.jpg";
+import multigainImg from "@/assets/product-multigrain-snack.jpg";
+import chikkiImg from "@/assets/product-chikki.jpg";
 
 interface SearchOverlayProps {
   isOpen: boolean;
@@ -10,19 +14,19 @@ interface SearchOverlayProps {
 }
 
 const suggestedProducts = [
-  { name: "Protein Bar - Peanut Butter", category: "Protein Bars" },
-  { name: "Protein Crunch Bites", category: "Protein Bars" },
-  { name: "Multigrain Millet Cookies", category: "Multigrain Snacks" },
-  { name: "Quinoa Energy Balls", category: "Healthy Foods" },
-  { name: "Ragi Protein Ladoo", category: "Healthy Foods" },
-  { name: "Oats & Honey Bar", category: "Protein Bars" },
+  { name: "Protein Bar - Peanut Butter", category: "Protein Bars", image: proteinBarImg },
+  { name: "Protein Crunch Bites", category: "Protein Bars", image: proteinBarImg },
+  { name: "Multigrain Millet Cookies", category: "Multigrain Snacks", image: multigainImg },
+  { name: "Quinoa Energy Balls", category: "Healthy Foods", image: chikkiImg },
+  { name: "Ragi Protein Ladoo", category: "Healthy Foods", image: chikkiImg },
+  { name: "Oats & Honey Bar", category: "Protein Bars", image: proteinBarImg },
 ];
 
 const categories = [
-  { name: "Protein Bars", count: 24 },
-  { name: "Multigrain Snacks", count: 18 },
-  { name: "Healthy Foods", count: 32 },
-  { name: "Combos & Value Packs", count: 12 },
+  { name: "Protein Bars", count: 24, icon: Zap },
+  { name: "Multigrain Snacks", count: 18, icon: Leaf },
+  { name: "Healthy Foods", count: 32, icon: Shield },
+  { name: "Combos & Value Packs", count: 12, icon: Flame },
 ];
 
 const healthKeywords = [
@@ -35,11 +39,11 @@ const healthKeywords = [
 ];
 
 const trendingSearches = [
-  "Millet snacks",
-  "Protein bars",
-  "Sugar free",
-  "Healthy breakfast",
-  "Ragi cookies",
+  { name: "Millet snacks", emoji: "🌾" },
+  { name: "Protein bars", emoji: "💪" },
+  { name: "Sugar free", emoji: "🚫" },
+  { name: "Healthy breakfast", emoji: "🥗" },
+  { name: "Ragi cookies", emoji: "🍪" },
 ];
 
 const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
@@ -111,236 +115,331 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
       )
     : [];
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[100]">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-[100]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          {/* Backdrop - Soft fade dim */}
+          <motion.div
+            className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
+            onClick={onClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          />
 
-      {/* Search Container */}
-      <div className="relative z-10 bg-background">
-        <div className="container mx-auto px-4 py-4 md:px-8">
-          {/* Search Input Row */}
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Search for multigrain snacks, protein bars…"
-                className="h-12 rounded-full border-2 border-primary/30 bg-card pl-12 pr-4 font-body text-base shadow-lg focus-visible:border-primary focus-visible:ring-primary/20 md:h-14 md:text-lg"
-              />
+          {/* Search Container - Slide down animation */}
+          <motion.div
+            className="relative z-10 bg-background"
+            initial={{ y: -30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -30, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            <div className="container mx-auto px-4 py-4 md:px-8">
+              {/* Search Input Row */}
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Search for multigrain snacks, protein bars…"
+                    className="h-12 rounded-full border-2 border-primary/30 bg-card pl-12 pr-4 font-body text-base shadow-lg focus-visible:border-primary focus-visible:ring-primary/20 md:h-14 md:text-lg"
+                  />
+                </div>
+                <motion.button
+                  onClick={onClose}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <X className="h-5 w-5" />
+                </motion.button>
+              </div>
             </div>
-            <button
-              onClick={onClose}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
+
+            {/* Dropdown Panel - Staggered content animation */}
+            <motion.div
+              className="max-h-[calc(100vh-100px)] overflow-y-auto border-t border-border bg-card shadow-xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
             >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
+              <div className="container mx-auto px-4 py-6 md:px-8">
+                {/* When typing - show filtered results */}
+                {query.length > 0 ? (
+                  <motion.div
+                    className="space-y-6"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {/* Suggested Products */}
+                    {filteredProducts.length > 0 && (
+                      <div>
+                        <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                          Suggested Products
+                        </h3>
+                        <div className="space-y-1">
+                          {filteredProducts.map((product, index) => (
+                            <motion.button
+                              key={index}
+                              onClick={() => handleSearch(product.name)}
+                              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-muted"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.2, delay: index * 0.05 }}
+                              whileHover={{ x: 4 }}
+                            >
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={product.image}
+                                  alt={product.name}
+                                  className="h-8 w-8 rounded-full object-cover shadow-sm"
+                                />
+                                <span className="font-body text-foreground">
+                                  {product.name}
+                                </span>
+                              </div>
+                              <span className="font-body text-xs text-muted-foreground">
+                                {product.category}
+                              </span>
+                            </motion.button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-        {/* Dropdown Panel */}
-        <div className="max-h-[calc(100vh-100px)] overflow-y-auto border-t border-border bg-card shadow-xl">
-          <div className="container mx-auto px-4 py-6 md:px-8">
-            {/* When typing - show filtered results */}
-            {query.length > 0 ? (
-              <div className="space-y-6">
-                {/* Suggested Products */}
-                {filteredProducts.length > 0 && (
-                  <div>
-                    <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                      Suggested Products
-                    </h3>
-                    <div className="space-y-1">
-                      {filteredProducts.map((product, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSearch(product.name)}
-                          className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-muted"
+                    {/* Categories */}
+                    {filteredCategories.length > 0 && (
+                      <div>
+                        <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                          Categories
+                        </h3>
+                        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                          {filteredCategories.map((cat, index) => {
+                            const IconComponent = cat.icon;
+                            return (
+                              <motion.button
+                                key={index}
+                                onClick={() => handleSearch(cat.name)}
+                                className="flex items-center justify-between rounded-xl border border-border bg-background p-3 transition-all hover:border-primary/30 hover:shadow-md"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.2, delay: index * 0.05 }}
+                                whileHover={{ y: -4 }}
+                              >
+                                <span className="flex flex-col items-start gap-1">
+                                  <IconComponent className="h-5 w-5 text-primary" />
+                                  <span className="font-body text-sm font-medium text-foreground">
+                                    {cat.name}
+                                  </span>
+                                </span>
+                                <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                              </motion.button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Health Keywords */}
+                    {filteredKeywords.length > 0 && (
+                      <div>
+                        <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                          Health & Nutrition
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {filteredKeywords.map((keyword, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.15, delay: index * 0.03 }}
+                            >
+                              <Badge
+                                variant="outline"
+                                className="cursor-pointer rounded-full border-primary/30 px-4 py-1.5 font-body text-sm transition-colors hover:bg-primary hover:text-primary-foreground"
+                                onClick={() => handleSearch(keyword)}
+                              >
+                                {keyword}
+                              </Badge>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* No results */}
+                    {filteredProducts.length === 0 &&
+                      filteredCategories.length === 0 &&
+                      filteredKeywords.length === 0 && (
+                        <motion.div
+                          className="py-8 text-center"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.3 }}
                         >
-                          <div className="flex items-center gap-3">
-                            <Search className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-body text-foreground">
-                              {product.name}
-                            </span>
-                          </div>
-                          <span className="font-body text-xs text-muted-foreground">
-                            {product.category}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                          <p className="font-body text-muted-foreground">
+                            No suggestions found for "{query}"
+                          </p>
+                          <button
+                            onClick={() => handleSearch(query)}
+                            className="mt-2 font-body text-primary hover:underline"
+                          >
+                            Search for "{query}" anyway
+                          </button>
+                        </motion.div>
+                      )}
+                  </motion.div>
+                ) : (
+                  /* Default state - no query */
+                  <motion.div
+                    className="space-y-8"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {/* Recent Searches */}
+                    {recentSearches.length > 0 && (
+                      <div>
+                        <div className="mb-3 flex items-center justify-between">
+                          <h3 className="flex items-center gap-2 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                            <Clock className="h-4 w-4" />
+                            Recent Searches
+                          </h3>
+                          <button
+                            onClick={clearHistory}
+                            className="font-body text-xs text-primary hover:underline"
+                          >
+                            Clear history
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {recentSearches.map((search, index) => (
+                            <motion.div
+                              key={index}
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ duration: 0.2, delay: index * 0.05 }}
+                            >
+                              <Badge
+                                variant="secondary"
+                                className="cursor-pointer rounded-full px-4 py-1.5 font-body text-sm transition-colors hover:bg-secondary/80"
+                                onClick={() => handleSearch(search)}
+                              >
+                                <Clock className="mr-1.5 h-3 w-3 opacity-50" />
+                                {search}
+                              </Badge>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                {/* Categories */}
-                {filteredCategories.length > 0 && (
-                  <div>
-                    <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                      Categories
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-                      {filteredCategories.map((cat, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleSearch(cat.name)}
-                          className="flex items-center justify-between rounded-xl border border-border bg-background p-3 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
-                        >
-                          <span className="font-body text-sm font-medium text-foreground">
-                            {cat.name}
-                          </span>
-                          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Health Keywords */}
-                {filteredKeywords.length > 0 && (
-                  <div>
-                    <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                      Health & Nutrition
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {filteredKeywords.map((keyword, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="cursor-pointer rounded-full border-primary/30 px-4 py-1.5 font-body text-sm transition-colors hover:bg-primary hover:text-primary-foreground"
-                          onClick={() => handleSearch(keyword)}
-                        >
-                          {keyword}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* No results */}
-                {filteredProducts.length === 0 &&
-                  filteredCategories.length === 0 &&
-                  filteredKeywords.length === 0 && (
-                    <div className="py-8 text-center">
-                      <p className="font-body text-muted-foreground">
-                        No suggestions found for "{query}"
-                      </p>
-                      <button
-                        onClick={() => handleSearch(query)}
-                        className="mt-2 font-body text-primary hover:underline"
-                      >
-                        Search for "{query}" anyway
-                      </button>
-                    </div>
-                  )}
-              </div>
-            ) : (
-              /* Default state - no query */
-              <div className="space-y-8">
-                {/* Recent Searches */}
-                {recentSearches.length > 0 && (
-                  <div>
-                    <div className="mb-3 flex items-center justify-between">
-                      <h3 className="flex items-center gap-2 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                        <Clock className="h-4 w-4" />
-                        Recent Searches
+                    {/* Trending Searches */}
+                    <div>
+                      <h3 className="mb-3 flex items-center gap-2 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                        <TrendingUp className="h-4 w-4" />
+                        Trending Now
                       </h3>
-                      <button
-                        onClick={clearHistory}
-                        className="font-body text-xs text-primary hover:underline"
-                      >
-                        Clear history
-                      </button>
+                      <div className="flex flex-wrap gap-2">
+                        {trendingSearches.map((search, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.2, delay: index * 0.05 }}
+                          >
+                            <Badge
+                              variant="outline"
+                              className="cursor-pointer rounded-full border-accent/50 bg-accent/10 px-4 py-1.5 font-body text-sm text-foreground transition-colors hover:bg-accent/20"
+                              onClick={() => handleSearch(search.name)}
+                            >
+                              <span className="mr-1.5">{search.emoji}</span>
+                              {search.name}
+                            </Badge>
+                          </motion.div>
+                        ))}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {recentSearches.map((search, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="cursor-pointer rounded-full px-4 py-1.5 font-body text-sm transition-colors hover:bg-secondary/80"
-                          onClick={() => handleSearch(search)}
-                        >
-                          {search}
-                        </Badge>
-                      ))}
+
+                    {/* Popular Categories */}
+                    <div>
+                      <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                        Popular Categories
+                      </h3>
+                      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                        {categories.map((cat, index) => {
+                          const IconComponent = cat.icon;
+                          return (
+                            <motion.button
+                              key={index}
+                              onClick={() => handleSearch(cat.name)}
+                              className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-background p-4 transition-all hover:border-primary/30 hover:shadow-lg"
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.3, delay: index * 0.07 }}
+                              whileHover={{ y: -8 }}
+                            >
+                              <div className="rounded-full bg-primary/10 p-3">
+                                <IconComponent className="h-6 w-6 text-primary" />
+                              </div>
+                              <span className="font-body text-sm font-semibold text-foreground">
+                                {cat.name}
+                              </span>
+                              <span className="font-body text-xs text-muted-foreground">
+                                {cat.count} products
+                              </span>
+                            </motion.button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
+
+                    {/* Health Keywords */}
+                    <div>
+                      <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+                        Shop by Health Goal
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {healthKeywords.map((keyword, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.15, delay: index * 0.04 }}
+                          >
+                            <Badge
+                              variant="outline"
+                              className="cursor-pointer rounded-full border-primary/30 px-4 py-2 font-body text-sm transition-colors hover:bg-primary hover:text-primary-foreground"
+                              onClick={() => handleSearch(keyword)}
+                            >
+                              {keyword}
+                            </Badge>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
                 )}
-
-                {/* Trending Searches */}
-                <div>
-                  <h3 className="mb-3 flex items-center gap-2 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                    <TrendingUp className="h-4 w-4" />
-                    Trending Now
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {trendingSearches.map((search, index) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="cursor-pointer rounded-full border-accent/50 bg-accent/10 px-4 py-1.5 font-body text-sm text-foreground transition-colors hover:bg-accent/20"
-                        onClick={() => handleSearch(search)}
-                      >
-                        🔥 {search}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Popular Categories */}
-                <div>
-                  <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                    Popular Categories
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    {categories.map((cat, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleSearch(cat.name)}
-                        className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-background p-4 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
-                      >
-                        <span className="font-body text-sm font-semibold text-foreground">
-                          {cat.name}
-                        </span>
-                        <span className="font-body text-xs text-muted-foreground">
-                          {cat.count} products
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Health Keywords */}
-                <div>
-                  <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                    Shop by Health Goal
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {healthKeywords.map((keyword, index) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="cursor-pointer rounded-full border-primary/30 px-4 py-2 font-body text-sm transition-colors hover:bg-primary hover:text-primary-foreground"
-                        onClick={() => handleSearch(keyword)}
-                      >
-                        {keyword}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
