@@ -26,9 +26,11 @@ import RatingsPage from "./pages/profile/RatingsPage";
 import RecentlyViewedPage from "./pages/profile/RecentlyViewedPage";
 import PaymentMethodsPage from "./pages/profile/PaymentMethodsPage";
 import HelpCenterPage from "./pages/profile/HelpCenterPage";
-import AboutPage from "./pages/profile/AboutPage";
+import ProfileAboutPage from "./pages/profile/AboutPage";
 import TermsPage from "./pages/profile/TermsPage";
 import PrivacyPage from "./pages/profile/PrivacyPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
 const queryClient = new QueryClient();
 
@@ -61,9 +63,11 @@ const App = () => (
           <Route path="/profile/recent" element={<RecentlyViewedPage />} />
           <Route path="/profile/payments" element={<PaymentMethodsPage />} />
           <Route path="/profile/help" element={<HelpCenterPage />} />
-          <Route path="/profile/about" element={<AboutPage />} />
+          <Route path="/profile/about" element={<ProfileAboutPage />} />
           <Route path="/profile/terms" element={<TermsPage />} />
           <Route path="/profile/privacy" element={<PrivacyPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
