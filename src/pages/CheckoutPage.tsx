@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Truck, ShieldCheck, Clock } from "lucide-react";
+import { ArrowLeft, Plus, Truck, ShieldCheck, Clock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AddressCard from "@/components/checkout/AddressCard";
@@ -63,6 +64,9 @@ const CheckoutPage = () => {
   const [quantities, setQuantities] = useState<Record<string, number>>(
     checkoutItems.reduce((acc, item) => ({ ...acc, [item.id]: item.quantity }), {})
   );
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [couponError, setCouponError] = useState("");
 
   const updateQuantity = (id: string, delta: number) => {
     setQuantities((prev) => ({
@@ -71,12 +75,24 @@ const CheckoutPage = () => {
     }));
   };
 
+  const handleApplyCoupon = () => {
+    setCouponError("");
+    if (couponCode.trim().toUpperCase() === "CRUNCHFIRST") {
+      setAppliedCoupon("CRUNCHFIRST");
+      setCouponCode("");
+    } else {
+      setCouponError("Invalid coupon code");
+      setAppliedCoupon(null);
+    }
+  };
+
   const subtotal = checkoutItems.reduce(
     (sum, item) => sum + item.price * (quantities[item.id] || item.quantity),
     0
   );
+  const couponDiscount = appliedCoupon === "CRUNCHFIRST" ? Math.floor(subtotal * 0.2) : 0;
   const delivery = subtotal > 499 ? 0 : 49;
-  const discount = 50; // Dummy discount
+  const discount = 50 + couponDiscount; // Previous dummy discount + coupon discount
   const total = subtotal + delivery - discount;
 
   return (
@@ -228,6 +244,46 @@ const CheckoutPage = () => {
               <h2 className="mb-6 font-display text-xl font-bold text-foreground">
                 Order Summary
               </h2>
+
+              {/* Coupon Section */}
+              <div className="mb-6 rounded-xl border border-border bg-background p-4">
+                <label className="mb-3 block font-body text-sm font-medium text-foreground">
+                  Have a coupon?
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Enter coupon code"
+                    value={couponCode}
+                    onChange={(e) => {
+                      setCouponCode(e.target.value);
+                      setCouponError("");
+                    }}
+                    className="flex-1 rounded-lg font-body text-sm"
+                  />
+                  <Button
+                    onClick={handleApplyCoupon}
+                    disabled={!couponCode.trim()}
+                    variant="secondary"
+                    className="rounded-lg font-body text-sm font-semibold"
+                  >
+                    Apply
+                  </Button>
+                </div>
+                {couponError && (
+                  <div className="mt-2 flex items-center gap-2 text-destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <p className="font-body text-xs">{couponError}</p>
+                  </div>
+                )}
+                {appliedCoupon && (
+                  <div className="mt-2 rounded-lg bg-secondary/10 px-3 py-2">
+                    <p className="font-body text-xs font-semibold text-secondary">
+                      ✓ {appliedCoupon} applied - 20% off
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* Price breakdown */}
               <div className="space-y-3 border-b border-border pb-4">
