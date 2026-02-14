@@ -31,6 +31,10 @@ import TermsPage from "./pages/profile/TermsPage";
 import PrivacyPage from "./pages/profile/PrivacyPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import TermsOfServicePage from "./pages/TermsOfServicePage";
+import ShippingInfoPage from "./pages/ShippingInfoPage";
+import ReturnsRefundsPage from "./pages/ReturnsRefundsPage";
 
 const queryClient = new QueryClient();
 
@@ -66,10 +70,14 @@ const App = () => (
           <Route path="/profile/about" element={<ProfileAboutPage />} />
           <Route path="/profile/terms" element={<TermsPage />} />
           <Route path="/profile/privacy" element={<PrivacyPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+           <Route path="/about" element={<AboutPage />} />
+           <Route path="/contact" element={<ContactPage />} />
+           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+           <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+           <Route path="/shipping-info" element={<ShippingInfoPage />} />
+           <Route path="/returns-refunds" element={<ReturnsRefundsPage />} />
+           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
       </CartProvider>
