@@ -15,9 +15,14 @@ const Footer = () => (
         <div>
           <h4 className="mb-3 font-body text-sm font-bold text-foreground">Quick Links</h4>
           <ul className="space-y-2">
-            {["Home", "Shop", "Categories", "About Us"].map((l) => (
-              <li key={l}>
-                <a href="#" className="font-body text-sm text-muted-foreground transition-colors hover:text-primary">{l}</a>
+            {[
+              { label: "Home", href: "/" },
+              { label: "Shop", href: "/search" },
+              { label: "Categories", href: "/categories" },
+              { label: "About Us", href: "/about" },
+            ].map((l) => (
+              <li key={l.label}>
+                <a href={l.href} className="font-body text-sm text-muted-foreground transition-colors hover:text-primary">{l.label}</a>
               </li>
             ))}
           </ul>
@@ -25,9 +30,14 @@ const Footer = () => (
         <div>
           <h4 className="mb-3 font-body text-sm font-bold text-foreground">Policies</h4>
           <ul className="space-y-2">
-            {["Privacy Policy", "Terms of Service", "Shipping Info", "Returns & Refunds"].map((l) => (
-              <li key={l}>
-                <a href="#" className="font-body text-sm text-muted-foreground transition-colors hover:text-primary">{l}</a>
+            {[
+              { label: "Privacy Policy", href: "/privacy-policy" },
+              { label: "Terms of Service", href: "/terms-of-service" },
+              { label: "Shipping Info", href: "/shipping-info" },
+              { label: "Returns & Refunds", href: "/returns-refunds" },
+            ].map((l) => (
+              <li key={l.label}>
+                <a href={l.href} className="font-body text-sm text-muted-foreground transition-colors hover:text-primary">{l.label}</a>
               </li>
             ))}
           </ul>
@@ -35,13 +45,20 @@ const Footer = () => (
         <div>
           <h4 className="mb-3 font-body text-sm font-bold text-foreground">Follow Us</h4>
           <div className="flex gap-3">
-            {[Instagram, Facebook, Twitter, Youtube].map((Icon, i) => (
+            {[
+              { icon: Instagram, href: "https://instagram.com/crunchx" },
+              { icon: Facebook, href: "https://facebook.com/crunchx" },
+              { icon: Twitter, href: "https://twitter.com/crunchx" },
+              { icon: Youtube, href: "https://youtube.com/@crunchx" },
+            ].map((social) => (
               <a
-                key={i}
-                href="#"
+                key={social.href}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
               >
-                <Icon className="h-4 w-4" />
+                <social.icon className="h-4 w-4" />
               </a>
             ))}
           </div>
