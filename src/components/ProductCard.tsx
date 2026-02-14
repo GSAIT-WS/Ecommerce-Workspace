@@ -69,11 +69,11 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, rating, image 
           <div className="flex gap-2">
             <Button 
               size="sm" 
-              className="flex-1 rounded-full bg-primary px-3 text-primary-foreground hover:bg-primary/90"
+              className="flex-1 rounded-full px-3"
               onClick={handleAddToCart}
             >
               <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-              <span className="font-body text-xs">Add</span>
+              <span className="text-sm">Add</span>
             </Button>
             <Button 
               size="sm" 
@@ -81,7 +81,7 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, rating, image 
               className="flex-1 rounded-full"
               onClick={handleBuyNow}
             >
-              <span className="font-body text-xs">Buy</span>
+              <span className="text-sm">Buy</span>
             </Button>
           </div>
         </div>

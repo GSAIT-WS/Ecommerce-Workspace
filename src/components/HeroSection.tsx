@@ -20,10 +20,10 @@ const HeroSection = () => (
           Premium protein bars, millet snacks & healthy foods ethically sourced from Indian farms. Nourish your body with every crunch.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Button size="lg" className="rounded-full bg-primary px-8 font-body font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
+          <Button size="lg" className="rounded-full px-8 font-semibold shadow-lg">
             Shop Now
           </Button>
-          <Button size="lg" variant="outline" className="rounded-full border-card/30 px-8 font-body font-semibold text-card hover:bg-card/10">
+          <Button size="lg" variant="outline" className="rounded-full border-background/30 px-8 font-semibold text-background hover:bg-background/10">
             Explore Categories
           </Button>
         </div>
