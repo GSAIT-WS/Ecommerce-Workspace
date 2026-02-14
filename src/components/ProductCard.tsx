@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Star, ShoppingCart } from "lucide-react";
+import { Star, ShoppingCart, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/context/CartContext";
@@ -18,11 +19,14 @@ interface ProductCardProps {
 const ProductCard = ({ id = "1", name, tag, price, originalPrice, rating, image }: ProductCardProps) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const [added, setAdded] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     addToCart({ id, name, tag, price, originalPrice, image });
     toast.success("Added to cart ✓");
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1200);
   };
 
   const handleBuyNow = (e: React.MouseEvent) => {
@@ -34,7 +38,7 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, rating, image 
   return (
     <Link 
       to={`/product/${id}`}
-      className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+      className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
     >
       <div className="relative aspect-square overflow-hidden bg-muted">
         <img
@@ -69,11 +73,20 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, rating, image 
           <div className="flex gap-2">
             <Button 
               size="sm" 
-              className="flex-1 rounded-full px-3"
+              className={`flex-1 rounded-full px-3 transition-all duration-200 ${added ? "bg-secondary hover:bg-secondary" : ""}`}
               onClick={handleAddToCart}
             >
-              <ShoppingCart className="mr-1 h-3.5 w-3.5" />
-              <span className="text-sm">Add</span>
+              {added ? (
+                <>
+                  <Check className="mr-1 h-3.5 w-3.5 animate-[bounce_0.4s_ease-out]" />
+                  <span className="text-sm">Added ✓</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="mr-1 h-3.5 w-3.5" />
+                  <span className="text-sm">Add</span>
+                </>
+              )}
             </Button>
             <Button 
               size="sm" 

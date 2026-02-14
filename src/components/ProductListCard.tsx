@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Star, ShoppingCart } from "lucide-react";
+import { Star, ShoppingCart, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/context/CartContext";
@@ -34,11 +35,14 @@ const ProductListCard = ({
 }: ProductListCardProps) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const [added, setAdded] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     addToCart({ id, name, tag, price, originalPrice, image });
     toast.success("Added to cart ✓");
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1200);
   };
 
   const handleBuyNow = (e: React.MouseEvent) => {
@@ -50,7 +54,7 @@ const ProductListCard = ({
   return (
     <Link 
       to={`/product/${id}`}
-      className="group flex gap-4 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:shadow-md md:gap-6"
+      className="group flex gap-4 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg md:gap-6"
     >
       {/* Product Image */}
       <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl bg-muted md:h-36 md:w-36">
@@ -123,11 +127,20 @@ const ProductListCard = ({
           <div className="flex gap-2">
             <Button
               size="sm"
-              className="rounded-full px-4"
+              className={`rounded-full px-4 transition-all duration-200 ${added ? "bg-secondary hover:bg-secondary" : ""}`}
               onClick={handleAddToCart}
             >
-              <ShoppingCart className="mr-1.5 h-4 w-4" />
-              <span className="text-sm">Add</span>
+              {added ? (
+                <>
+                  <Check className="mr-1.5 h-4 w-4 animate-[bounce_0.4s_ease-out]" />
+                  <span className="text-sm">Added ✓</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="mr-1.5 h-4 w-4" />
+                  <span className="text-sm">Add</span>
+                </>
+              )}
             </Button>
             <Button
               size="sm"

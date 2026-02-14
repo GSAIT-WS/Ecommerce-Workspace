@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, Package, MapPin, Clock, Phone, ChevronRight } from "lucide-react";
+import { Package, MapPin, Clock, Phone, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import OrderStatusTimeline from "@/components/checkout/OrderStatusTimeline";
+import AnimatedCheckmark from "@/components/AnimatedCheckmark";
 import productProteinBar from "@/assets/product-protein-bar.jpg";
 import productMilletBar from "@/assets/product-millet-bar.jpg";
 
@@ -73,18 +74,7 @@ const OrderConfirmationPage = () => {
           animate={{ scale: 1, opacity: 1 }}
           className="mb-8 text-center"
         >
-          {/* Success icon with animation */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="relative mx-auto mb-6 flex h-24 w-24 items-center justify-center"
-          >
-            <div className="absolute inset-0 animate-ping rounded-full bg-secondary/20" />
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-              <Check className="h-10 w-10" strokeWidth={3} />
-            </div>
-          </motion.div>
+          <AnimatedCheckmark />
 
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
