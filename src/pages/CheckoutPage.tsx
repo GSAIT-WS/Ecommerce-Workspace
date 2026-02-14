@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Truck, ShieldCheck, Clock, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -99,7 +100,12 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-8 md:py-12">
+      <motion.main
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="container mx-auto px-4 py-8 md:py-12"
+      >
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -270,19 +276,31 @@ const CheckoutPage = () => {
                     Apply
                   </Button>
                 </div>
-                {couponError && (
-                  <div className="mt-2 flex items-center gap-2 text-destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <p className="font-body text-xs">{couponError}</p>
-                  </div>
-                )}
-                {appliedCoupon && (
-                  <div className="mt-2 rounded-lg bg-secondary/10 px-3 py-2">
-                    <p className="font-body text-xs font-semibold text-secondary">
-                      ✓ {appliedCoupon} applied - 20% off
-                    </p>
-                  </div>
-                )}
+                <AnimatePresence>
+                  {couponError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="mt-2 flex items-center gap-2 text-destructive"
+                    >
+                      <AlertCircle className="h-4 w-4" />
+                      <p className="font-body text-xs">{couponError}</p>
+                    </motion.div>
+                  )}
+                  {appliedCoupon && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      className="mt-2 rounded-lg bg-secondary/10 px-3 py-2"
+                    >
+                      <p className="font-body text-xs font-semibold text-secondary">
+                        ✓ {appliedCoupon} applied - 20% off
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Price breakdown */}
@@ -299,16 +317,30 @@ const CheckoutPage = () => {
                 </div>
                 <div className="flex justify-between font-body text-sm">
                   <span className="text-muted-foreground">Discount</span>
-                  <span className="font-semibold text-secondary">−₹{discount}</span>
+                  <motion.span
+                    key={discount}
+                    initial={{ scale: 1.15, color: "hsl(var(--secondary))" }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="font-semibold text-secondary"
+                  >
+                    −₹{discount}
+                  </motion.span>
                 </div>
               </div>
 
               {/* Total */}
               <div className="flex items-center justify-between py-4">
                 <span className="font-display font-bold text-foreground">Total</span>
-                <span className="font-display text-2xl font-bold text-primary">
+                <motion.span
+                  key={total}
+                  initial={{ scale: 1.1 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="font-display text-2xl font-bold text-primary"
+                >
                   ₹{total}
-                </span>
+                </motion.span>
               </div>
 
               {/* Delivery info */}
@@ -340,7 +372,7 @@ const CheckoutPage = () => {
             </div>
           </div>
         </div>
-      </main>
+      </motion.main>
 
       {/* Mobile Sticky CTA */}
       <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-card p-4 lg:hidden">
