@@ -1,28 +1,38 @@
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, useRef, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import offerBanner from "@/assets/offer-banner.jpg";
+import offerSlide1 from "@/assets/offer-slide-1.jpg";
+import offerSlide2 from "@/assets/offer-slide-2.jpg";
+import offerSlide3 from "@/assets/offer-slide-3.jpg";
+import offerSlide4 from "@/assets/offer-slide-4.jpg";
 
 const offerSlides = [
   {
-    image: offerBanner,
-    badge: "Limited Offer",
-    title: "Family Combo Pack",
-    description: "Get 6 assorted bars + 2 trail mix packs at 30% off. Perfect for the whole family.",
-    cta: "Shop Combos",
+    image: offerSlide1,
+    badge: "20% OFF",
+    title: "Peanut Millet Protein Bar",
+    description: "Crunchy peanuts & millet crispies — your daily protein fix at a special price.",
+    cta: "Shop Now",
   },
   {
-    image: offerBanner,
-    badge: "Weekend Special",
-    title: "Buy 2 Get 1 Free",
-    description: "On all protein bars and millet snacks. Stock up and save big this weekend.",
+    image: offerSlide2,
+    badge: "15% OFF",
+    title: "Sesame Millet Energy Bar",
+    description: "Toasted sesame goodness meets wholesome millet. Light, crunchy & nutritious.",
     cta: "Grab Deal",
   },
   {
-    image: offerBanner,
-    badge: "New Launch",
-    title: "Shilajit Energy Bar",
-    description: "Power-packed with natural shilajit extract. Introductory price — flat 25% off.",
+    image: offerSlide3,
+    badge: "Buy 2 Get 1",
+    title: "Coconut Millet Bar",
+    description: "Tropical coconut flakes with millet crispies. Naturally sweet & energizing.",
+    cta: "Shop Now",
+  },
+  {
+    image: offerSlide4,
+    badge: "Launch Offer",
+    title: "Super Seeds Bar",
+    description: "Watermelon, pumpkin & flax seeds with dates. The ultimate superfood bar.",
     cta: "Try Now",
   },
 ];
@@ -45,15 +55,30 @@ const miniOffers = [
 const OffersSection = memo(() => {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % offerSlides.length), []);
   const prev = useCallback(() => setCurrent((c) => (c - 1 + offerSlides.length) % offerSlides.length), []);
+
+  const pauseTemporarily = useCallback(() => {
+    setIsPaused(true);
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    pauseTimerRef.current = setTimeout(() => setIsPaused(false), 5000);
+  }, []);
 
   useEffect(() => {
     if (isPaused) return;
     const id = setInterval(next, 3000);
     return () => clearInterval(id);
   }, [isPaused, next]);
+
+  useEffect(() => {
+    return () => { if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current); };
+  }, []);
+
+  const handlePrev = () => { prev(); pauseTemporarily(); };
+  const handleNext = () => { next(); pauseTemporarily(); };
+  const handleDot = (i: number) => { setCurrent(i); pauseTemporarily(); };
 
   const slide = offerSlides[current];
 
@@ -69,13 +94,11 @@ const OffersSection = memo(() => {
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Sliding Offer Banner */}
           <div
             className="relative overflow-hidden rounded-2xl shadow-md md:col-span-2"
             onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
+            onMouseLeave={() => { if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current); setIsPaused(false); }}
           >
-            {/* Images */}
             {offerSlides.map((s, i) => (
               <img
                 key={i}
@@ -104,28 +127,26 @@ const OffersSection = memo(() => {
               </div>
             </div>
 
-            {/* Arrows */}
             <button
-              onClick={prev}
+              onClick={handlePrev}
               className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-card/20 text-card backdrop-blur-sm transition-colors hover:bg-card/40"
               aria-label="Previous offer"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
-              onClick={next}
+              onClick={handleNext}
               className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-card/20 text-card backdrop-blur-sm transition-colors hover:bg-card/40"
               aria-label="Next offer"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
 
-            {/* Dots */}
             <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
               {offerSlides.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setCurrent(i)}
+                  onClick={() => handleDot(i)}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     i === current ? "w-6 bg-card" : "w-1.5 bg-card/40"
                   }`}
@@ -135,7 +156,6 @@ const OffersSection = memo(() => {
             </div>
           </div>
 
-          {/* Mini offer cards */}
           {miniOffers.map((offer, i) => (
             <div
               key={i}
