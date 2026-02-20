@@ -1,10 +1,11 @@
+import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import heroBanner from "@/assets/hero-banner.jpg";
 
-const HeroSection = () => (
+const HeroSection = memo(() => (
   <section className="relative overflow-hidden">
     <div className="absolute inset-0">
-      <img src={heroBanner} alt="Healthy multigrain snacks" className="h-full w-full object-cover" />
+      <img src={heroBanner} alt="Healthy multigrain snacks" className="h-full w-full object-cover" loading="eager" fetchPriority="high" decoding="async" />
       <div className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/50 to-transparent" />
     </div>
     <div className="container relative mx-auto flex min-h-[520px] items-center px-4 py-20 md:min-h-[600px] md:px-8">
@@ -30,6 +31,7 @@ const HeroSection = () => (
       </div>
     </div>
   </section>
-);
+));
 
+HeroSection.displayName = "HeroSection";
 export default HeroSection;
