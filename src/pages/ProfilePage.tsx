@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Sparkles,
 } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProfileMenuItem from "@/components/profile/ProfileMenuItem";
@@ -44,11 +45,13 @@ import {
   notificationSettings,
 } from "@/data/user";
 import { toast } from "sonner";
+import { useTheme } from "@/context/ThemeContext";
 
 const ProfilePage = () => {
   const [notifications, setNotifications] = useState(notificationSettings);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
   const activePreferences = healthPreferences.filter((p) => p.enabled);
   const defaultAddress = savedAddresses.find((a) => a.isDefault);
@@ -192,6 +195,29 @@ const ProfilePage = () => {
               subtitle="Manage saved cards & UPI"
               href="/profile/payments"
             />
+          </ProfileSection>
+
+          {/* Theme */}
+          <ProfileSection title="Appearance">
+            <div className="px-4 py-3">
+              <div className="flex items-center justify-between py-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    {resolvedTheme === "dark" ? <Moon className="h-5 w-5 text-primary" /> : <Sun className="h-5 w-5 text-primary" />}
+                  </div>
+                  <div>
+                    <p className="font-medium">Dark Mode</p>
+                    <p className="text-sm text-muted-foreground">
+                      {theme === "system" ? "Following system" : resolvedTheme === "dark" ? "Dark theme" : "Light theme"}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={resolvedTheme === "dark"}
+                  onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                />
+              </div>
+            </div>
           </ProfileSection>
 
           {/* Notifications */}

@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SearchOverlay from "@/components/SearchOverlay";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -45,6 +46,7 @@ const Navbar = () => {
 
         {/* Icons */}
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="icon"

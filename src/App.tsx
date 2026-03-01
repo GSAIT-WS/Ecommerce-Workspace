@@ -36,6 +36,7 @@ import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import ShippingInfoPage from "./pages/ShippingInfoPage";
 import ReturnsRefundsPage from "./pages/ReturnsRefundsPage";
+import BuildComboPage from "./pages/BuildComboPage";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,7 @@ const App = () => (
            <Route path="/terms-of-service" element={<TermsOfServicePage />} />
            <Route path="/shipping-info" element={<ShippingInfoPage />} />
            <Route path="/returns-refunds" element={<ReturnsRefundsPage />} />
+           <Route path="/build-combo" element={<BuildComboPage />} />
            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
            <Route path="*" element={<NotFound />} />
         </Routes>
