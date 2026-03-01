@@ -4,6 +4,7 @@ import CategoriesSection from "@/components/CategoriesSection";
 import FeaturedProducts from "@/components/FeaturedProducts";
 import TrustSection from "@/components/TrustSection";
 import OffersSection from "@/components/OffersSection";
+import CustomerReviews from "@/components/CustomerReviews";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 
@@ -16,6 +17,7 @@ const Index = () => (
       <FeaturedProducts />
       <TrustSection />
       <OffersSection />
+      <CustomerReviews />
     </PageTransition>
     <Footer />
   </div>
