@@ -44,10 +44,13 @@ Deno.serve(async (req: Request) => {
       .from("cart_items")
       .select(`
         id,
+        item_type,
         product_id,
+        combo_id,
         quantity,
         unit_price,
         added_at,
+        customization_json,
         products (
           id,
           name,
@@ -69,12 +72,26 @@ Deno.serve(async (req: Request) => {
 
     const items = (rows ?? []).map((row: Record<string, unknown>) => {
       const product = row.products as Record<string, unknown> | null;
-      return {
+      const itemType = (row.item_type as string) || "product";
+      const base = {
         id: row.id,
-        product_id: row.product_id,
+        item_type: itemType,
+        product_id: row.product_id ?? null,
+        combo_id: row.combo_id ?? null,
         quantity: Number(row.quantity),
         unit_price: row.unit_price != null ? Number(row.unit_price) : null,
         added_at: row.added_at,
+      };
+      if (itemType === "combo") {
+        return {
+          ...base,
+          customization: row.customization_json ?? null,
+          product: null,
+        };
+      }
+      return {
+        ...base,
+        customization: null,
         product: product
           ? {
               id: product.id,

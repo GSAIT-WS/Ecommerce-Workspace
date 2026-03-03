@@ -10,16 +10,11 @@ const MAX_CART_ITEMS = 100;
 export function validateCartItems(items: unknown): items is CartItemInput[] {
   if (!Array.isArray(items)) return false;
   for (const item of items) {
-    if (
-      !item ||
-      typeof item !== "object" ||
-      typeof (item as Record<string, unknown>).product_id !== "string" ||
-      typeof (item as Record<string, unknown>).quantity !== "number" ||
-      (item as Record<string, unknown>).quantity < 1 ||
-      typeof (item as Record<string, unknown>).unit_price !== "number" ||
-      (item as Record<string, unknown>).unit_price < 0
-    )
-      return false;
+    const o = item as Record<string, unknown>;
+    if (!item || typeof item !== "object") return false;
+    if (typeof o.quantity !== "number" || o.quantity < 1) return false;
+    if (typeof o.unit_price !== "number" || o.unit_price < 0) return false;
+    // product items have product_id; combo items have item_type and optionally customization_json
   }
   const totalQty = items.reduce(
     (sum, i) => sum + ((i as CartItemInput).quantity ?? 0),

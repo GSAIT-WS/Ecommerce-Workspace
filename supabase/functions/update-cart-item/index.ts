@@ -25,28 +25,28 @@ Deno.serve(async (req: Request) => {
       return errorResponse(validated.error, 400);
     }
 
-    const { user_id, product_id, quantity } = validated.params;
+    const { user_id, product_id, cart_item_id, quantity } = validated.params;
     const supabase = createSupabaseServiceRoleClient();
+    const byId = !!cart_item_id;
 
     if (quantity === 0) {
-      const { error: deleteErr } = await supabase
-        .from("cart_items")
-        .delete()
-        .eq("user_id", user_id)
-        .eq("product_id", product_id);
+      let q = supabase.from("cart_items").delete().eq("user_id", user_id);
+      if (byId) q = q.eq("id", cart_item_id!);
+      else q = q.eq("product_id", product_id!);
+      const { error: deleteErr } = await q;
       if (deleteErr) {
         return jsonResponse({ success: false, error: deleteErr.message }, 500);
       }
-      return successResponse({ user_id, product_id, removed: true }, 200);
+      return successResponse({ user_id, ...(byId ? { cart_item_id } : { product_id }), removed: true }, 200);
     }
 
-    const { data: updated, error: updateErr } = await supabase
+    let updateQ = supabase
       .from("cart_items")
       .update({ quantity })
-      .eq("user_id", user_id)
-      .eq("product_id", product_id)
-      .select("id, quantity, unit_price")
-      .maybeSingle();
+      .eq("user_id", user_id);
+    if (byId) updateQ = updateQ.eq("id", cart_item_id!);
+    else updateQ = updateQ.eq("product_id", product_id!);
+    const { data: updated, error: updateErr } = await updateQ.select("id, item_type, product_id, quantity, unit_price").maybeSingle();
 
     if (updateErr) {
       return jsonResponse({ success: false, error: updateErr.message }, 500);
@@ -59,7 +59,8 @@ Deno.serve(async (req: Request) => {
     return successResponse(
       {
         user_id,
-        product_id,
+        ...(byId ? { cart_item_id: row.id } : { product_id: row.product_id }),
+        item_type: row.item_type ?? "product",
         quantity: Number(row.quantity),
         unit_price: row.unit_price != null ? Number(row.unit_price) : null,
       },

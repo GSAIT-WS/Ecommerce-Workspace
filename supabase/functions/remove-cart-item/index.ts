@@ -29,10 +29,14 @@ Deno.serve(async (req: Request) => {
       const url = new URL(req.url);
       const user_id = url.searchParams.get("user_id");
       const product_id = url.searchParams.get("product_id");
-      if (!user_id || !product_id) {
-        return errorResponse("user_id and product_id are required", 400);
+      const cart_item_id = url.searchParams.get("cart_item_id");
+      if (!user_id) {
+        return errorResponse("user_id is required", 400);
       }
-      body = { user_id, product_id };
+      if (!cart_item_id && !product_id) {
+        return errorResponse("Either cart_item_id or product_id is required", 400);
+      }
+      body = { user_id, ...(cart_item_id ? { cart_item_id } : {}), ...(product_id ? { product_id } : {}) };
     }
 
     const validated = validateRemoveCartItemParams(body);
@@ -41,18 +45,26 @@ Deno.serve(async (req: Request) => {
     }
 
     const supabase = createSupabaseServiceRoleClient();
-    const { error } = await supabase
-      .from("cart_items")
-      .delete()
-      .eq("user_id", validated.params.user_id)
-      .eq("product_id", validated.params.product_id);
+    let q = supabase.from("cart_items").delete().eq("user_id", validated.params.user_id);
+    if (validated.params.cart_item_id) {
+      q = q.eq("id", validated.params.cart_item_id);
+    } else {
+      q = q.eq("product_id", validated.params.product_id!);
+    }
+    const { error } = await q;
 
     if (error) {
       return jsonResponse({ success: false, error: error.message }, 500);
     }
 
     return successResponse(
-      { user_id: validated.params.user_id, product_id: validated.params.product_id, removed: true },
+      {
+        user_id: validated.params.user_id,
+        ...(validated.params.cart_item_id
+          ? { cart_item_id: validated.params.cart_item_id }
+          : { product_id: validated.params.product_id }),
+        removed: true,
+      },
       200
     );
   } catch (e) {

@@ -45,6 +45,7 @@ export type {
   OrderInput,
   OrderTotals,
   CartItemInput,
+  ComboCustomization,
   CartTotals,
   CreateOnlineOrderRequest,
   CreateOnlineOrderResult,

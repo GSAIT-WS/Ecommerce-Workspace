@@ -33,9 +33,20 @@ export interface OrderTotals {
 }
 
 export interface CartItemInput {
-  product_id: string;
+  product_id?: string;
   quantity: number;
   unit_price: number;
+  /** When present, item is a combo; use unit_price and quantity from cart. */
+  item_type?: 'product' | 'combo';
+  combo_id?: string | null;
+  customization_json?: ComboCustomization | null;
+}
+
+/** Combo/gift customization stored in cart_items.customization_json */
+export interface ComboCustomization {
+  items: { product_id: string; quantity: number }[];
+  gift_wrap?: boolean;
+  gift_message?: string;
 }
 
 export interface CartTotals {
@@ -147,19 +158,30 @@ export interface GetCartParams {
 
 export interface AddToCartParams {
   user_id: string;
-  product_id: string;
+  /** Required when item_type is 'product' */
+  product_id?: string;
   quantity: number;
+  /** 'product' (default) or 'combo' */
+  item_type?: 'product' | 'combo';
+  /** Required when item_type is 'combo': items, gift_wrap, gift_message */
+  customization?: ComboCustomization;
 }
 
 export interface UpdateCartItemParams {
   user_id: string;
-  product_id: string;
+  /** For product items; use cart_item_id for combo items */
+  product_id?: string;
   quantity: number;
+  /** When set, identify item by cart row id (for combo items) */
+  cart_item_id?: string;
 }
 
 export interface RemoveCartItemParams {
   user_id: string;
-  product_id: string;
+  /** For product items; use cart_item_id for combo items */
+  product_id?: string;
+  /** When set, remove by cart row id (for combo items) */
+  cart_item_id?: string;
 }
 
 export interface ClearCartParams {
