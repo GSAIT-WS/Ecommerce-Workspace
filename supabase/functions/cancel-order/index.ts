@@ -1,7 +1,10 @@
 /**
  * Edge Function: cancel-order
- * Cancels order if status is pending or confirmed; restores stock; logs status history.
- * Uses public.cancel_order RPC (transaction). 403 if wrong user, 400 if invalid status.
+ *
+ * Cancels order if status is pending or confirmed; logs status history.
+ * After cancelling, calls IMS release API to free reserved inventory.
+ *
+ * Uses ecommerce.cancel_order RPC. 403 if wrong user, 400 if invalid status.
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
@@ -9,6 +12,7 @@ import { jsonResponse, successResponse, errorResponse } from "../_shared/respons
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
 import { validateCancelOrderParams } from "../_shared/services/index.ts";
 import { authenticateRequest } from "../_shared/auth.ts";
+import { releaseInventory } from "../_shared/services/imsService.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -64,7 +68,7 @@ Deno.serve(async (req: Request) => {
           403
         );
       }
-      if (err.error === "invalid_status") {
+      if (err.error === "invalid_status" || err.error === "order_not_cancellable") {
         return jsonResponse(
           {
             success: false,
@@ -85,6 +89,21 @@ Deno.serve(async (req: Request) => {
         { success: false, error: err.error, message: err.message ?? "Cancel failed" },
         400
       );
+    }
+
+    // ── Call IMS release API to free reserved inventory ──
+    const imsReleaseItems = (result as { ims_release_items?: Array<{ sku: string; quantity: number }> })
+      .ims_release_items ?? [];
+    if (imsReleaseItems.length > 0) {
+      const releaseResult = await releaseInventory(
+        (result as { order_id: string }).order_id,
+        imsReleaseItems
+      );
+      if (!releaseResult.success) {
+        console.error("[cancel-order] IMS release failed:", releaseResult.error);
+        // Order is already cancelled in DB; log but don't fail the response
+        // (IMS may need manual reconciliation)
+      }
     }
 
     return successResponse(

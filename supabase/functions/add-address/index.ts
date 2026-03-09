@@ -50,6 +50,8 @@ Deno.serve(async (req: Request) => {
       p_postal_code: p.postal_code,
       p_country: p.country,
       p_is_default: !!p.is_default,
+      p_latitude: p.latitude ?? null,
+      p_longitude: p.longitude ?? null,
     });
 
     if (error) {

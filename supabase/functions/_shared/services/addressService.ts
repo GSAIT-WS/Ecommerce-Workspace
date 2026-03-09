@@ -11,6 +11,7 @@ const POSTAL_CODE_REGEX = /^\d{6}$/;
 const UPDATABLE_FIELDS = [
   "label", "recipient_name", "phone", "address_line1",
   "address_line2", "city", "state", "postal_code", "country",
+  "latitude", "longitude",
 ] as const;
 
 export function validateAddAddressParams(body: unknown): {
@@ -41,6 +42,11 @@ export function validateAddAddressParams(body: unknown): {
     return { valid: false, error: "postal_code must be a 6-digit pincode" };
   }
 
+  const lat = o.latitude;
+  const lng = o.longitude;
+  const latitude = lat != null && typeof lat === "number" && !Number.isNaN(lat) ? lat : undefined;
+  const longitude = lng != null && typeof lng === "number" && !Number.isNaN(lng) ? lng : undefined;
+
   return {
     valid: true,
     params: {
@@ -54,6 +60,8 @@ export function validateAddAddressParams(body: unknown): {
       country: (o.country as string) || "IN",
       label: (o.label as string) || "Home",
       is_default: !!o.is_default,
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
     },
   };
 }
@@ -85,6 +93,11 @@ export function validateUpdateAddressParams(body: unknown): {
     return { valid: false, error: "postal_code must be a 6-digit pincode" };
   }
 
+  const lat = o.latitude;
+  const lng = o.longitude;
+  const latitude = lat != null && typeof lat === "number" && !Number.isNaN(lat) ? lat : undefined;
+  const longitude = lng != null && typeof lng === "number" && !Number.isNaN(lng) ? lng : undefined;
+
   return {
     valid: true,
     params: {
@@ -98,6 +111,8 @@ export function validateUpdateAddressParams(body: unknown): {
       state: o.state ? (o.state as string).trim() : undefined,
       postal_code: o.postal_code ? (o.postal_code as string).trim() : undefined,
       country: o.country ? (o.country as string) : undefined,
+      latitude: latitude ?? undefined,
+      longitude: longitude ?? undefined,
     },
   };
 }

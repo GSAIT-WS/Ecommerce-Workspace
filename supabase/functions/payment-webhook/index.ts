@@ -1,8 +1,9 @@
 /**
  * Edge Function: payment-webhook
+ *
  * Handles payment success/failure events; idempotent via process_payment_webhook RPC.
- * On success: payment_status = paid, order_status = confirmed.
- * On failure: payment_status = failed, stock restored.
+ * On success: payment_status = paid, order_status = confirmed. IMS reservation stays locked.
+ * On failure: order cancelled, calls IMS release API to free reserved inventory.
  *
  * Security: verifies X-Webhook-Signature (HMAC-SHA256) when WEBHOOK_SECRET is set.
  */
@@ -12,6 +13,7 @@ import { jsonResponse, errorResponse, successResponse } from "../_shared/respons
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
 import { validatePaymentWebhookParams } from "../_shared/services/index.ts";
 import { verifyWebhookSignature } from "../_shared/auth.ts";
+import { releaseInventory } from "../_shared/services/imsService.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -91,6 +93,18 @@ Deno.serve(async (req: Request) => {
         { success: false, error: result.error ?? "webhook_failed" },
         400
       );
+    }
+
+    // ── On payment failure: call IMS release to free reserved inventory ──
+    if (result.status === "failed" && result.order_id && result.ims_release_items) {
+      const items = result.ims_release_items as Array<{ sku: string; quantity: number }>;
+      if (items.length > 0) {
+        const releaseResult = await releaseInventory(result.order_id, items);
+        if (!releaseResult.success) {
+          console.error("[payment-webhook] IMS release failed:", releaseResult.error);
+          // Order already cancelled in DB; log but don't fail response
+        }
+      }
     }
 
     return successResponse(

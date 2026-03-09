@@ -41,7 +41,8 @@ supabase/functions/
 │       ├── placeOrderService.ts   # Place-order request validators
 │       ├── ordersReadService.ts   # Order read & cancel validators
 │       ├── paymentIntentService.ts# Payment intent param validators
-│       └── paymentWebhookService.ts # Webhook payload validators
+│       ├── paymentWebhookService.ts # Webhook payload validators
+│       └── imsService.ts            # IMS HTTP client (reserve/release)
 │
 ├── add-to-cart/                   # POST  — Add item to cart
 ├── update-cart-item/              # POST | PUT | PATCH — Update cart quantity
@@ -65,6 +66,18 @@ supabase/functions/
 ├── payment-webhook/               # POST — Handle payment gateway callbacks
 └── README.md
 ```
+
+---
+
+## 2.5 IMS Integration
+
+CrunchX coordinates inventory with an external **IMS (Inventory Management System)** via HTTP:
+
+- **place-order** — Calls IMS reserve API *before* creating the order. If IMS fails, no order is created.
+- **cancel-order** — Calls IMS release API after cancelling.
+- **payment-webhook** — On payment failure, calls IMS release API.
+
+See [docs/IMS_INTEGRATION.md](../../docs/IMS_INTEGRATION.md) for full details.
 
 ---
 

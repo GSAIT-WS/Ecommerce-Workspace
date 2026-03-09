@@ -88,6 +88,8 @@ export interface AddAddressParams {
   country?: string;
   label?: string;
   is_default?: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface UpdateAddressParams {
@@ -101,6 +103,8 @@ export interface UpdateAddressParams {
   state?: string;
   postal_code?: string;
   country?: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 // --- Products & Categories (Phase 1) ---
