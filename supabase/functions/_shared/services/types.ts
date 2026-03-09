@@ -201,6 +201,27 @@ export interface OrderStatusHistoryEntry {
   created_at: string;
 }
 
+/** IMS shipment status (synced from ims_ops.live_shipments) */
+export interface ShipmentStatus {
+  source_shipment_id: string;
+  order_id: string;
+  order_date: string;
+  status: "preparing" | "in_transit" | "delivered" | "failed";
+  shipment_number: string | null;
+  estimated_delivery: string | null;
+  tracking_notes: string | null;
+  source_updated_at: string | null;
+  synced_at: string;
+}
+
+/** Customer-facing label for IMS shipment status */
+export const SHIPMENT_STATUS_LABELS: Record<ShipmentStatus["status"], string> = {
+  preparing: "Packaging",
+  in_transit: "In transit",
+  delivered: "Delivered",
+  failed: "Delivery issue",
+};
+
 /** Full order detail for get-order-by-id */
 export interface GetOrderByIdResult {
   id: string;
@@ -215,6 +236,8 @@ export interface GetOrderByIdResult {
   shipping_address: unknown;
   items: OrderItemDetail[];
   status_history?: OrderStatusHistoryEntry[];
+  /** IMS logistics status when order is linked (ims_order_id or shipment_number) */
+  shipment?: ShipmentStatus;
 }
 
 /** Request body for cancel-order */

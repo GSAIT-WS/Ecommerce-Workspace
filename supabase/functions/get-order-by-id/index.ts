@@ -76,6 +76,21 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    // Fetch IMS shipment status if order is linked (ims_order_id or shipment_number)
+    let shipment: Record<string, unknown> | null = null;
+    const imsOrderId = ord.ims_order_id as string | null;
+    const shipmentNumber = ord.shipment_number as string | null;
+    if (imsOrderId || shipmentNumber) {
+      const { data: shipByOrder } = imsOrderId
+        ? await supabase.schema("ecommerce").from("shipment_status").select("*").eq("order_id", imsOrderId).maybeSingle()
+        : { data: null };
+      const { data: shipByNumber } = !shipByOrder && shipmentNumber
+        ? await supabase.schema("ecommerce").from("shipment_status").select("*").eq("shipment_number", shipmentNumber).maybeSingle()
+        : { data: null };
+      const shipRow = shipByOrder ?? shipByNumber;
+      if (shipRow) shipment = shipRow as Record<string, unknown>;
+    }
+
     const { data: itemRows, error: itemsError } = await supabase
       .schema("ecommerce")
       .from("order_items")
@@ -125,6 +140,19 @@ Deno.serve(async (req: Request) => {
       shipping_address: ord.shipping_address_snapshot ?? null,
       items,
       ...(status_history && status_history.length > 0 && { status_history }),
+      ...(shipment && {
+        shipment: {
+          source_shipment_id: shipment.source_shipment_id,
+          order_id: shipment.order_id,
+          order_date: shipment.order_date,
+          status: shipment.status,
+          shipment_number: shipment.shipment_number ?? null,
+          estimated_delivery: shipment.estimated_delivery ?? null,
+          tracking_notes: shipment.tracking_notes ?? null,
+          source_updated_at: shipment.source_updated_at ?? null,
+          synced_at: shipment.synced_at,
+        },
+      }),
     };
 
     return successResponse(result, 200);
