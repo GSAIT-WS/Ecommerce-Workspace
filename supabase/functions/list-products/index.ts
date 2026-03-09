@@ -47,15 +47,17 @@ Deno.serve(async (req: Request) => {
     const supabase = createSupabaseServiceRoleClient();
 
     let query = supabase
+      .schema("ecommerce")
       .from("products")
-      .select("id, name, description, price, stock_quantity, category_id, image_url, is_active, nutrition_info, weight_grams, created_at, updated_at", { count: "exact" })
+      .select("id, product_external_id, name, description, price, compare_at_price, image_url, gallery_urls, category_id, is_active, weight_grams, tags, created_at, updated_at", { count: "exact" })
       .eq("is_active", true);
 
     if (params.category_id) {
       query = query.eq("category_id", params.category_id);
     }
     if (params.search && params.search.trim() !== "") {
-      query = query.ilike("name", `%${params.search.trim()}%`);
+      const escaped = params.search.trim().replace(/[%_\\]/g, "\\$&");
+      query = query.ilike("name", `%${escaped}%`);
     }
     if (params.min_price != null && params.min_price >= 0) {
       query = query.gte("price", params.min_price);
@@ -75,15 +77,17 @@ Deno.serve(async (req: Request) => {
     const total = count ?? items?.length ?? 0;
     const rows = (items ?? []).map((row: Record<string, unknown>) => ({
       id: row.id,
+      product_external_id: row.product_external_id ?? null,
       name: row.name,
       description: row.description ?? null,
       price: Number(row.price),
-      stock_quantity: Number(row.stock_quantity),
-      category_id: row.category_id ?? null,
+      compare_at_price: row.compare_at_price != null ? Number(row.compare_at_price) : null,
       image_url: row.image_url ?? null,
+      gallery_urls: row.gallery_urls ?? [],
+      category_id: row.category_id ?? null,
       is_active: Boolean(row.is_active),
-      nutrition_info: row.nutrition_info ?? null,
       weight_grams: row.weight_grams != null ? Number(row.weight_grams) : null,
+      tags: row.tags ?? [],
       created_at: row.created_at,
       updated_at: row.updated_at,
     }));

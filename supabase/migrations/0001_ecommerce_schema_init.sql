@@ -12,48 +12,38 @@ CREATE SCHEMA IF NOT EXISTS ecommerce;
 
 -- ────────────────────────────────────────────────────────────────────────────
 -- Enums  (all scoped to ecommerce schema for clarity)
+-- Idempotent: skip creation if type already exists (e.g. from prior partial run)
 -- ────────────────────────────────────────────────────────────────────────────
 
 -- Order lifecycle
-CREATE TYPE ecommerce.order_status AS ENUM (
-  'pending',
-  'confirmed',
-  'packed',
-  'shipped',
-  'delivered',
-  'cancelled'
-);
+DO $$ BEGIN
+  CREATE TYPE ecommerce.order_status AS ENUM ('pending', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Payment attempt result
-CREATE TYPE ecommerce.payment_status AS ENUM (
-  'pending',
-  'processing',
-  'succeeded',
-  'failed',
-  'refunded'
-);
+DO $$ BEGIN
+  CREATE TYPE ecommerce.payment_status AS ENUM ('pending', 'processing', 'succeeded', 'failed', 'refunded');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Cart / order line item types
-CREATE TYPE ecommerce.item_type AS ENUM (
-  'product',
-  'combo'
-);
+DO $$ BEGIN
+  CREATE TYPE ecommerce.item_type AS ENUM ('product', 'combo');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Discount shape (matches IMS contract v1)
-CREATE TYPE ecommerce.discount_type AS ENUM (
-  'none',
-  'percentage',
-  'fixed_amount',
-  'buy_x_get_y',
-  'free_shipping'
-);
+DO $$ BEGIN
+  CREATE TYPE ecommerce.discount_type AS ENUM ('none', 'percentage', 'fixed_amount', 'buy_x_get_y', 'free_shipping');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Review moderation state
-CREATE TYPE ecommerce.review_status AS ENUM (
-  'pending',
-  'approved',
-  'rejected'
-);
+DO $$ BEGIN
+  CREATE TYPE ecommerce.review_status AS ENUM ('pending', 'approved', 'rejected');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ────────────────────────────────────────────────────────────────────────────
 -- Utility: auto-update updated_at on any table

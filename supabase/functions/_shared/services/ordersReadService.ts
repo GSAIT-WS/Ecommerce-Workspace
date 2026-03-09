@@ -102,8 +102,4 @@ export function validateCancelOrderParams(body: unknown): {
 }
 
 /** Statuses that allow cancellation */
-export const CANCELLABLE_ORDER_STATUSES = ["pending", "confirmed"] as const;
-
-export function isCancellableStatus(status: string): boolean {
-  return CANCELLABLE_ORDER_STATUSES.includes(status as typeof CANCELLABLE_ORDER_STATUSES[number]);
-}
+const CANCELLABLE_ORDER_STATUSES = ["pending", "confirmed"] as const;

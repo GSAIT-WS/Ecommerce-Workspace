@@ -1,9 +1,10 @@
 /**
  * Edge Function: process-order
- * API entry — business logic is in the service layer.
+ * In-memory order total calculation — no DB, no auth required.
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
+import { jsonResponse, errorResponse, successResponse } from "../_shared/response.ts";
 import {
   validateOrderInput,
   calculateOrderTotals,
@@ -15,30 +16,27 @@ Deno.serve(async (req: Request) => {
   }
 
   if (req.method !== "POST") {
-    return new Response(
-      JSON.stringify({ error: "Method not allowed" }),
-      { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ success: false, error: "Method not allowed" }, 405);
   }
 
   try {
-    const body = await req.json();
+    let body: unknown = {};
+    try {
+      body = await req.json();
+    } catch {
+      return errorResponse("Invalid JSON body", 400);
+    }
+
     if (!validateOrderInput(body)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid order payload" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("Invalid order payload", 400);
     }
 
     const totals = calculateOrderTotals(body);
-    return new Response(
-      JSON.stringify({ ok: true, totals }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-  } catch {
-    return new Response(
-      JSON.stringify({ error: "Bad request" }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    return successResponse({ totals }, 200);
+  } catch (e) {
+    return jsonResponse(
+      { success: false, error: e instanceof Error ? e.message : "Internal server error" },
+      500
     );
   }
 });

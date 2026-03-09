@@ -5,17 +5,17 @@
 
 import { corsHeaders } from "./cors.ts";
 
-export interface ApiSuccess<T = unknown> {
+interface ApiSuccess<T = unknown> {
   success: true;
   data: T;
 }
 
-export interface ApiError {
+interface ApiError {
   success: false;
   error: string;
 }
 
-export type ApiResponse<T = unknown> = ApiSuccess<T> | ApiError;
+type ApiResponse<T = unknown> = ApiSuccess<T> | ApiError;
 
 export function jsonResponse<T>(body: ApiResponse<T>, status: number): Response {
   return new Response(JSON.stringify(body), {

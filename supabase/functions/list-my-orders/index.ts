@@ -1,7 +1,6 @@
 /**
  * Edge Function: list-my-orders
  * Returns paginated list of orders for user_id, sorted by created_at DESC.
- * Accepts user_id in request body (auth later).
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
@@ -9,6 +8,7 @@ import { jsonResponse, successResponse, errorResponse } from "../_shared/respons
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
 import { validateListMyOrdersParams } from "../_shared/services/index.ts";
 import type { OrderSummary } from "../_shared/services/index.ts";
+import { authenticateRequest } from "../_shared/auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -38,18 +38,27 @@ Deno.serve(async (req: Request) => {
       body = { user_id, ...(limit != null && { limit }), ...(offset != null && { offset }) };
     }
 
+    const o = body as Record<string, unknown>;
+    const auth = await authenticateRequest(req, o.user_id as string | undefined);
+    if (!auth.authenticated) {
+      return errorResponse(auth.error, auth.status);
+    }
+    (body as Record<string, unknown>).user_id = auth.user_id;
+
     const validated = validateListMyOrdersParams(body);
     if (!validated.valid) {
       return errorResponse(validated.error, 400);
     }
 
-    const { user_id, limit, offset } = validated.params;
+    const { limit, offset } = validated.params;
+    const userId = auth.user_id;
     const supabase = createSupabaseServiceRoleClient();
 
     const { data: rows, error: listError, count } = await supabase
+      .schema("ecommerce")
       .from("orders")
-      .select("id, created_at, status, payment_status, subtotal, discount_amount, shipping_amount, total", { count: "exact" })
-      .eq("user_id", user_id)
+      .select("id, order_number, created_at, status, subtotal, discount_amount, shipping_amount, total_amount", { count: "exact" })
+      .eq("customer_id", userId)
       .order("created_at", { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -59,10 +68,10 @@ Deno.serve(async (req: Request) => {
 
     const items: OrderSummary[] = (rows ?? []).map((row: Record<string, unknown>) => ({
       id: row.id,
+      order_number: row.order_number,
       created_at: row.created_at,
       order_status: row.status,
-      payment_status: row.payment_status,
-      total_amount: Number(row.total ?? 0),
+      total_amount: Number(row.total_amount ?? 0),
       subtotal: row.subtotal != null ? Number(row.subtotal) : undefined,
       discount_amount: row.discount_amount != null ? Number(row.discount_amount) : undefined,
       shipping_amount: row.shipping_amount != null ? Number(row.shipping_amount) : undefined,

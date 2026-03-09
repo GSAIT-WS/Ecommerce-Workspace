@@ -3,18 +3,15 @@
  * Handles payment success/failure events; idempotent via process_payment_webhook RPC.
  * On success: payment_status = paid, order_status = confirmed.
  * On failure: payment_status = failed, stock restored.
+ *
+ * Security: verifies X-Webhook-Signature (HMAC-SHA256) when WEBHOOK_SECRET is set.
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
-import { jsonResponse, successResponse, errorResponse } from "../_shared/response.ts";
+import { jsonResponse, errorResponse, successResponse } from "../_shared/response.ts";
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
 import { validatePaymentWebhookParams } from "../_shared/services/index.ts";
-
-const json = (body: unknown, status: number) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
+import { verifyWebhookSignature } from "../_shared/auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -26,9 +23,19 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
+    const rawBody = await req.text();
+
+    const sigResult = await verifyWebhookSignature(
+      rawBody,
+      req.headers.get("X-Webhook-Signature"),
+    );
+    if (!sigResult.valid) {
+      return errorResponse(sigResult.error ?? "Signature verification failed", 401);
+    }
+
     let body: unknown = {};
     try {
-      body = await req.json();
+      body = JSON.parse(rawBody);
     } catch {
       body = {};
     }
@@ -41,26 +48,29 @@ Deno.serve(async (req: Request) => {
     const { external_id, outcome } = validated.params;
     const supabase = createSupabaseServiceRoleClient();
 
-    const { data, error: rpcError } = await supabase.rpc("process_payment_webhook", {
+    const paymentStatus = outcome === "succeeded" ? "succeeded" : "failed";
+
+    const { data, error: rpcError } = await supabase.schema("ecommerce").rpc("process_payment_webhook", {
       p_external_id: external_id,
-      p_outcome: outcome,
+      p_status: paymentStatus,
+      p_amount: 0,
+      p_failure_reason: outcome === "failed" ? "Payment failed via webhook" : null,
     });
 
     if (rpcError) {
       return jsonResponse(
-        { success: false, error: "rpc_error", message: rpcError.message },
+        { success: false, error: rpcError.message },
         500
       );
     }
 
     const result = data as {
-      success: boolean;
+      ok: boolean;
       error?: string;
-      message?: string;
       idempotent?: boolean;
+      status?: string;
       order_id?: string;
-      payment_status?: string;
-      order_status?: string;
+      ims_release_items?: unknown;
     } | null;
 
     if (result == null) {
@@ -70,30 +80,25 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    if (!result.success) {
-      if ((result as { error?: string }).error === "attempt_not_found") {
-        return json(
-          { success: false, error: "attempt_not_found", message: result.message ?? "Payment attempt not found" },
+    if (!result.ok) {
+      if (result.error === "payment_attempt_not_found") {
+        return jsonResponse(
+          { success: false, error: "attempt_not_found", message: "Payment attempt not found" },
           404
         );
       }
-      if ((result as { error?: string }).error === "invalid_outcome") {
-        return errorResponse(result.message ?? "Invalid outcome", 400);
-      }
       return jsonResponse(
-        { success: false, error: (result as { error: string }).error, message: result.message },
+        { success: false, error: result.error ?? "webhook_failed" },
         400
       );
     }
 
-    return json(
+    return successResponse(
       {
-        success: true,
         ...(result.idempotent && { idempotent: true }),
         ...(result.order_id && { order_id: result.order_id }),
-        ...(result.payment_status && { payment_status: result.payment_status }),
-        ...(result.order_status && { order_status: result.order_status }),
-        message: result.message ?? "Webhook processed",
+        ...(result.status && { payment_status: result.status }),
+        message: "Webhook processed",
       },
       200
     );

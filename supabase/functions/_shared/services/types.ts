@@ -3,14 +3,6 @@
  * Aligned with DB (e.g. public.order_status) and API contracts.
  */
 
-export type OrderStatus =
-  | "pending"
-  | "confirmed"
-  | "packed"
-  | "shipped"
-  | "delivered"
-  | "cancelled";
-
 export interface OrderItemInput {
   product_id: string;
   quantity: number;
@@ -83,34 +75,32 @@ export interface CreateOnlineOrderError {
   available?: number;
 }
 
-/** Request body for place-order (blueprint: POST /api/orders) */
-export interface PlaceOrderRequest {
-  shipping_address: Record<string, unknown>;
-  payment_method?: string;
-  gift_option?: Record<string, unknown> | null;
-  discount_type?: "none" | "bulk" | "combo";
-  discount_amount?: number;
-  shipping_amount?: number;
+// --- Address types ---
+
+export interface AddAddressParams {
+  recipient_name: string;
+  phone: string;
+  address_line1: string;
+  address_line2?: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country?: string;
+  label?: string;
+  is_default?: boolean;
 }
 
-/** Success result from public.place_order RPC */
-export interface PlaceOrderResult {
-  success: true;
-  order_id: string;
-  subtotal: number;
-  discount_amount: number;
-  shipping_amount: number;
-  total: number;
-}
-
-/** Error result from public.place_order RPC */
-export interface PlaceOrderError {
-  success: false;
-  error: string;
-  message: string;
-  product_id?: string;
-  requested?: number;
-  available?: number;
+export interface UpdateAddressParams {
+  address_id: string;
+  label?: string;
+  recipient_name?: string;
+  phone?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string;
 }
 
 // --- Products & Categories (Phase 1) ---
@@ -123,27 +113,6 @@ export interface ListProductsParams {
   max_price?: number;
   limit?: number;
   offset?: number;
-}
-
-/** Paginated products result */
-export interface ListProductsResult {
-  items: Array<{
-    id: string;
-    name: string;
-    description: string | null;
-    price: number;
-    stock_quantity: number;
-    category_id: string | null;
-    image_url: string | null;
-    is_active: boolean;
-    nutrition_info: unknown;
-    weight_grams: number | null;
-    created_at: string;
-    updated_at: string;
-  }>;
-  total: number;
-  limit: number;
-  offset: number;
 }
 
 /** Request body for get-product-by-id */
@@ -200,21 +169,13 @@ export interface ListMyOrdersParams {
 /** Single order summary for list-my-orders */
 export interface OrderSummary {
   id: string;
+  order_number?: string;
   created_at: string;
   order_status: string;
-  payment_status: string;
   total_amount: number;
   subtotal?: number;
   discount_amount?: number;
   shipping_amount?: number;
-}
-
-/** Paginated list of orders */
-export interface ListMyOrdersResult {
-  items: OrderSummary[];
-  total: number;
-  limit: number;
-  offset: number;
 }
 
 /** Request body for get-order-by-id */
@@ -247,14 +208,11 @@ export interface GetOrderByIdResult {
   created_at: string;
   updated_at: string;
   order_status: string;
-  payment_status: string;
   subtotal: number;
   discount_amount: number;
   shipping_amount: number;
   total: number;
-  discount_type: string | null;
   shipping_address: unknown;
-  payment_ref: string | null;
   items: OrderItemDetail[];
   status_history?: OrderStatusHistoryEntry[];
 }

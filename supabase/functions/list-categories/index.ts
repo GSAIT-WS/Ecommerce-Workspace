@@ -19,8 +19,9 @@ Deno.serve(async (req: Request) => {
   try {
     const supabase = createSupabaseServiceRoleClient();
     const { data: categories, error } = await supabase
+      .schema("ecommerce")
       .from("categories")
-      .select("id, name, slug, description, image_url, is_active, sort_order")
+      .select("id, name, source_slug, image_url, is_active, sort_order")
       .eq("is_active", true)
       .order("sort_order", { ascending: true });
 
@@ -31,8 +32,7 @@ Deno.serve(async (req: Request) => {
     const items = (categories ?? []).map((row: Record<string, unknown>) => ({
       id: row.id,
       name: row.name,
-      slug: row.slug,
-      description: row.description ?? null,
+      slug: row.source_slug,
       image_url: row.image_url ?? null,
       is_active: Boolean(row.is_active),
       sort_order: Number(row.sort_order ?? 0),

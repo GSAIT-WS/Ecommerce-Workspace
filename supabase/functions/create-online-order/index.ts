@@ -6,6 +6,7 @@
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
+import { errorResponse, successResponse, jsonResponse } from "../_shared/response.ts";
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
 import {
   validateCreateOrderRequest,
@@ -15,12 +16,7 @@ import type {
   CreateOnlineOrderResult,
   CreateOnlineOrderError,
 } from "../_shared/services/index.ts";
-
-const json = (body: unknown, status: number) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
+import { authenticateRequest } from "../_shared/auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -28,16 +24,26 @@ Deno.serve(async (req: Request) => {
   }
 
   if (req.method !== "POST") {
-    return json({ error: "Method not allowed" }, 405);
+    return errorResponse("Method not allowed", 405);
   }
 
   try {
-    const body = await req.json();
+    let body: unknown = {};
+    try {
+      body = await req.json();
+    } catch {
+      return errorResponse("Invalid JSON body", 400);
+    }
+
+    const o = body as Record<string, unknown>;
+    const auth = await authenticateRequest(req, o.customer_id as string | undefined);
+    if (!auth.authenticated) {
+      return errorResponse(auth.error, auth.status);
+    }
+    (body as Record<string, unknown>).customer_id = auth.user_id;
+
     if (!validateCreateOrderRequest(body)) {
-      return json(
-        { error: "Invalid request", message: "customer_id and cart_id (UUIDs) required" },
-        400
-      );
+      return errorResponse("customer_id and cart_id (UUIDs) required", 400);
     }
 
     const payload = normalizeCreateOrderPayload(body);
@@ -46,7 +52,7 @@ Deno.serve(async (req: Request) => {
     const { data, error: rpcError } = await supabase
       .schema("ecommerce")
       .rpc("create_online_order", {
-        p_customer_id: payload.customer_id,
+        p_customer_id: auth.user_id,
         p_cart_id: payload.cart_id,
         p_coupon_code: payload.coupon_code,
         p_shipping_amount: payload.shipping_amount,
@@ -54,20 +60,16 @@ Deno.serve(async (req: Request) => {
       });
 
     if (rpcError) {
-      return json(
-        {
-          success: false,
-          error: "rpc_error",
-          message: rpcError.message,
-        },
+      return jsonResponse(
+        { success: false, error: rpcError.message },
         500
       );
     }
 
     const result = data as CreateOnlineOrderResult | CreateOnlineOrderError | null;
     if (result == null) {
-      return json(
-        { success: false, error: "empty_result", message: "No result from create_online_order" },
+      return jsonResponse(
+        { success: false, error: "No result from create_online_order" },
         500
       );
     }
@@ -82,7 +84,7 @@ Deno.serve(async (req: Request) => {
           : err.error === "insufficient_stock"
             ? 409
             : 400;
-      return json(
+      return jsonResponse(
         {
           success: false,
           error: err.error,
@@ -98,9 +100,8 @@ Deno.serve(async (req: Request) => {
     }
 
     const success = result as CreateOnlineOrderResult;
-    return json(
+    return successResponse(
       {
-        success: true,
         order_id: success.order_id,
         subtotal: success.subtotal,
         discount_amount: success.discount_amount,
@@ -110,13 +111,9 @@ Deno.serve(async (req: Request) => {
       201
     );
   } catch (e) {
-    return json(
-      {
-        success: false,
-        error: "bad_request",
-        message: e instanceof Error ? e.message : "Bad request",
-      },
-      400
+    return jsonResponse(
+      { success: false, error: e instanceof Error ? e.message : "Internal server error" },
+      500
     );
   }
 });

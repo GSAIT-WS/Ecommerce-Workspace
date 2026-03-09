@@ -4,19 +4,15 @@
  */
 
 import type { CreateOnlineOrderRequest } from "./types.ts";
-
-const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+import { isValidUuid } from "../validation.ts";
 
 export function validateCreateOrderRequest(
   body: unknown
 ): body is CreateOnlineOrderRequest {
   if (!body || typeof body !== "object") return false;
   const o = body as Record<string, unknown>;
-  if (typeof o.customer_id !== "string" || !UUID_REGEX.test(o.customer_id))
-    return false;
-  if (typeof o.cart_id !== "string" || !UUID_REGEX.test(o.cart_id))
-    return false;
+  if (!isValidUuid(o.customer_id)) return false;
+  if (!isValidUuid(o.cart_id)) return false;
   if (o.coupon_code !== undefined && o.coupon_code !== null) {
     if (typeof o.coupon_code !== "string") return false;
   }

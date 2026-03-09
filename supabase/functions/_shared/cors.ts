@@ -1,20 +1,15 @@
 /**
  * CORS headers for Supabase Edge Functions.
- * Use in each function's response or via a helper.
+ *
+ * Set CORS_ORIGIN env var to restrict allowed origins in production.
+ * Defaults to "*" (all origins) when not set.
  */
+const allowedOrigin =
+  (typeof Deno !== "undefined" ? Deno.env.get("CORS_ORIGIN") : undefined) ?? "*";
+
 export const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": allowedOrigin,
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, x-webhook-signature, apikey, content-type",
   "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
 };
-
-export function withCors(response: Response, headers = corsHeaders): Response {
-  const newHeaders = new Headers(response.headers);
-  Object.entries(headers).forEach(([k, v]) => newHeaders.set(k, v));
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: newHeaders,
-  });
-}

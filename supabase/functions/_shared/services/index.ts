@@ -16,14 +16,13 @@ export {
   normalizeCreateOrderPayload,
 } from "./onlineOrderService.ts";
 export {
-  validatePlaceOrderRequest,
-  normalizePlaceOrderPayload,
-} from "./placeOrderService.ts";
+  validateAddAddressParams,
+  validateUpdateAddressParams,
+} from "./addressService.ts";
 export {
   validateListProductsParams,
   validateGetProductByIdParams,
 } from "./productService.ts";
-export { validateListCategoriesParams } from "./categoryService.ts";
 export {
   validateGetCartParams,
   validateAddToCartParams,
@@ -35,12 +34,10 @@ export {
   validateListMyOrdersParams,
   validateGetOrderByIdParams,
   validateCancelOrderParams,
-  isCancellableStatus,
 } from "./ordersReadService.ts";
 export { validateCreatePaymentIntentParams } from "./paymentIntentService.ts";
 export { validatePaymentWebhookParams } from "./paymentWebhookService.ts";
 export type {
-  OrderStatus,
   OrderItemInput,
   OrderInput,
   OrderTotals,
@@ -50,11 +47,9 @@ export type {
   CreateOnlineOrderRequest,
   CreateOnlineOrderResult,
   CreateOnlineOrderError,
-  PlaceOrderRequest,
-  PlaceOrderResult,
-  PlaceOrderError,
+  AddAddressParams,
+  UpdateAddressParams,
   ListProductsParams,
-  ListProductsResult,
   GetProductByIdParams,
   GetCartParams,
   AddToCartParams,
@@ -62,7 +57,6 @@ export type {
   RemoveCartItemParams,
   ClearCartParams,
   ListMyOrdersParams,
-  ListMyOrdersResult,
   OrderSummary,
   GetOrderByIdParams,
   GetOrderByIdResult,

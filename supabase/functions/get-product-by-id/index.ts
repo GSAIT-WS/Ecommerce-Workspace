@@ -41,6 +41,7 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createSupabaseServiceRoleClient();
     const { data: product, error } = await supabase
+      .schema("ecommerce")
       .from("products")
       .select("*")
       .eq("id", validated.params.product_id)
@@ -60,15 +61,17 @@ Deno.serve(async (req: Request) => {
     const row = product as Record<string, unknown>;
     return successResponse({
       id: row.id,
+      product_external_id: row.product_external_id ?? null,
       name: row.name,
       description: row.description ?? null,
       price: Number(row.price),
-      stock_quantity: Number(row.stock_quantity),
-      category_id: row.category_id ?? null,
+      compare_at_price: row.compare_at_price != null ? Number(row.compare_at_price) : null,
       image_url: row.image_url ?? null,
+      gallery_urls: row.gallery_urls ?? [],
+      category_id: row.category_id ?? null,
       is_active: Boolean(row.is_active),
-      nutrition_info: row.nutrition_info ?? null,
       weight_grams: row.weight_grams != null ? Number(row.weight_grams) : null,
+      tags: row.tags ?? [],
       created_at: row.created_at,
       updated_at: row.updated_at,
     }, 200);

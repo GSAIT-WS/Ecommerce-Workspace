@@ -1,26 +1,15 @@
 /**
- * Edge Function: place-order (blueprint POST /api/orders)
- * Places order from current user's cart. Uses public.place_order RPC.
- * User from JWT (Authorization: Bearer) or body.user_id for server/testing.
+ * Edge Function: place-order
+ * Calls ecommerce.place_order RPC with proper signature:
+ *   (p_customer_id, p_shipping_address_id, p_coupon_code, p_notes)
+ * User from JWT (preferred) or body.user_id for backward compat.
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
-import { createSupabaseClient } from "../_shared/supabaseClient.ts";
+import { jsonResponse, errorResponse, successResponse } from "../_shared/response.ts";
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
-import {
-  validatePlaceOrderRequest,
-  normalizePlaceOrderPayload,
-} from "../_shared/services/index.ts";
-import type {
-  PlaceOrderResult,
-  PlaceOrderError,
-} from "../_shared/services/index.ts";
-
-const json = (body: unknown, status: number) =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
+import { isValidUuid } from "../_shared/validation.ts";
+import { authenticateRequest } from "../_shared/auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -28,114 +17,67 @@ Deno.serve(async (req: Request) => {
   }
 
   if (req.method !== "POST") {
-    return json({ error: "Method not allowed" }, 405);
+    return errorResponse("Method not allowed", 405);
   }
 
   try {
-    const body = await req.json();
-    if (!validatePlaceOrderRequest(body)) {
-      return json(
-        {
-          error: "Invalid request",
-          code: "VALIDATION_ERROR",
-          details: "shipping_address (object) is required",
-        },
-        400
-      );
+    let body: Record<string, unknown> = {};
+    try {
+      body = await req.json();
+    } catch {
+      return errorResponse("Invalid JSON body", 400);
     }
 
-    // Resolve user_id: from JWT (preferred) or body (for server/testing)
-    let userId: string | null = (body as Record<string, unknown>).user_id as string | undefined ?? null;
-    if (!userId) {
-      const supabaseAuth = createSupabaseClient(req);
-      const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(
-        req.headers.get("Authorization")?.replace("Bearer ", "") ?? ""
-      );
-      if (authError || !user?.id) {
-        return json(
-          { error: "Unauthorized", code: "AUTH_REQUIRED", message: "Valid JWT or user_id required" },
-          401
-        );
-      }
-      userId = user.id;
+    const auth = await authenticateRequest(req, body.user_id as string | undefined);
+    if (!auth.authenticated) {
+      return errorResponse(auth.error, auth.status);
+    }
+    const userId = auth.user_id;
+
+    if (!body.shipping_address_id || typeof body.shipping_address_id !== "string") {
+      return errorResponse("shipping_address_id is required", 400);
+    }
+    if (!isValidUuid(body.shipping_address_id)) {
+      return errorResponse("shipping_address_id must be a valid UUID", 400);
     }
 
-    const payload = normalizePlaceOrderPayload(body);
     const supabase = createSupabaseServiceRoleClient();
-
-    const { data, error: rpcError } = await supabase.rpc("place_order", {
-      p_user_id: userId,
-      p_shipping_address: payload.shipping_address,
-      p_discount_type: payload.discount_type,
-      p_discount_amount: payload.discount_amount,
-      p_shipping_amount: payload.shipping_amount,
+    const { data, error: rpcError } = await supabase.schema("ecommerce").rpc("place_order", {
+      p_customer_id: userId,
+      p_shipping_address_id: body.shipping_address_id as string,
+      p_coupon_code: (body.coupon_code as string) ?? null,
+      p_notes: (body.notes as string) ?? null,
     });
 
     if (rpcError) {
-      return json(
-        {
-          success: false,
-          error: "rpc_error",
-          code: "RPC_ERROR",
-          message: rpcError.message,
-        },
-        500
-      );
+      return jsonResponse({ success: false, error: rpcError.message }, 500);
     }
 
-    const result = data as PlaceOrderResult | PlaceOrderError | null;
-    if (result == null) {
-      return json(
-        { success: false, error: "empty_result", message: "No result from place_order" },
-        500
-      );
+    const result = data as Record<string, unknown> | null;
+    if (!result) {
+      return jsonResponse({ success: false, error: "empty_result" }, 500);
     }
 
-    if (!result.success) {
-      const err = result as PlaceOrderError;
+    if (result.ok === false) {
       const status =
-        err.error === "user_not_found" || err.error === "cart_empty" ? 404
-          : err.error === "insufficient_stock" || err.error === "product_inactive" ? 409
-          : 400;
-      return json(
-        {
-          success: false,
-          error: err.error,
-          message: err.message,
-          ...(err.product_id != null && {
-            product_id: err.product_id,
-            requested: err.requested,
-            available: err.available,
-          }),
-        },
-        status
-      );
+        result.error === "customer_not_found" || result.error === "cart_is_empty" ? 404
+        : result.error === "insufficient_stock" ? 409
+        : 400;
+      return jsonResponse({ success: false, error: result.error, details: result }, status);
     }
 
-    const success = result as PlaceOrderResult;
-    return json(
-      {
-        order: {
-          id: success.order_id,
-          total: success.total,
-          status: "pending",
-          subtotal: success.subtotal,
-          discount_amount: success.discount_amount,
-          shipping_amount: success.shipping_amount,
-          payment_intent: null,
-        },
-        message: "Order placed successfully",
+    return successResponse({
+      order: {
+        id: result.order_id,
+        order_number: result.order_number,
+        total_amount: result.total_amount,
+        status: result.status,
       },
-      201
-    );
+    }, 201);
   } catch (e) {
-    return json(
-      {
-        error: "Bad request",
-        code: "BAD_REQUEST",
-        message: e instanceof Error ? e.message : "Bad request",
-      },
-      400
+    return jsonResponse(
+      { success: false, error: e instanceof Error ? e.message : "Internal server error" },
+      500
     );
   }
 });

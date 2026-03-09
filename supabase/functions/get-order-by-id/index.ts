@@ -9,6 +9,7 @@ import { jsonResponse, successResponse, errorResponse } from "../_shared/respons
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
 import { validateGetOrderByIdParams } from "../_shared/services/index.ts";
 import type { GetOrderByIdResult, OrderItemDetail, OrderStatusHistoryEntry } from "../_shared/services/index.ts";
+import { authenticateRequest } from "../_shared/auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -37,15 +38,24 @@ Deno.serve(async (req: Request) => {
       body = { user_id, order_id };
     }
 
+    const o = body as Record<string, unknown>;
+    const auth = await authenticateRequest(req, o.user_id as string | undefined);
+    if (!auth.authenticated) {
+      return errorResponse(auth.error, auth.status);
+    }
+    (body as Record<string, unknown>).user_id = auth.user_id;
+
     const validated = validateGetOrderByIdParams(body);
     if (!validated.valid) {
       return errorResponse(validated.error, 400);
     }
 
-    const { user_id, order_id } = validated.params;
+    const { order_id } = validated.params;
+    const userId = auth.user_id;
     const supabase = createSupabaseServiceRoleClient();
 
     const { data: orderRow, error: orderError } = await supabase
+      .schema("ecommerce")
       .from("orders")
       .select("*")
       .eq("id", order_id)
@@ -58,73 +68,61 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const o = orderRow as Record<string, unknown>;
-    if (o.user_id !== user_id) {
+    const ord = orderRow as Record<string, unknown>;
+    if (ord.customer_id !== userId) {
       return jsonResponse(
-        { success: false, error: "Forbidden", message: "Order does not belong to user" },
+        { success: false, error: "forbidden", message: "Order does not belong to user" },
         403
       );
     }
 
     const { data: itemRows, error: itemsError } = await supabase
+      .schema("ecommerce")
       .from("order_items")
-      .select(`
-        id,
-        product_id,
-        quantity,
-        unit_price,
-        discount_applied,
-        line_total,
-        products ( name )
-      `)
+      .select("id, product_id, name_snapshot, quantity, unit_price, line_total")
       .eq("order_id", order_id);
 
     if (itemsError) {
       return jsonResponse({ success: false, error: itemsError.message }, 500);
     }
 
-    const items: OrderItemDetail[] = (itemRows ?? []).map((row: Record<string, unknown>) => {
-      const product = row.products as Record<string, unknown> | null;
-      return {
-        id: row.id,
-        product_id: row.product_id,
-        product_name: product?.name != null ? String(product.name) : null,
-        quantity: Number(row.quantity),
-        unit_price: Number(row.unit_price),
-        line_total: Number(row.line_total),
-      };
-    });
+    const items: OrderItemDetail[] = (itemRows ?? []).map((row: Record<string, unknown>) => ({
+      id: row.id,
+      product_id: row.product_id,
+      product_name: row.name_snapshot != null ? String(row.name_snapshot) : null,
+      quantity: Number(row.quantity),
+      unit_price: Number(row.unit_price),
+      line_total: Number(row.line_total),
+    }));
 
     const { data: historyRows } = await supabase
+      .schema("ecommerce")
       .from("order_status_history")
-      .select("id, status, created_at")
+      .select("id, new_status, created_at")
       .eq("order_id", order_id)
       .order("created_at", { ascending: true });
 
     const status_history: OrderStatusHistoryEntry[] | undefined = historyRows?.length
       ? (historyRows as Record<string, unknown>[]).map((r) => ({
           id: r.id,
-          status: r.status,
+          status: r.new_status,
           created_at: r.created_at,
         }))
       : undefined;
 
-    const shippingAmount = o.shipping_amount != null ? Number(o.shipping_amount) : 0;
+    const shippingAmount = ord.shipping_amount != null ? Number(ord.shipping_amount) : 0;
 
     const result: GetOrderByIdResult = {
-      id: o.id,
-      user_id: o.user_id,
-      created_at: o.created_at,
-      updated_at: o.updated_at,
-      order_status: o.status,
-      payment_status: o.payment_status,
-      subtotal: Number(o.subtotal),
-      discount_amount: Number(o.discount_amount ?? 0),
+      id: ord.id,
+      user_id: ord.customer_id,
+      created_at: ord.created_at,
+      updated_at: ord.updated_at,
+      order_status: ord.status,
+      subtotal: Number(ord.subtotal),
+      discount_amount: Number(ord.discount_amount ?? 0),
       shipping_amount: shippingAmount,
-      total: Number(o.total),
-      discount_type: o.discount_type ?? null,
-      shipping_address: o.shipping_address ?? null,
-      payment_ref: o.payment_ref != null ? String(o.payment_ref) : null,
+      total: Number(ord.total_amount),
+      shipping_address: ord.shipping_address_snapshot ?? null,
       items,
       ...(status_history && status_history.length > 0 && { status_history }),
     };

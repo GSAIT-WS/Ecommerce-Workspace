@@ -1,9 +1,10 @@
 /**
  * Edge Function: cart-totals
- * API entry — business logic is in the service layer.
+ * In-memory cart total calculation — no DB, no auth required.
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
+import { jsonResponse, errorResponse, successResponse } from "../_shared/response.ts";
 import {
   validateCartItems,
   calculateCartTotals,
@@ -15,31 +16,30 @@ Deno.serve(async (req: Request) => {
   }
 
   if (req.method !== "POST") {
-    return new Response(
-      JSON.stringify({ error: "Method not allowed" }),
-      { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ success: false, error: "Method not allowed" }, 405);
   }
 
   try {
-    const body = await req.json();
-    const items = Array.isArray(body?.items) ? body.items : body;
+    let body: unknown = {};
+    try {
+      body = await req.json();
+    } catch {
+      return errorResponse("Invalid JSON body", 400);
+    }
+
+    const items = Array.isArray((body as Record<string, unknown>)?.items)
+      ? (body as Record<string, unknown>).items
+      : body;
     if (!validateCartItems(items)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid cart items" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse("Invalid cart items", 400);
     }
 
     const totals = calculateCartTotals(items);
-    return new Response(
-      JSON.stringify({ ok: true, totals }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-  } catch {
-    return new Response(
-      JSON.stringify({ error: "Bad request" }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    return successResponse({ totals }, 200);
+  } catch (e) {
+    return jsonResponse(
+      { success: false, error: e instanceof Error ? e.message : "Internal server error" },
+      500
     );
   }
 });

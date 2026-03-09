@@ -8,6 +8,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { jsonResponse, successResponse, errorResponse } from "../_shared/response.ts";
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
 import { validateCancelOrderParams } from "../_shared/services/index.ts";
+import { authenticateRequest } from "../_shared/auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -23,20 +24,27 @@ Deno.serve(async (req: Request) => {
     try {
       body = await req.json();
     } catch {
-      body = {};
+      return errorResponse("Invalid JSON body", 400);
     }
+
+    const o = body as Record<string, unknown>;
+    const auth = await authenticateRequest(req, o.user_id as string | undefined);
+    if (!auth.authenticated) {
+      return errorResponse(auth.error, auth.status);
+    }
+    (body as Record<string, unknown>).user_id = auth.user_id;
 
     const validated = validateCancelOrderParams(body);
     if (!validated.valid) {
       return errorResponse(validated.error, 400);
     }
 
-    const { user_id, order_id } = validated.params;
+    const { order_id } = validated.params;
     const supabase = createSupabaseServiceRoleClient();
 
-    const { data, error: rpcError } = await supabase.rpc("cancel_order", {
-      p_user_id: user_id,
+    const { data, error: rpcError } = await supabase.schema("ecommerce").rpc("cancel_order", {
       p_order_id: order_id,
+      p_customer_id: auth.user_id,
     });
 
     if (rpcError) {
