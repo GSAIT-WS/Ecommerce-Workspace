@@ -5,6 +5,7 @@ import { ArrowLeft, Plus, Home, Briefcase, MapPin, MoreVertical, Check } from "l
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import LocationAddressSelector from "@/components/address/LocationAddressSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,7 @@ import { toast } from "sonner";
 const AddressesPage = () => {
   const navigate = useNavigate();
   const [addresses, setAddresses] = useState<SavedAddress[]>(initialAddresses);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const getIcon = (type: SavedAddress["type"]) => {
     switch (type) {
@@ -65,7 +67,7 @@ const AddressesPage = () => {
             </div>
             <Button
               size="sm"
-              onClick={() => toast.info("Add address form coming soon!")}
+              onClick={() => setShowAddModal(true)}
             >
               <Plus className="mr-1 h-4 w-4" />
               Add
@@ -158,7 +160,7 @@ const AddressesPage = () => {
               </p>
               <Button
                 className="mt-4"
-                onClick={() => toast.info("Add address form coming soon!")}
+                onClick={() => setShowAddModal(true)}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Address
@@ -167,6 +169,15 @@ const AddressesPage = () => {
           )}
         </motion.div>
       </main>
+
+      <LocationAddressSelector
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSuccess={() => {
+          setShowAddModal(false);
+          toast.success("Address added successfully.");
+        }}
+      />
 
       <Footer />
     </div>

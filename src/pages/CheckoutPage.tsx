@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Truck, ShieldCheck, Clock, AlertCircle } from "lucide-react";
+import { ArrowLeft, Plus, Truck, ShieldCheck, Clock, AlertCircle, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,30 +9,50 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AddressCard from "@/components/checkout/AddressCard";
 import DeliverySlotSelector from "@/components/checkout/DeliverySlotSelector";
+import LocationAddressSelector from "@/components/address/LocationAddressSelector";
+import AddressMapPreview from "@/components/address/AddressMapPreview";
 import productProteinBar from "@/assets/product-protein-bar.jpg";
 import productMilletBar from "@/assets/product-millet-bar.jpg";
 
-// Dummy addresses
-const addresses = [
+// Address type with optional coordinates for map preview
+interface CheckoutAddress {
+  id: string;
+  type: "home" | "work" | "other";
+  name: string;
+  phone: string;
+  address: string;
+  landmark?: string;
+  pincode: string;
+  isDefault: boolean;
+  latitude?: number;
+  longitude?: number;
+}
+
+// Dummy addresses (with sample coords for map preview)
+const initialAddresses: CheckoutAddress[] = [
   {
     id: "1",
-    type: "home" as const,
+    type: "home",
     name: "Rahul Sharma",
     phone: "+91 98765 43210",
     address: "123, Green Valley Apartments, Koramangala, 5th Block",
     landmark: "Near Sony World Signal",
     pincode: "560095, Bangalore",
     isDefault: true,
+    latitude: 12.9352,
+    longitude: 77.6245,
   },
   {
     id: "2",
-    type: "work" as const,
+    type: "work",
     name: "Rahul Sharma",
     phone: "+91 98765 43210",
     address: "Tech Park, Tower B, 4th Floor, Outer Ring Road",
     landmark: "Opposite Marathahalli Bridge",
     pincode: "560037, Bangalore",
     isDefault: false,
+    latitude: 12.9698,
+    longitude: 77.7499,
   },
 ];
 
@@ -61,7 +81,9 @@ const checkoutItems = [
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const [selectedAddress, setSelectedAddress] = useState(addresses[0].id);
+  const [addresses, setAddresses] = useState<CheckoutAddress[]>(initialAddresses);
+  const [selectedAddress, setSelectedAddress] = useState(initialAddresses[0]?.id ?? "");
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, number>>(
     checkoutItems.reduce((acc, item) => ({ ...acc, [item.id]: item.quantity }), {})
   );
@@ -133,24 +155,77 @@ const CheckoutPage = () => {
                   variant="outline"
                   size="sm"
                   className="gap-2 rounded-full font-body text-sm"
+                  onClick={() => setShowAddressSelector(true)}
                 >
                   <Plus className="h-4 w-4" />
-                  Add New
+                  {addresses.length === 0 ? "Add Address" : "Add New"}
                 </Button>
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                {addresses.map((address) => (
-                  <AddressCard
-                    key={address.id}
-                    address={address}
-                    isSelected={selectedAddress === address.id}
-                    onSelect={() => setSelectedAddress(address.id)}
-                    onEdit={() => {}}
-                    deliveryAvailable={true}
-                  />
-                ))}
-              </div>
+              {addresses.length === 0 ? (
+                <div className="rounded-xl border-2 border-dashed border-border bg-muted/30 p-8 text-center">
+                  <MapPin className="mx-auto h-12 w-12 text-muted-foreground" />
+                  <h3 className="mt-4 font-semibold text-foreground">
+                    No delivery address
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Add your delivery address to place the order
+                  </p>
+                  <Button
+                    className="mt-4"
+                    onClick={() => setShowAddressSelector(true)}
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Address
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {addresses.map((address) => (
+                      <AddressCard
+                        key={address.id}
+                        address={address}
+                        isSelected={selectedAddress === address.id}
+                        onSelect={() => setSelectedAddress(address.id)}
+                        onEdit={() => setShowAddressSelector(true)}
+                        deliveryAvailable={true}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Map preview for selected address */}
+                  {(() => {
+                    const addr = addresses.find((a) => a.id === selectedAddress);
+                    if (addr?.latitude != null && addr?.longitude != null) {
+                      return (
+                        <div className="mt-6">
+                          <div className="mb-3 flex items-center justify-between">
+                            <h3 className="font-body text-sm font-medium text-foreground">
+                              Location Preview
+                            </h3>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="gap-1.5 text-primary"
+                              onClick={() => setShowAddressSelector(true)}
+                            >
+                              <MapPin className="h-4 w-4" />
+                              Change Location
+                            </Button>
+                          </div>
+                          <AddressMapPreview
+                            latitude={addr.latitude}
+                            longitude={addr.longitude}
+                            address={addr.address}
+                          />
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                </>
+              )}
             </section>
 
             {/* Delivery Time Section */}
@@ -359,9 +434,12 @@ const CheckoutPage = () => {
               {/* CTA */}
               <Button
                 onClick={() => navigate("/payment")}
+                disabled={addresses.length === 0}
                 className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground"
               >
-                Proceed to Payment
+                {addresses.length === 0
+                  ? "Add address to continue"
+                  : "Proceed to Payment"}
               </Button>
 
               {/* Security badge */}
@@ -382,11 +460,37 @@ const CheckoutPage = () => {
         </div>
         <Button
           onClick={() => navigate("/payment")}
+          disabled={addresses.length === 0}
           className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground"
         >
-          Proceed to Payment
+          {addresses.length === 0
+            ? "Add address to continue"
+            : "Proceed to Payment"}
         </Button>
       </div>
+
+      <LocationAddressSelector
+        open={showAddressSelector}
+        onClose={() => setShowAddressSelector(false)}
+        onSuccess={(data) => {
+          setShowAddressSelector(false);
+          if (data) {
+            const newAddr: CheckoutAddress = {
+              id: `new-${Date.now()}`,
+              type: "home",
+              name: data.recipient_name,
+              phone: data.phone,
+              address: [data.address_line1, data.address_line2].filter(Boolean).join(", "),
+              pincode: `${data.postal_code}, ${data.city}`,
+              isDefault: false,
+              latitude: data.latitude ?? undefined,
+              longitude: data.longitude ?? undefined,
+            };
+            setAddresses((prev) => [...prev, newAddr]);
+            setSelectedAddress(newAddr.id);
+          }
+        }}
+      />
 
       <div className="h-32 lg:h-0" />
 
