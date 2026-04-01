@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Map, PenLine } from "lucide-react";
+import { Map, PenLine, Search } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -7,14 +7,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import LocationButton from "./LocationButton";
 import MapPickerModal from "./MapPickerModal";
 import AddressFormModal from "./AddressFormModal";
-import { reverseGeocode } from "@/services/reverseGeocodeService";
+import { reverseGeocode, searchPlace } from "@/services/reverseGeocodeService";
 import { toast } from "sonner";
 import type { GeocodedAddress } from "@/services/reverseGeocodeService";
 import type { AddressFormInitialValues } from "./AddressFormModal";
-
 import type { SavedAddressData } from "./AddressFormModal";
 
 interface LocationAddressSelectorProps {
@@ -33,6 +33,8 @@ const LocationAddressSelector = ({
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
+  const [placeSearchQuery, setPlaceSearchQuery] = useState("");
+  const [placeSearchLoading, setPlaceSearchLoading] = useState(false);
   const [formInitialValues, setFormInitialValues] = useState<AddressFormInitialValues | undefined>();
 
   const handleUseCurrentLocation = () => {
@@ -119,6 +121,40 @@ const LocationAddressSelector = ({
     onClose();
   };
 
+  const handlePlaceSearch = async () => {
+    if (!placeSearchQuery.trim()) {
+      toast.error("Enter a place to search");
+      return;
+    }
+    setPlaceSearchLoading(true);
+    try {
+      const result = await searchPlace(placeSearchQuery);
+      if (result) {
+        setFormInitialValues({
+          recipient_name: "",
+          phone: "",
+          address_line1: result.address.line1,
+          address_line2: result.address.line2,
+          city: result.address.city,
+          state: result.address.state,
+          postal_code: result.address.pincode,
+          country: result.address.country,
+          latitude: result.latitude,
+          longitude: result.longitude,
+        });
+        setShowAddressForm(true);
+        setPlaceSearchQuery("");
+        onClose();
+      } else {
+        toast.error("Place not found. Try a different search or enter manually.");
+      }
+    } catch {
+      toast.error("Search failed. Try entering manually.");
+    } finally {
+      setPlaceSearchLoading(false);
+    }
+  };
+
   const handleFormSuccess = (data?: SavedAddressData) => {
     setShowAddressForm(false);
     setFormInitialValues(undefined);
@@ -157,6 +193,30 @@ const LocationAddressSelector = ({
               <Map className="h-4 w-4" />
               Pick on Map
             </Button>
+
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Search for a place (e.g. Koramangala, Bangalore)"
+                  value={placeSearchQuery}
+                  onChange={(e) => setPlaceSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handlePlaceSearch()}
+                  className="h-12"
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="h-12 shrink-0"
+                  onClick={handlePlaceSearch}
+                  disabled={placeSearchLoading || !placeSearchQuery.trim()}
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground px-1">
+                Search by area, landmark, or address.
+              </p>
+            </div>
 
             <Button
               type="button"

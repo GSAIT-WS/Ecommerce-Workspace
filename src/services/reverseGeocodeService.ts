@@ -101,3 +101,55 @@ export async function reverseGeocode(
 
   return parseNominatimAddress(data.address);
 }
+
+const SEARCH_BASE = "https://nominatim.openstreetmap.org/search";
+
+/** Forward geocode: search for a place and return first result with lat/lng */
+export async function searchPlace(
+  query: string
+): Promise<{ latitude: number; longitude: number; address: GeocodedAddress } | null> {
+  if (!query.trim()) return null;
+  await throttle();
+
+  const params = new URLSearchParams({
+    q: query.trim(),
+    format: "json",
+    addressdetails: "1",
+    limit: "1",
+    "accept-language": "en",
+  });
+
+  const res = await fetch(`${SEARCH_BASE}?${params}`, {
+    method: "GET",
+    headers: {
+      "User-Agent": USER_AGENT,
+      Accept: "application/json",
+    },
+  });
+
+  if (!res.ok) return null;
+  const results = (await res.json()) as Array<{
+    lat?: string;
+    lon?: string;
+    address?: Record<string, string>;
+    display_name?: string;
+  }>;
+
+  const first = results[0];
+  if (!first?.lat || !first?.lon) return null;
+
+  const lat = parseFloat(first.lat);
+  const lng = parseFloat(first.lon);
+  const addr = first.address
+    ? parseNominatimAddress(first.address)
+    : {
+        line1: first.display_name || "Address",
+        city: "City",
+        state: "State",
+        pincode: "",
+        country: "India",
+        displayAddress: first.display_name || `${lat}, ${lng}`,
+      };
+
+  return { latitude: lat, longitude: lng, address: addr };
+}

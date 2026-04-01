@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { allProducts, Product } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
+import type { Product } from "@/lib/productsApi";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 
@@ -22,6 +23,8 @@ function getTier(count: number) {
 }
 
 const BuildComboPage = () => {
+  const { data, isLoading, error } = useProducts({ limit: 100 });
+  const allProducts = data?.items ?? [];
   const [selected, setSelected] = useState<Product[]>([]);
   const [isGift, setIsGift] = useState(false);
   const [giftMessage, setGiftMessage] = useState("");
@@ -92,6 +95,15 @@ const BuildComboPage = () => {
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Product Grid */}
             <div className="lg:col-span-2">
+              {isLoading ? (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="aspect-square animate-pulse rounded-xl bg-muted" />
+                  ))}
+                </div>
+              ) : error ? (
+                <p className="font-body text-muted-foreground">Unable to load products.</p>
+              ) : (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {allProducts.map((product) => {
                   const isSelected = selected.some((p) => p.id === product.id);
@@ -124,6 +136,7 @@ const BuildComboPage = () => {
                   );
                 })}
               </div>
+              )}
             </div>
 
             {/* Combo Box */}

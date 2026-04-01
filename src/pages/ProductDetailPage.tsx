@@ -16,7 +16,8 @@ import {
   Package,
   X,
   BadgePercent,
-  Send
+  Send,
+  MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,9 +27,11 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { allProducts } from "@/data/products";
+import { useProduct, useProducts } from "@/hooks/useProducts";
 import { useCart } from "@/context/CartContext";
 import { toast } from "@/components/ui/sonner";
+import ProductCard from "@/components/ProductCard";
+import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 
 // ── Bulk Order helpers ──────────────────────────────────────────────────────
 const BULK_TIERS = [
@@ -50,11 +53,8 @@ interface BulkInquiryForm {
   message: string;
 }
 
-// Import product images for gallery
-import productProteinBar from "@/assets/product-protein-bar.jpg";
-import productMilletBar from "@/assets/product-millet-bar.jpg";
-import productHealthyMix from "@/assets/product-healthy-mix.jpg";
-import productChikki from "@/assets/product-chikki.jpg";
+// Placeholder for product images (replace with real images later)
+const PRODUCT_IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
 
 // Extended product details (for PDP display)
 const productDetails: Record<string, {
@@ -87,7 +87,7 @@ const productDetails: Record<string, {
   default: {
     subtitle: "High Protein | Low Sugar | Natural Ingredients",
     reviewCount: 2847,
-    images: [productProteinBar, productMilletBar, productHealthyMix, productChikki],
+    images: [PRODUCT_IMAGE_PLACEHOLDER, PRODUCT_IMAGE_PLACEHOLDER, PRODUCT_IMAGE_PLACEHOLDER, PRODUCT_IMAGE_PLACEHOLDER],
     tags: ["High Protein", "Multigrain", "No Added Sugar"],
     description: "Our Premium Multigrain Protein Bar is crafted with a blend of ancient Indian grains including ragi, jowar, and bajra. Each bar delivers 15g of plant-based protein, making it perfect for your active lifestyle. Made with natural jaggery and zero artificial sweeteners.",
     highlights: [
@@ -119,60 +119,69 @@ const productDetails: Record<string, {
   }
 };
 
-const reviews = [
-  {
-    id: 1,
-    name: "Priya Sharma",
-    avatar: "PS",
-    rating: 5,
-    date: "2 weeks ago",
-    title: "Best protein bar I've ever had!",
-    content: "Finally a protein bar that doesn't taste like cardboard! The multigrain texture is amazing and it keeps me full for hours. Perfect for my morning gym sessions.",
-    helpful: 124,
-    verified: true
-  },
-  {
-    id: 2,
-    name: "Rahul Verma",
-    avatar: "RV",
-    rating: 4,
-    date: "1 month ago",
-    title: "Great taste, good nutrition",
-    content: "Love the fact that it uses traditional Indian grains. The jaggery sweetness is just right - not too sweet. Would love to see more flavors!",
-    helpful: 89,
-    verified: true
-  },
-  {
-    id: 3,
-    name: "Anjali Patel",
-    avatar: "AP",
-    rating: 5,
-    date: "1 month ago",
-    title: "Perfect snack for busy professionals",
-    content: "I keep these in my office drawer for those mid-afternoon hunger pangs. Healthy, filling, and delicious. The no added sugar aspect is a huge plus for me.",
-    helpful: 67,
-    verified: true
-  },
-  {
-    id: 4,
-    name: "Vikram Singh",
-    avatar: "VS",
-    rating: 4,
-    date: "2 months ago",
-    title: "Solid protein source",
-    content: "Good macros for the price. The texture is a bit dense but I actually prefer it that way. Feels more substantial than other bars.",
-    helpful: 45,
-    verified: false
-  }
-];
+// Reviews and rating breakdown will be populated from backend data.
+// When real review data is available, pass it via API and replace the empty arrays below.
+const reviews: {
+  id: number;
+  name: string;
+  avatar: string;
+  rating: number;
+  date: string;
+  title: string;
+  content: string;
+  helpful: number;
+  verified: boolean;
+}[] = [];
 
-const ratingBreakdown = [
-  { stars: 5, percentage: 72 },
-  { stars: 4, percentage: 18 },
-  { stars: 3, percentage: 6 },
-  { stars: 2, percentage: 3 },
-  { stars: 1, percentage: 1 }
-];
+const ratingBreakdown: { stars: number; percentage: number }[] = [];
+
+// ── You May Also Like ───────────────────────────────────────────────────────
+const YouMayAlsoLike = ({ currentProductId }: { currentProductId: string }) => {
+  const { data, isLoading } = useProducts({ limit: 4 });
+  const suggestions = (data?.items ?? []).filter((p) => p.id !== currentProductId).slice(0, 4);
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className="mt-16"
+    >
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="font-display text-xl font-bold text-foreground md:text-2xl">
+          You May Also Like
+        </h2>
+        <Link
+          to="/search"
+          className="font-body text-sm text-primary hover:underline underline-offset-2"
+        >
+          View all
+        </Link>
+      </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : suggestions.length > 0 ? (
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {suggestions.map((p) => (
+            <ProductCard key={p.id} {...p} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      )}
+    </motion.section>
+  );
+};
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -192,43 +201,79 @@ const ProductDetailPage = () => {
     name: "", business: "", phone: "", email: "", quantity: "", message: "",
   });
 
-  // Find product from shared data
-  const baseProduct = allProducts.find((p) => p.id === id) || allProducts[0];
+  const { data: baseProduct, isLoading, error } = useProduct(id);
   const details = productDetails.default;
-  
-  // Combine base product with extended details
-  const product = {
-    ...baseProduct,
-    ...details,
-    images: [baseProduct.image, productMilletBar, productHealthyMix, productChikki],
-    tags: [baseProduct.tag, ...details.tags.slice(1)],
-  };
 
-  const discount = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const product = baseProduct
+    ? {
+        ...baseProduct,
+        ...details,
+        images: [baseProduct.image, PRODUCT_IMAGE_PLACEHOLDER, PRODUCT_IMAGE_PLACEHOLDER, PRODUCT_IMAGE_PLACEHOLDER],
+        tags: [baseProduct.tag, ...details.tags.slice(1)],
+      }
+    : null;
+
+  const discount = product
+    ? (product.originalPrice
+        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+        : 0)
     : 0;
 
+  if (isLoading || !product) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-6 md:py-10">
+          {isLoading ? (
+            <div className="grid gap-8 lg:grid-cols-2">
+              <div className="aspect-square animate-pulse rounded-3xl bg-muted" />
+              <div className="space-y-4">
+                <div className="h-8 w-2/3 animate-pulse rounded bg-muted" />
+                <div className="h-4 w-48 animate-pulse rounded bg-muted" />
+                <div className="h-12 w-24 animate-pulse rounded bg-muted" />
+              </div>
+            </div>
+          ) : error || !baseProduct ? (
+            <div className="py-16 text-center">
+              <p className="font-body text-muted-foreground">Product not found or unable to load.</p>
+              <Link to="/" className="mt-4 inline-block font-body text-primary hover:underline">
+                Back to Home
+              </Link>
+            </div>
+          ) : null}
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   const handleAddToCart = () => {
-    addToCart({ 
-      id: product.id, 
-      name: product.name, 
-      tag: product.tag, 
-      price: product.price, 
-      originalPrice: product.originalPrice, 
-      image: product.image 
-    });
+    addToCart(
+      {
+        id: product.id,
+        name: product.name,
+        tag: product.tag,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.image,
+      },
+      quantity
+    );
     toast.success(`Added ${quantity} item(s) to cart ✓`);
   };
 
   const handleBuyNow = () => {
-    addToCart({ 
-      id: product.id, 
-      name: product.name, 
-      tag: product.tag, 
-      price: product.price, 
-      originalPrice: product.originalPrice, 
-      image: product.image 
-    });
+    addToCart(
+      {
+        id: product.id,
+        name: product.name,
+        tag: product.tag,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.image,
+      },
+      quantity
+    );
     navigate("/checkout");
   };
 
@@ -257,16 +302,18 @@ const ProductDetailPage = () => {
   const handleBulkAddToCart = () => {
     const n = parseInt(bulkQty, 10);
     if (isNaN(n) || n < 25) { setBulkError("Minimum bulk order is 25 units."); return; }
-    for (let i = 0; i < n; i++) {
-      addToCart({
+    const bulkPrice = activeTier ? Math.round(product.price * (1 - activeTier.discount / 100)) : product.price;
+    addToCart(
+      {
         id: product.id,
         name: product.name,
         tag: product.tag,
-        price: activeTier ? Math.round(product.price * (1 - activeTier.discount / 100)) : product.price,
+        price: bulkPrice,
         originalPrice: product.price,
         image: product.image,
-      });
-    }
+      },
+      n
+    );
     toast.success(`Bulk order of ${n} units added to cart ✓`);
   };
 
@@ -319,9 +366,11 @@ const ProductDetailPage = () => {
                   className="h-full w-full object-cover"
                 />
               </AnimatePresence>
-              <Badge className="absolute left-4 top-4 rounded-full bg-secondary px-3 py-1 font-body text-sm font-semibold text-secondary-foreground">
-                {discount}% OFF
-              </Badge>
+              {discount > 0 && (
+                <Badge className="absolute left-4 top-4 rounded-full bg-secondary px-3 py-1 font-body text-sm font-semibold text-secondary-foreground">
+                  {discount}% OFF
+                </Badge>
+              )}
             </div>
 
             {/* Thumbnail Gallery */}
@@ -388,9 +437,11 @@ const ProductDetailPage = () => {
                 <span className="font-body text-sm font-medium text-foreground">
                   {product.rating}
                 </span>
-                <span className="font-body text-sm text-muted-foreground">
-                  ({product.reviewCount.toLocaleString()} reviews)
-                </span>
+                {reviews.length > 0 && (
+                  <span className="font-body text-sm text-muted-foreground">
+                    ({reviews.length.toLocaleString()} reviews)
+                  </span>
+                )}
               </div>
             </div>
 
@@ -400,12 +451,16 @@ const ProductDetailPage = () => {
                 <span className="font-display text-3xl font-bold text-foreground">
                   ₹{product.price}
                 </span>
-                <span className="font-body text-lg text-muted-foreground line-through">
-                  ₹{product.originalPrice}
-                </span>
-                <Badge className="rounded-full bg-primary/10 px-2 py-0.5 font-body text-sm font-semibold text-primary">
-                  Save ₹{product.originalPrice - product.price}
-                </Badge>
+                {product.originalPrice && (
+                  <>
+                    <span className="font-body text-lg text-muted-foreground line-through">
+                      ₹{product.originalPrice}
+                    </span>
+                    <Badge className="rounded-full bg-primary/10 px-2 py-0.5 font-body text-sm font-semibold text-primary">
+                      Save ₹{product.originalPrice - product.price}
+                    </Badge>
+                  </>
+                )}
               </div>
               {/* Bulk Order Link */}
               <button
@@ -548,7 +603,7 @@ const ProductDetailPage = () => {
                 value="reviews"
                 className="rounded-none border-b-2 border-transparent px-6 py-3 font-body font-semibold data-[state=active]:border-primary data-[state=active]:bg-transparent"
               >
-                Reviews ({product.reviewCount.toLocaleString()})
+                Reviews{reviews.length > 0 ? ` (${reviews.length.toLocaleString()})` : ""}
               </TabsTrigger>
             </TabsList>
 
@@ -659,112 +714,134 @@ const ProductDetailPage = () => {
 
             {/* Reviews Tab */}
             <TabsContent value="reviews" className="mt-6">
-              <div className="grid gap-8 lg:grid-cols-3">
-                {/* Rating Summary */}
-                <div className="rounded-2xl border border-border bg-card p-6">
-                  <div className="mb-4 text-center">
-                    <div className="font-display text-5xl font-bold text-foreground">
-                      {product.rating}
-                    </div>
-                    <div className="mt-2 flex justify-center gap-1">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-5 w-5 ${
-                            i < Math.floor(product.rating)
-                              ? "fill-accent text-accent"
-                              : "fill-muted text-muted"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <p className="mt-2 font-body text-sm text-muted-foreground">
-                      Based on {product.reviewCount.toLocaleString()} reviews
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    {ratingBreakdown.map((item) => (
-                      <div key={item.stars} className="flex items-center gap-3">
-                        <span className="w-3 font-body text-sm text-muted-foreground">
-                          {item.stars}
-                        </span>
-                        <Star className="h-4 w-4 fill-accent text-accent" />
-                        <Progress value={item.percentage} className="h-2 flex-1" />
-                        <span className="w-10 text-right font-body text-sm text-muted-foreground">
-                          {item.percentage}%
-                        </span>
+              {reviews.length > 0 ? (
+                <div className="grid gap-8 lg:grid-cols-3">
+                  {/* Rating Summary — only shown when real review data exists */}
+                  <div className="rounded-2xl border border-border bg-card p-6">
+                    <div className="mb-4 text-center">
+                      <div className="font-display text-5xl font-bold text-foreground">
+                        {product.rating}
                       </div>
-                    ))}
-                  </div>
+                      <div className="mt-2 flex justify-center gap-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-5 w-5 ${
+                              i < Math.floor(product.rating)
+                                ? "fill-accent text-accent"
+                                : "fill-muted text-muted"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="mt-2 font-body text-sm text-muted-foreground">
+                        Based on {reviews.length.toLocaleString()} reviews
+                      </p>
+                    </div>
 
-                  <Button className="mt-6 w-full rounded-full" variant="outline">
-                    Write a Review
-                  </Button>
-                </div>
-
-                {/* Reviews List */}
-                <div className="space-y-4 lg:col-span-2">
-                  {reviews.map((review) => (
-                    <motion.div
-                      key={review.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="rounded-2xl border border-border bg-card p-6"
-                    >
-                      <div className="mb-3 flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-body font-semibold text-primary">
-                            {review.avatar}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-body font-semibold text-foreground">
-                                {review.name}
-                              </span>
-                              {review.verified && (
-                                <Badge className="rounded bg-secondary/10 px-1.5 py-0.5 font-body text-xs text-secondary-foreground">
-                                  Verified
-                                </Badge>
-                              )}
-                            </div>
-                            <span className="font-body text-xs text-muted-foreground">
-                              {review.date}
+                    {ratingBreakdown.length > 0 && (
+                      <div className="space-y-2">
+                        {ratingBreakdown.map((item) => (
+                          <div key={item.stars} className="flex items-center gap-3">
+                            <span className="w-3 font-body text-sm text-muted-foreground">
+                              {item.stars}
+                            </span>
+                            <Star className="h-4 w-4 fill-accent text-accent" />
+                            <Progress value={item.percentage} className="h-2 flex-1" />
+                            <span className="w-10 text-right font-body text-sm text-muted-foreground">
+                              {item.percentage}%
                             </span>
                           </div>
-                        </div>
-                        <div className="flex gap-0.5">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < review.rating
-                                  ? "fill-accent text-accent"
-                                  : "fill-muted text-muted"
-                              }`}
-                            />
-                          ))}
-                        </div>
+                        ))}
                       </div>
-                      <h4 className="mb-2 font-body font-semibold text-foreground">
-                        {review.title}
-                      </h4>
-                      <p className="font-body text-sm leading-relaxed text-muted-foreground">
-                        {review.content}
-                      </p>
-                      <div className="mt-4 flex items-center gap-4">
-                        <Button variant="ghost" size="sm" className="h-8 font-body text-xs">
-                          Helpful ({review.helpful})
-                        </Button>
-                      </div>
-                    </motion.div>
-                  ))}
+                    )}
 
-                  <Button variant="outline" className="w-full rounded-full">
-                    Load More Reviews
-                  </Button>
+                    <Button className="mt-6 w-full rounded-full" variant="outline">
+                      Write a Review
+                    </Button>
+                  </div>
+
+                  {/* Reviews List */}
+                  <div className="space-y-4 lg:col-span-2">
+                    {reviews.map((review) => (
+                      <motion.div
+                        key={review.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="rounded-2xl border border-border bg-card p-6"
+                      >
+                        <div className="mb-3 flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 font-body font-semibold text-primary">
+                              {review.avatar}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-body font-semibold text-foreground">
+                                  {review.name}
+                                </span>
+                                {review.verified && (
+                                  <Badge className="rounded bg-secondary/10 px-1.5 py-0.5 font-body text-xs text-secondary-foreground">
+                                    Verified
+                                  </Badge>
+                                )}
+                              </div>
+                              <span className="font-body text-xs text-muted-foreground">
+                                {review.date}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex gap-0.5">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < review.rating
+                                    ? "fill-accent text-accent"
+                                    : "fill-muted text-muted"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <h4 className="mb-2 font-body font-semibold text-foreground">
+                          {review.title}
+                        </h4>
+                        <p className="font-body text-sm leading-relaxed text-muted-foreground">
+                          {review.content}
+                        </p>
+                        <div className="mt-4 flex items-center gap-4">
+                          <Button variant="ghost" size="sm" className="h-8 font-body text-xs">
+                            Helpful ({review.helpful})
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                /* Empty state — shown until real reviews are connected from backend */
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col items-center gap-6 rounded-2xl border border-dashed border-border bg-muted/30 py-16 text-center"
+                >
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                    <MessageSquare className="h-7 w-7 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="font-display text-lg font-semibold text-foreground">
+                      No reviews yet
+                    </p>
+                    <p className="mt-1 font-body text-sm text-muted-foreground">
+                      Be the first to share your experience with this product.
+                    </p>
+                  </div>
+                  <Button variant="outline" className="rounded-full px-8">
+                    Write the First Review
+                  </Button>
+                </motion.div>
+              )}
             </TabsContent>
           </Tabs>
         </motion.div>
@@ -950,6 +1027,8 @@ const ProductDetailPage = () => {
             </Button>
           </div>
         </motion.div>
+        {/* You May Also Like */}
+        <YouMayAlsoLike currentProductId={product.id} />
       </main>
 
       <Footer />

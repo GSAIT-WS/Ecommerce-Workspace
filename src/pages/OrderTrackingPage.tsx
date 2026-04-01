@@ -14,8 +14,9 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import OrderStatusTimeline from "@/components/checkout/OrderStatusTimeline";
-import productProteinBar from "@/assets/product-protein-bar.jpg";
-import productMilletBar from "@/assets/product-millet-bar.jpg";
+
+// Placeholder for product images (replace with real images later)
+const PRODUCT_IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
 
 type OrderStatus = "confirmed" | "packed" | "shipped" | "delivered";
 
@@ -33,13 +34,13 @@ const orderData = {
       id: "1",
       name: "Peanut Butter Protein Bar",
       quantity: 2,
-      image: productProteinBar,
+      image: PRODUCT_IMAGE_PLACEHOLDER,
     },
     {
       id: "5",
       name: "Ragi Millet Energy Bar",
       quantity: 1,
-      image: productMilletBar,
+      image: PRODUCT_IMAGE_PLACEHOLDER,
     },
   ],
   address: {

@@ -1,4 +1,6 @@
 // Dummy user data for profile page
+// Placeholder for product images (replace with real images later)
+const PRODUCT_IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
 
 export interface UserProfile {
   id: string;
@@ -127,21 +129,21 @@ export const savedProducts: SavedProduct[] = [
   {
     id: "1",
     name: "Protein Power Bar",
-    image: "/src/assets/product-protein-bar.jpg",
+    image: PRODUCT_IMAGE_PLACEHOLDER,
     price: 149,
     originalPrice: 199,
   },
   {
     id: "2",
     name: "Multigrain Crunch",
-    image: "/src/assets/product-multigrain-snack.jpg",
+    image: PRODUCT_IMAGE_PLACEHOLDER,
     price: 99,
     originalPrice: 129,
   },
   {
     id: "3",
     name: "Healthy Trail Mix",
-    image: "/src/assets/product-healthy-mix.jpg",
+    image: PRODUCT_IMAGE_PLACEHOLDER,
     price: 249,
     originalPrice: 299,
   },
@@ -151,7 +153,7 @@ export const ratedProducts: RatedProduct[] = [
   {
     id: "1",
     name: "Shilajit Energy Bar",
-    image: "/src/assets/product-shilajit-bar.jpg",
+    image: PRODUCT_IMAGE_PLACEHOLDER,
     rating: 5,
     review: "Amazing taste and energy boost!",
     date: "2 weeks ago",
@@ -159,7 +161,7 @@ export const ratedProducts: RatedProduct[] = [
   {
     id: "2",
     name: "Millet Crunch Bar",
-    image: "/src/assets/product-millet-bar.jpg",
+    image: PRODUCT_IMAGE_PLACEHOLDER,
     rating: 4,
     review: "Good healthy snack option",
     date: "1 month ago",
@@ -170,14 +172,14 @@ export const recentlyViewed: SavedProduct[] = [
   {
     id: "4",
     name: "Peanut Chikki Bar",
-    image: "/src/assets/product-chikki.jpg",
+    image: PRODUCT_IMAGE_PLACEHOLDER,
     price: 79,
     originalPrice: 99,
   },
   {
     id: "6",
     name: "Combo Pack",
-    image: "/src/assets/product-combo.jpg",
+    image: PRODUCT_IMAGE_PLACEHOLDER,
     price: 499,
     originalPrice: 649,
   },

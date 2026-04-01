@@ -1,102 +1,42 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Truck, ShieldCheck, Clock, AlertCircle, MapPin } from "lucide-react";
+import { ArrowLeft, Plus, Truck, ShieldCheck, Clock, AlertCircle, MapPin, Home, Briefcase } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import AddressCard from "@/components/checkout/AddressCard";
 import DeliverySlotSelector from "@/components/checkout/DeliverySlotSelector";
-import LocationAddressSelector from "@/components/address/LocationAddressSelector";
-import AddressMapPreview from "@/components/address/AddressMapPreview";
-import productProteinBar from "@/assets/product-protein-bar.jpg";
-import productMilletBar from "@/assets/product-millet-bar.jpg";
+import AddressFormModal from "@/components/address/AddressFormModal";
+import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import { useAddress } from "@/context/AddressContext";
+import type { ApiAddress } from "@/services/addressApi";
 
-// Address type with optional coordinates for map preview
-interface CheckoutAddress {
-  id: string;
-  type: "home" | "work" | "other";
-  name: string;
-  phone: string;
-  address: string;
-  landmark?: string;
-  pincode: string;
-  isDefault: boolean;
-  latitude?: number;
-  longitude?: number;
-}
-
-// Dummy addresses (with sample coords for map preview)
-const initialAddresses: CheckoutAddress[] = [
-  {
-    id: "1",
-    type: "home",
-    name: "Rahul Sharma",
-    phone: "+91 98765 43210",
-    address: "123, Green Valley Apartments, Koramangala, 5th Block",
-    landmark: "Near Sony World Signal",
-    pincode: "560095, Bangalore",
-    isDefault: true,
-    latitude: 12.9352,
-    longitude: 77.6245,
-  },
-  {
-    id: "2",
-    type: "work",
-    name: "Rahul Sharma",
-    phone: "+91 98765 43210",
-    address: "Tech Park, Tower B, 4th Floor, Outer Ring Road",
-    landmark: "Opposite Marathahalli Bridge",
-    pincode: "560037, Bangalore",
-    isDefault: false,
-    latitude: 12.9698,
-    longitude: 77.7499,
-  },
-];
-
-// Dummy cart items for checkout
-const checkoutItems = [
-  {
-    id: "1",
-    name: "Peanut Butter Protein Bar",
-    variant: "Pack of 6 • Chocolate",
-    price: 149,
-    originalPrice: 199,
-    quantity: 2,
-    image: productProteinBar,
-    tag: "High Protein",
-  },
-  {
-    id: "5",
-    name: "Ragi Millet Energy Bar",
-    variant: "Pack of 4 • Original",
-    price: 139,
-    quantity: 1,
-    image: productMilletBar,
-    tag: "Multigrain",
-  },
-];
+const labelIcon = (label?: string) => {
+  switch (label?.toLowerCase()) {
+    case "work":
+      return Briefcase;
+    case "other":
+      return MapPin;
+    default:
+      return Home;
+  }
+};
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
-  const [addresses, setAddresses] = useState<CheckoutAddress[]>(initialAddresses);
-  const [selectedAddress, setSelectedAddress] = useState(initialAddresses[0]?.id ?? "");
-  const [showAddressSelector, setShowAddressSelector] = useState(false);
-  const [quantities, setQuantities] = useState<Record<string, number>>(
-    checkoutItems.reduce((acc, item) => ({ ...acc, [item.id]: item.quantity }), {})
-  );
+  const { items: cartItems, updateQuantity, getSubtotal, getDeliveryCharge } = useCart();
+  const { session } = useAuth();
+  const { addresses, selectedAddressId, setSelectedAddressId, refreshAddresses } = useAddress();
+
+  const [showAddressModal, setShowAddressModal] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponError, setCouponError] = useState("");
 
-  const updateQuantity = (id: string, delta: number) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [id]: Math.max(1, (prev[id] || 1) + delta),
-    }));
-  };
+  const token = session?.access_token ?? null;
 
   const handleApplyCoupon = () => {
     setCouponError("");
@@ -109,14 +49,44 @@ const CheckoutPage = () => {
     }
   };
 
-  const subtotal = checkoutItems.reduce(
-    (sum, item) => sum + item.price * (quantities[item.id] || item.quantity),
-    0
-  );
+  const subtotal = getSubtotal();
+  const delivery = getDeliveryCharge();
   const couponDiscount = appliedCoupon === "CRUNCHFIRST" ? Math.floor(subtotal * 0.2) : 0;
-  const delivery = subtotal > 499 ? 0 : 49;
-  const discount = 50 + couponDiscount; // Previous dummy discount + coupon discount
-  const total = subtotal + delivery - discount;
+  const total = subtotal + delivery - couponDiscount;
+
+  const selectedAddress: ApiAddress | undefined = addresses.find(
+    (a) => a.id === selectedAddressId
+  );
+
+  const canProceed = addresses.length > 0 && !!selectedAddressId;
+
+  const handleProceedToPayment = () => {
+    navigate("/payment", {
+      state: {
+        selectedAddress,
+        couponDiscount,
+        total,
+        subtotal,
+        delivery,
+      },
+    });
+  };
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-16 text-center">
+          <h1 className="font-display text-2xl font-bold text-foreground">Your cart is empty</h1>
+          <p className="mt-2 font-body text-muted-foreground">Add items to your cart before checkout.</p>
+          <Button asChild className="mt-6">
+            <Link to="/search">Continue Shopping</Link>
+          </Button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -143,9 +113,10 @@ const CheckoutPage = () => {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Left Column - Forms */}
+          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Delivery Address Section */}
+
+            {/* ── Delivery Address Section ── */}
             <section className="rounded-2xl border border-border bg-card p-6">
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="font-display text-xl font-bold text-foreground">
@@ -155,7 +126,7 @@ const CheckoutPage = () => {
                   variant="outline"
                   size="sm"
                   className="gap-2 rounded-full font-body text-sm"
-                  onClick={() => setShowAddressSelector(true)}
+                  onClick={() => setShowAddressModal(true)}
                 >
                   <Plus className="h-4 w-4" />
                   {addresses.length === 0 ? "Add Address" : "Add New"}
@@ -169,66 +140,76 @@ const CheckoutPage = () => {
                     No delivery address
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Add your delivery address to place the order
+                    Please add a delivery address to continue
                   </p>
-                  <Button
-                    className="mt-4"
-                    onClick={() => setShowAddressSelector(true)}
-                  >
+                  <Button className="mt-4" onClick={() => setShowAddressModal(true)}>
                     <Plus className="mr-2 h-4 w-4" />
                     Add Address
                   </Button>
                 </div>
               ) : (
-                <>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {addresses.map((address) => (
-                      <AddressCard
+                <div className="space-y-3">
+                  {addresses.map((address) => {
+                    const Icon = labelIcon(address.label);
+                    const isSelected = selectedAddressId === address.id;
+                    return (
+                      <button
                         key={address.id}
-                        address={address}
-                        isSelected={selectedAddress === address.id}
-                        onSelect={() => setSelectedAddress(address.id)}
-                        onEdit={() => setShowAddressSelector(true)}
-                        deliveryAvailable={true}
-                      />
-                    ))}
-                  </div>
-
-                  {/* Map preview for selected address */}
-                  {(() => {
-                    const addr = addresses.find((a) => a.id === selectedAddress);
-                    if (addr?.latitude != null && addr?.longitude != null) {
-                      return (
-                        <div className="mt-6">
-                          <div className="mb-3 flex items-center justify-between">
-                            <h3 className="font-body text-sm font-medium text-foreground">
-                              Location Preview
-                            </h3>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="gap-1.5 text-primary"
-                              onClick={() => setShowAddressSelector(true)}
-                            >
-                              <MapPin className="h-4 w-4" />
-                              Change Location
-                            </Button>
+                        type="button"
+                        onClick={() => setSelectedAddressId(address.id)}
+                        className={`w-full text-left rounded-xl border-2 p-4 transition-all ${
+                          isSelected
+                            ? "border-primary bg-primary/5"
+                            : "border-border bg-background hover:border-primary/40"
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          {/* Radio indicator */}
+                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-current transition-colors"
+                            style={{ borderColor: isSelected ? "hsl(var(--primary))" : "hsl(var(--border))" }}
+                          >
+                            {isSelected && (
+                              <div className="h-2.5 w-2.5 rounded-full bg-primary" />
+                            )}
                           </div>
-                          <AddressMapPreview
-                            latitude={addr.latitude}
-                            longitude={addr.longitude}
-                            address={addr.address}
-                          />
+
+                          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${isSelected ? "bg-primary/10" : "bg-muted"}`}>
+                            <Icon className={`h-4 w-4 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-semibold text-sm text-foreground">
+                                {address.label ?? "Home"}
+                              </span>
+                              {address.is_default && (
+                                <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm font-medium text-foreground mt-0.5">
+                              {address.recipient_name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {[address.address_line1, address.address_line2]
+                                .filter(Boolean)
+                                .join(", ")}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {address.city}, {address.state} – {address.postal_code}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{address.phone}</p>
+                          </div>
                         </div>
-                      );
-                    }
-                    return null;
-                  })()}
-                </>
+                      </button>
+                    );
+                  })}
+                </div>
               )}
             </section>
 
-            {/* Delivery Time Section */}
+            {/* ── Delivery Time Section ── */}
             <section className="rounded-2xl border border-border bg-card p-6">
               <div className="mb-6 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/10">
@@ -243,18 +224,17 @@ const CheckoutPage = () => {
                   </p>
                 </div>
               </div>
-
               <DeliverySlotSelector onSlotSelect={() => {}} />
             </section>
 
-            {/* Order Items Section */}
+            {/* ── Order Items Section ── */}
             <section className="rounded-2xl border border-border bg-card p-6">
               <h2 className="mb-6 font-display text-xl font-bold text-foreground">
-                Order Items ({checkoutItems.length})
+                Order Items ({cartItems.length})
               </h2>
 
               <div className="space-y-4">
-                {checkoutItems.map((item) => (
+                {cartItems.map((item) => (
                   <div
                     key={item.id}
                     className="flex gap-4 rounded-xl border border-border bg-background p-4"
@@ -267,14 +247,7 @@ const CheckoutPage = () => {
                     <div className="flex flex-1 flex-col justify-between">
                       <div>
                         <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-display font-semibold text-foreground">
-                              {item.name}
-                            </p>
-                            <p className="font-body text-xs text-muted-foreground">
-                              {item.variant}
-                            </p>
-                          </div>
+                          <p className="font-display font-semibold text-foreground">{item.name}</p>
                           <Badge
                             variant="secondary"
                             className="rounded-full bg-secondary/10 text-xs font-medium text-secondary"
@@ -286,16 +259,16 @@ const CheckoutPage = () => {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1">
                           <button
-                            onClick={() => updateQuantity(item.id, -1)}
+                            onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                             className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-muted"
                           >
                             −
                           </button>
                           <span className="w-6 text-center font-body text-sm font-semibold">
-                            {quantities[item.id]}
+                            {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.id, 1)}
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-muted"
                           >
                             +
@@ -303,11 +276,11 @@ const CheckoutPage = () => {
                         </div>
                         <div className="text-right">
                           <p className="font-display font-bold text-foreground">
-                            ₹{item.price * quantities[item.id]}
+                            ₹{item.price * item.quantity}
                           </p>
                           {item.originalPrice && (
                             <p className="font-body text-xs text-muted-foreground line-through">
-                              ₹{item.originalPrice * quantities[item.id]}
+                              ₹{item.originalPrice * item.quantity}
                             </p>
                           )}
                         </div>
@@ -326,7 +299,7 @@ const CheckoutPage = () => {
                 Order Summary
               </h2>
 
-              {/* Coupon Section */}
+              {/* Coupon */}
               <div className="mb-6 rounded-xl border border-border bg-background p-4">
                 <label className="mb-3 block font-body text-sm font-medium text-foreground">
                   Have a coupon?
@@ -336,10 +309,7 @@ const CheckoutPage = () => {
                     type="text"
                     placeholder="Enter coupon code"
                     value={couponCode}
-                    onChange={(e) => {
-                      setCouponCode(e.target.value);
-                      setCouponError("");
-                    }}
+                    onChange={(e) => { setCouponCode(e.target.value); setCouponError(""); }}
                     className="flex-1 rounded-lg font-body text-sm"
                   />
                   <Button
@@ -390,18 +360,20 @@ const CheckoutPage = () => {
                     {delivery === 0 ? "Free" : `₹${delivery}`}
                   </span>
                 </div>
-                <div className="flex justify-between font-body text-sm">
-                  <span className="text-muted-foreground">Discount</span>
-                  <motion.span
-                    key={discount}
-                    initial={{ scale: 1.15, color: "hsl(var(--secondary))" }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.3 }}
-                    className="font-semibold text-secondary"
-                  >
-                    −₹{discount}
-                  </motion.span>
-                </div>
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between font-body text-sm">
+                    <span className="text-muted-foreground">Discount</span>
+                    <motion.span
+                      key={couponDiscount}
+                      initial={{ scale: 1.15, color: "hsl(var(--secondary))" }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                      className="font-semibold text-secondary"
+                    >
+                      −₹{couponDiscount}
+                    </motion.span>
+                  </div>
+                )}
               </div>
 
               {/* Total */}
@@ -422,27 +394,24 @@ const CheckoutPage = () => {
               <div className="mb-6 flex items-center gap-3 rounded-xl bg-secondary/10 px-4 py-3">
                 <Truck className="h-5 w-5 text-secondary" />
                 <div>
-                  <p className="font-body text-sm font-semibold text-foreground">
-                    Express Delivery
-                  </p>
-                  <p className="font-body text-xs text-muted-foreground">
-                    Estimated 30-45 mins
-                  </p>
+                  <p className="font-body text-sm font-semibold text-foreground">Express Delivery</p>
+                  <p className="font-body text-xs text-muted-foreground">Estimated 30-45 mins</p>
                 </div>
               </div>
 
               {/* CTA */}
               <Button
-                onClick={() => navigate("/payment")}
-                disabled={addresses.length === 0}
+                onClick={handleProceedToPayment}
+                disabled={!canProceed}
                 className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground"
               >
                 {addresses.length === 0
                   ? "Add address to continue"
+                  : !selectedAddressId
+                  ? "Select an address"
                   : "Proceed to Payment"}
               </Button>
 
-              {/* Security badge */}
               <div className="mt-4 flex items-center justify-center gap-2 text-muted-foreground">
                 <ShieldCheck className="h-4 w-4" />
                 <span className="font-body text-xs">Secure & Encrypted Checkout</span>
@@ -459,41 +428,30 @@ const CheckoutPage = () => {
           <span className="font-display text-lg font-bold text-primary">₹{total}</span>
         </div>
         <Button
-          onClick={() => navigate("/payment")}
-          disabled={addresses.length === 0}
+          onClick={handleProceedToPayment}
+          disabled={!canProceed}
           className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground"
         >
           {addresses.length === 0
             ? "Add address to continue"
+            : !selectedAddressId
+            ? "Select an address"
             : "Proceed to Payment"}
         </Button>
       </div>
 
-      <LocationAddressSelector
-        open={showAddressSelector}
-        onClose={() => setShowAddressSelector(false)}
-        onSuccess={(data) => {
-          setShowAddressSelector(false);
-          if (data) {
-            const newAddr: CheckoutAddress = {
-              id: `new-${Date.now()}`,
-              type: "home",
-              name: data.recipient_name,
-              phone: data.phone,
-              address: [data.address_line1, data.address_line2].filter(Boolean).join(", "),
-              pincode: `${data.postal_code}, ${data.city}`,
-              isDefault: false,
-              latitude: data.latitude ?? undefined,
-              longitude: data.longitude ?? undefined,
-            };
-            setAddresses((prev) => [...prev, newAddr]);
-            setSelectedAddress(newAddr.id);
-          }
+      {/* Add new address modal */}
+      <AddressFormModal
+        open={showAddressModal}
+        onClose={() => setShowAddressModal(false)}
+        token={token}
+        onSuccess={async () => {
+          setShowAddressModal(false);
+          await refreshAddresses();
         }}
       />
 
       <div className="h-32 lg:h-0" />
-
       <Footer />
     </div>
   );

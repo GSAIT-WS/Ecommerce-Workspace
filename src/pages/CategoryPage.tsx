@@ -15,7 +15,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import ProductListCard from "@/components/ProductListCard";
 import ProductFilters from "@/components/ProductFilters";
-import { allProducts, getProductsByCategory } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
 
 // Category metadata
 const categoryData: Record<string, { title: string; subtitle: string }> = {
@@ -44,14 +44,12 @@ const CategoryPage = () => {
   const [sortBy, setSortBy] = useState("popularity");
 
   const category = categoryData[slug || "protein-bars"] || categoryData["protein-bars"];
-  
-  // Get products for this category from shared data
-  let products = slug ? getProductsByCategory(slug) : allProducts;
-  
-  // If no products found for category, show all products
-  if (products.length === 0) {
-    products = allProducts;
-  }
+
+  const { data, isLoading, error } = useProducts({
+    category_slug: slug || undefined,
+    limit: 100,
+  });
+  let products = data?.items ?? [];
 
   // Apply sorting
   const sortedProducts = [...products].sort((a, b) => {
@@ -159,7 +157,15 @@ const CategoryPage = () => {
       {/* Product Grid/List */}
       <section className="px-4 py-6 md:py-8">
         <div className="mx-auto max-w-7xl">
-          {viewMode === "grid" ? (
+          {isLoading ? (
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="aspect-square animate-pulse rounded-2xl bg-muted" />
+              ))}
+            </div>
+          ) : error ? (
+            <p className="py-8 text-center font-body text-muted-foreground">Unable to load products. Please try again later.</p>
+          ) : viewMode === "grid" ? (
             <motion.div
               initial="hidden"
               animate="visible"

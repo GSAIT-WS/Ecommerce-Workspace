@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -19,7 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addAddress, type AddressFormData } from "@/services/addressApi";
+import {
+  addAddress,
+  updateAddress,
+  type AddressFormData,
+  type ApiAddress,
+} from "@/services/addressApi";
 import { toast } from "sonner";
 
 const addressSchema = z.object({
@@ -27,7 +33,7 @@ const addressSchema = z.object({
   phone: z
     .string()
     .min(10, "Enter a valid 10-digit phone number")
-    .refine((v) => (v.replace(/\D/g, "").length >= 10), "Enter a valid 10-digit phone number"),
+    .refine((v) => v.replace(/\D/g, "").length >= 10, "Enter a valid 10-digit phone number"),
   address_line1: z.string().min(3, "Address line 1 is required"),
   address_line2: z.string().optional(),
   city: z.string().min(1, "City is required"),
@@ -73,7 +79,12 @@ interface AddressFormModalProps {
   onClose: () => void;
   onSuccess: (data?: SavedAddressData) => void;
   initialValues?: AddressFormInitialValues;
+  /** For backward-compat: function that returns the JWT token */
   getAuthToken?: () => string | null;
+  /** Direct token — takes priority over getAuthToken */
+  token?: string | null;
+  /** When set, the modal is in edit mode */
+  editAddress?: ApiAddress | null;
 }
 
 const AddressFormModal = ({
@@ -82,7 +93,11 @@ const AddressFormModal = ({
   onSuccess,
   initialValues,
   getAuthToken,
+  token: directToken,
+  editAddress,
 }: AddressFormModalProps) => {
+  const isEditMode = !!editAddress;
+
   const {
     register,
     handleSubmit,
@@ -108,11 +123,24 @@ const AddressFormModal = ({
     },
   });
 
-  // Apply initial values when modal opens
+  // Populate form when modal opens
   useEffect(() => {
     if (!open) return;
     reset();
-    if (initialValues) {
+
+    if (editAddress) {
+      setValue("recipient_name", editAddress.recipient_name);
+      setValue("phone", editAddress.phone);
+      setValue("address_line1", editAddress.address_line1);
+      setValue("address_line2", editAddress.address_line2 ?? "");
+      setValue("city", editAddress.city);
+      setValue("state", editAddress.state);
+      setValue("postal_code", editAddress.postal_code);
+      setValue("label", (editAddress.label as "Home" | "Work" | "Other") ?? "Home");
+      setValue("is_default", !!editAddress.is_default);
+      if (editAddress.latitude != null) setValue("latitude", editAddress.latitude);
+      if (editAddress.longitude != null) setValue("longitude", editAddress.longitude);
+    } else if (initialValues) {
       if (initialValues.recipient_name) setValue("recipient_name", initialValues.recipient_name);
       if (initialValues.phone) setValue("phone", initialValues.phone);
       if (initialValues.address_line1) setValue("address_line1", initialValues.address_line1);
@@ -121,11 +149,11 @@ const AddressFormModal = ({
       if (initialValues.state) setValue("state", initialValues.state);
       if (initialValues.postal_code) setValue("postal_code", initialValues.postal_code);
       if (initialValues.country) setValue("country", initialValues.country);
-      if (initialValues.label) setValue("label", initialValues.label);
+      if (initialValues.label) setValue("label", initialValues.label as "Home" | "Work" | "Other");
       if (initialValues.latitude != null) setValue("latitude", initialValues.latitude);
       if (initialValues.longitude != null) setValue("longitude", initialValues.longitude);
     }
-  }, [open, initialValues, setValue, reset]);
+  }, [open, editAddress, initialValues, setValue, reset]);
 
   const onSubmit = async (values: AddressFormValues) => {
     const phone = String(values.phone).replace(/\D/g, "").slice(-10);
@@ -134,22 +162,66 @@ const AddressFormModal = ({
       return;
     }
 
-    const data: AddressFormData = {
+    const token = directToken ?? getAuthToken?.() ?? null;
+
+    console.log(`[CrunchX] AddressFormModal: submit | mode=${isEditMode ? "edit" : "add"} | authenticated=${token ? "yes" : "no"}`);
+
+    // ── Edit mode ────────────────────────────────────────────────────────────
+    if (isEditMode && editAddress) {
+      if (!token) {
+        toast.error("Please log in to edit a saved address.");
+        return;
+      }
+      const data: AddressFormData = {
+        ...values,
+        phone,
+        latitude: values.latitude ?? null,
+        longitude: values.longitude ?? null,
+      };
+      const result = await updateAddress(editAddress.id, data, token);
+      if (result.error) {
+        // Form is NOT reset — user can correct and retry
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Address updated successfully");
+      reset();
+      onSuccess({
+        recipient_name: values.recipient_name,
+        phone,
+        address_line1: values.address_line1,
+        address_line2: values.address_line2,
+        city: values.city,
+        state: values.state,
+        postal_code: values.postal_code,
+      });
+      onClose();
+      return;
+    }
+
+    // ── Add mode ─────────────────────────────────────────────────────────────
+    const formData: AddressFormData = {
       ...values,
       phone,
       latitude: values.latitude ?? null,
       longitude: values.longitude ?? null,
     };
 
-    const token = getAuthToken?.() ?? null;
-    const result = await addAddress(data, token);
+    // addAddress handles both authenticated (API) and guest (localStorage) cases
+    const result = await addAddress(formData, token);
 
     if (result.error) {
+      // Form is NOT reset — user can correct and retry
       toast.error(result.error);
       return;
     }
 
-    toast.success("Address saved successfully");
+    if (token) {
+      toast.success("Address saved successfully");
+    } else {
+      toast.success("Address saved locally — log in to save permanently");
+    }
+
     const savedData: SavedAddressData = {
       recipient_name: values.recipient_name,
       phone,
@@ -161,6 +233,7 @@ const AddressFormModal = ({
       latitude: values.latitude ?? null,
       longitude: values.longitude ?? null,
     };
+
     reset();
     onSuccess(savedData);
     onClose();
@@ -175,9 +248,9 @@ const AddressFormModal = ({
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Delivery Address</DialogTitle>
+          <DialogTitle>{isEditMode ? "Edit Address" : "Add Delivery Address"}</DialogTitle>
           <p className="text-sm text-muted-foreground">
-            You can edit any auto-filled fields
+            {isEditMode ? "Update your saved address details" : "Enter your delivery address details"}
           </p>
         </DialogHeader>
 
@@ -196,11 +269,12 @@ const AddressFormModal = ({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">Phone Number</Label>
             <Input
               id="phone"
               {...register("phone")}
               placeholder="9876543210"
+              inputMode="numeric"
               className={errors.phone ? "border-destructive" : ""}
             />
             {errors.phone && (
@@ -213,7 +287,7 @@ const AddressFormModal = ({
             <Input
               id="address_line1"
               {...register("address_line1")}
-              placeholder="Building, Street, Area"
+              placeholder="House No., Building, Street, Area"
               className={errors.address_line1 ? "border-destructive" : ""}
             />
             {errors.address_line1 && (
@@ -222,11 +296,13 @@ const AddressFormModal = ({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="address_line2">Address Line 2 (optional)</Label>
+            <Label htmlFor="address_line2">
+              Address Line 2 <span className="text-muted-foreground">(optional)</span>
+            </Label>
             <Input
               id="address_line2"
               {...register("address_line2")}
-              placeholder="Landmark, Floor, etc."
+              placeholder="Landmark, Floor, Flat No."
             />
           </div>
 
@@ -264,6 +340,7 @@ const AddressFormModal = ({
               {...register("postal_code")}
               placeholder="560001"
               maxLength={6}
+              inputMode="numeric"
               className={errors.postal_code ? "border-destructive" : ""}
             />
             {errors.postal_code && (
@@ -272,7 +349,7 @@ const AddressFormModal = ({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="label">Label</Label>
+            <Label>Label</Label>
             <Select
               value={watch("label")}
               onValueChange={(v) => setValue("label", v as "Home" | "Work" | "Other")}
@@ -288,12 +365,25 @@ const AddressFormModal = ({
             </Select>
           </div>
 
+          {!isEditMode && (
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="is_default"
+                checked={watch("is_default")}
+                onCheckedChange={(checked) => setValue("is_default", !!checked)}
+              />
+              <Label htmlFor="is_default" className="cursor-pointer font-normal">
+                Set as default address
+              </Label>
+            </div>
+          )}
+
           <DialogFooter className="gap-2 sm:gap-0">
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Address"}
+              {isSubmitting ? "Saving..." : isEditMode ? "Update Address" : "Save Address"}
             </Button>
           </DialogFooter>
         </form>
