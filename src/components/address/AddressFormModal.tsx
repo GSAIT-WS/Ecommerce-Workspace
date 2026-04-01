@@ -210,13 +210,16 @@ const AddressFormModal = ({
     // addAddress handles both authenticated (API) and guest (localStorage) cases
     const result = await addAddress(formData, token);
 
-    if (result.error) {
-      // Form is NOT reset — user can correct and retry
+    // Hard failure — no addressId at all, keep form open so user can retry
+    if (result.error && !result.addressId) {
       toast.error(result.error);
       return;
     }
 
-    if (token) {
+    if (result.error && result.addressId) {
+      // API failed but address was saved locally as a fallback
+      toast.warning("Couldn't reach the server — address saved locally for now. It will sync when your connection is restored.");
+    } else if (token) {
       toast.success("Address saved successfully");
     } else {
       toast.success("Address saved locally — log in to save permanently");
