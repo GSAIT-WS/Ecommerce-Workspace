@@ -74,7 +74,7 @@ Deno.serve(async (req: Request) => {
 
       const { data: product, error: productErr } = await db
         .from("products")
-        .select("id, price, is_active")
+        .select("id, price, is_active, is_in_deletion_period")
         .eq("id", product_id)
         .single();
 
@@ -82,6 +82,9 @@ Deno.serve(async (req: Request) => {
         return jsonResponse({ success: false, error: "Product not found" }, 404);
       }
       const productRow = product as Record<string, unknown>;
+      if (productRow.is_in_deletion_period === true) {
+        return jsonResponse({ success: false, error: "Product is no longer available" }, 400);
+      }
       if (productRow.is_active === false) {
         return jsonResponse({ success: false, error: "Product is not available" }, 400);
       }
@@ -143,13 +146,16 @@ Deno.serve(async (req: Request) => {
     for (const it of customization.items) {
       const { data: product, error: productErr } = await db
         .from("products")
-        .select("id, price, is_active")
+        .select("id, price, is_active, is_in_deletion_period")
         .eq("id", it.product_id)
         .single();
       if (productErr || !product) {
         return jsonResponse({ success: false, error: `Product not found: ${it.product_id}` }, 404);
       }
       const productRow = product as Record<string, unknown>;
+      if (productRow.is_in_deletion_period === true) {
+        return jsonResponse({ success: false, error: `Product no longer available: ${it.product_id}` }, 400);
+      }
       if (productRow.is_active === false) {
         return jsonResponse({ success: false, error: `Product not available: ${it.product_id}` }, 400);
       }

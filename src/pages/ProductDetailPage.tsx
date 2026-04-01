@@ -17,7 +17,8 @@ import {
   X,
   BadgePercent,
   Send,
-  MessageSquare
+  MessageSquare,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -219,7 +220,10 @@ const ProductDetailPage = () => {
         : 0)
     : 0;
 
-  if (isLoading || !product) {
+  // Deletion-period products are fully hidden — treat as not found.
+  const isNotFound = !isLoading && (!baseProduct || baseProduct.isInDeletionPeriod);
+
+  if (isLoading || isNotFound || !product) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -233,7 +237,7 @@ const ProductDetailPage = () => {
                 <div className="h-12 w-24 animate-pulse rounded bg-muted" />
               </div>
             </div>
-          ) : error || !baseProduct ? (
+          ) : isNotFound || error ? (
             <div className="py-16 text-center">
               <p className="font-body text-muted-foreground">Product not found or unable to load.</p>
               <Link to="/" className="mt-4 inline-block font-body text-primary hover:underline">
@@ -345,6 +349,25 @@ const ProductDetailPage = () => {
           <span className="text-foreground">{product.name}</span>
         </nav>
 
+        {/* Unavailable Banner */}
+        {!product.isActive && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 dark:border-amber-800 dark:bg-amber-950/40"
+          >
+            <AlertCircle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+            <div>
+              <p className="font-body font-semibold text-amber-800 dark:text-amber-300">
+                This product is unavailable temporarily
+              </p>
+              <p className="font-body text-sm text-amber-700 dark:text-amber-400">
+                Our team is working on restocking this item. Check back soon or explore similar products below.
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Image Gallery */}
           <motion.div 
@@ -363,10 +386,17 @@ const ProductDetailPage = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="h-full w-full object-cover"
+                  className={`h-full w-full object-cover ${!product.isActive ? "opacity-40 grayscale" : ""}`}
                 />
               </AnimatePresence>
-              {discount > 0 && (
+              {!product.isActive && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="rounded-full bg-amber-500/90 px-5 py-2 font-body text-sm font-bold uppercase tracking-widest text-white shadow-lg">
+                    Temporarily Unavailable
+                  </span>
+                </div>
+              )}
+              {product.isActive && discount > 0 && (
                 <Badge className="absolute left-4 top-4 rounded-full bg-secondary px-3 py-1 font-body text-sm font-semibold text-secondary-foreground">
                   {discount}% OFF
                 </Badge>
@@ -496,12 +526,13 @@ const ProductDetailPage = () => {
 
             {/* Quantity & Add to Cart */}
             <div className="flex flex-wrap items-center gap-4 pt-4">
-              <div className="flex items-center gap-3 rounded-full border border-border bg-card px-2 py-1">
+              <div className={`flex items-center gap-3 rounded-full border border-border bg-card px-2 py-1 ${!product.isActive ? "opacity-40 pointer-events-none" : ""}`}>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 rounded-full"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={!product.isActive}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -511,22 +542,25 @@ const ProductDetailPage = () => {
                   size="icon"
                   className="h-8 w-8 rounded-full"
                   onClick={() => setQuantity(quantity + 1)}
+                  disabled={!product.isActive}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
 
               <Button 
-                className="flex-1 rounded-full bg-primary px-8 py-6 font-body text-base font-semibold text-primary-foreground hover:bg-primary/90 sm:flex-none"
+                className="flex-1 rounded-full bg-primary px-8 py-6 font-body text-base font-semibold text-primary-foreground hover:bg-primary/90 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleAddToCart}
+                disabled={!product.isActive}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Add to Cart
               </Button>
 
               <Button
-                className="flex-1 rounded-full bg-secondary px-8 py-6 font-body text-base font-semibold text-secondary-foreground hover:bg-secondary/90 sm:flex-none"
+                className="flex-1 rounded-full bg-secondary px-8 py-6 font-body text-base font-semibold text-secondary-foreground hover:bg-secondary/90 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleBuyNow}
+                disabled={!product.isActive}
               >
                 Buy Now
               </Button>
@@ -855,7 +889,7 @@ const ProductDetailPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mt-16 scroll-mt-24 rounded-3xl border border-border bg-card p-6 md:p-10"
+          className={`mt-16 scroll-mt-24 rounded-3xl border border-border bg-card p-6 md:p-10 ${!product.isActive ? "opacity-50 pointer-events-none select-none" : ""}`}
         >
           {/* Section Header */}
           <div className="mb-8 flex flex-wrap items-center justify-between gap-4">

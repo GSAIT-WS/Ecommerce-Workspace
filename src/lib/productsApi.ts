@@ -21,6 +21,7 @@ export interface ApiProduct {
   category_id: string | null;
   category_slug?: string | null;
   is_active: boolean;
+  is_in_deletion_period: boolean;
   weight_grams: number | null;
   tags: string[];
   created_at: string;
@@ -37,6 +38,8 @@ export interface Product {
   rating: number;
   image: string;
   category: string;
+  isActive: boolean;
+  isInDeletionPeriod: boolean;
   protein?: string;
   calories?: number;
   dietType?: string;
@@ -54,6 +57,8 @@ export function mapApiProductToProduct(row: ApiProduct): Product {
     rating: 4.5,
     image: row.image_url || PRODUCT_IMAGE_PLACEHOLDER,
     category: row.category_slug || "",
+    isActive: row.is_active,
+    isInDeletionPeriod: row.is_in_deletion_period,
     protein: row.weight_grams != null ? `${Math.round(row.weight_grams / 10)}g` : undefined,
     calories: row.weight_grams ?? undefined,
     dietType: tag,
