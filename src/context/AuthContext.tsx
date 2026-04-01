@@ -40,10 +40,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      if (event === "SIGNED_IN" && session) {
+        // Idempotent fallback: guarantees a customer_profiles row exists even
+        // if the DB trigger was absent. Safe to call on every sign-in because
+        // the SQL uses ON CONFLICT (id) DO NOTHING.
+        supabase.rpc("ensure_customer_profile").catch(() => {});
+      }
     });
 
     return () => subscription.unsubscribe();
