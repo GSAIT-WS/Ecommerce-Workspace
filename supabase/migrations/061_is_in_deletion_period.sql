@@ -103,11 +103,11 @@ BEGIN
       p.category_id,
       c.%I AS category_slug,
       p.is_active,
-      p.is_in_deletion_period,
       %s
       p.tags,
       p.created_at,
-      p.updated_at
+      p.updated_at,
+      p.is_in_deletion_period
     FROM ecommerce.products p
     LEFT JOIN ecommerce.categories c ON c.id = p.category_id
     WHERE p.is_in_deletion_period = false
