@@ -30,6 +30,7 @@ Deno.serve(async (req: Request) => {
       const url = new URL(req.url);
       body = {
         category_id: url.searchParams.get("category_id") ?? undefined,
+        category_slug: url.searchParams.get("category_slug") ?? undefined,
         search: url.searchParams.get("search") ?? undefined,
         min_price: url.searchParams.get("min_price") ? Number(url.searchParams.get("min_price")) : undefined,
         max_price: url.searchParams.get("max_price") ? Number(url.searchParams.get("max_price")) : undefined,
@@ -46,14 +47,27 @@ Deno.serve(async (req: Request) => {
     const { params } = validated;
     const supabase = createSupabaseServiceRoleClient();
 
+    // Resolve category_slug to category_id if provided
+    let categoryId = params.category_id;
+    if (params.category_slug && !categoryId) {
+      const { data: cat } = await supabase
+        .schema("ecommerce")
+        .from("categories")
+        .select("id")
+        .eq("source_slug", params.category_slug)
+        .eq("is_active", true)
+        .maybeSingle();
+      if (cat) categoryId = (cat as { id: string }).id;
+    }
+
     let query = supabase
       .schema("ecommerce")
       .from("products")
-      .select("id, product_external_id, name, description, price, compare_at_price, image_url, gallery_urls, category_id, is_active, weight_grams, tags, created_at, updated_at", { count: "exact" })
+      .select("id, product_external_id, name, description, price, compare_at_price, image_url, gallery_urls, category_id, categories(source_slug), is_active, weight_grams, tags, created_at, updated_at", { count: "exact" })
       .eq("is_active", true);
 
-    if (params.category_id) {
-      query = query.eq("category_id", params.category_id);
+    if (categoryId) {
+      query = query.eq("category_id", categoryId);
     }
     if (params.search && params.search.trim() !== "") {
       const escaped = params.search.trim().replace(/[%_\\]/g, "\\$&");
@@ -75,22 +89,27 @@ Deno.serve(async (req: Request) => {
     }
 
     const total = count ?? items?.length ?? 0;
-    const rows = (items ?? []).map((row: Record<string, unknown>) => ({
-      id: row.id,
-      product_external_id: row.product_external_id ?? null,
-      name: row.name,
-      description: row.description ?? null,
-      price: Number(row.price),
-      compare_at_price: row.compare_at_price != null ? Number(row.compare_at_price) : null,
-      image_url: row.image_url ?? null,
-      gallery_urls: row.gallery_urls ?? [],
-      category_id: row.category_id ?? null,
-      is_active: Boolean(row.is_active),
-      weight_grams: row.weight_grams != null ? Number(row.weight_grams) : null,
-      tags: row.tags ?? [],
-      created_at: row.created_at,
-      updated_at: row.updated_at,
-    }));
+    const rows = (items ?? []).map((row: Record<string, unknown>) => {
+      const cat = row.categories as Record<string, unknown> | null | undefined;
+      const categorySlug = cat && typeof cat === "object" && "source_slug" in cat ? (cat.source_slug as string) : null;
+      return {
+        id: row.id,
+        product_external_id: row.product_external_id ?? null,
+        name: row.name,
+        description: row.description ?? null,
+        price: Number(row.price),
+        compare_at_price: row.compare_at_price != null ? Number(row.compare_at_price) : null,
+        image_url: row.image_url ?? null,
+        gallery_urls: row.gallery_urls ?? [],
+        category_id: row.category_id ?? null,
+        category_slug: categorySlug,
+        is_active: Boolean(row.is_active),
+        weight_grams: row.weight_grams != null ? Number(row.weight_grams) : null,
+        tags: row.tags ?? [],
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+      };
+    });
 
     return successResponse(
       { items: rows, total, limit: params.limit, offset: params.offset },

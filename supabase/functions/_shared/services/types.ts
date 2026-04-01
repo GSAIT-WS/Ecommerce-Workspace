@@ -112,6 +112,8 @@ export interface UpdateAddressParams {
 /** Query params/body for list-products */
 export interface ListProductsParams {
   category_id?: string;
+  /** Filter by category slug (source_slug); resolved to category_id internally */
+  category_slug?: string;
   search?: string;
   min_price?: number;
   max_price?: number;

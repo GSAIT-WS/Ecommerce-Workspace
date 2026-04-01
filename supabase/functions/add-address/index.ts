@@ -3,15 +3,16 @@
  * Calls ecommerce.add_customer_address RPC.
  */
 
-import { corsHeaders } from "../_shared/cors.ts";
+import { preflightResponse } from "../_shared/cors.ts";
 import { jsonResponse, errorResponse, successResponse } from "../_shared/response.ts";
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
 import { validateAddAddressParams } from "../_shared/services/index.ts";
 import { authenticateRequest } from "../_shared/auth.ts";
 
 Deno.serve(async (req: Request) => {
+  // Handle CORS preflight — must return a real body ("ok") for strict browsers
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse();
   }
 
   if (req.method !== "POST") {

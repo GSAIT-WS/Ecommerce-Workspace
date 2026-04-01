@@ -3,14 +3,14 @@
  * Calls ecommerce.get_my_addresses RPC.
  */
 
-import { corsHeaders } from "../_shared/cors.ts";
+import { preflightResponse } from "../_shared/cors.ts";
 import { jsonResponse, errorResponse, successResponse } from "../_shared/response.ts";
 import { createSupabaseServiceRoleClient } from "../_shared/supabaseClient.ts";
 import { authenticateRequest } from "../_shared/auth.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse();
   }
 
   if (req.method !== "POST" && req.method !== "GET") {

@@ -21,6 +21,11 @@ export function validateListProductsParams(body: unknown): {
       return { valid: false, error: "category_id must be a valid UUID" };
     }
   }
+  if (o.category_slug !== undefined && o.category_slug !== null) {
+    if (typeof o.category_slug !== "string" || o.category_slug.trim() === "") {
+      return { valid: false, error: "category_slug must be a non-empty string" };
+    }
+  }
   if (o.search !== undefined && o.search !== null) {
     if (typeof o.search !== "string") {
       return { valid: false, error: "search must be a string" };
@@ -57,6 +62,9 @@ export function validateListProductsParams(body: unknown): {
     offset,
   };
   if (o.category_id !== undefined && o.category_id !== null) params.category_id = o.category_id as string;
+  if (o.category_slug !== undefined && o.category_slug !== null && String(o.category_slug).trim() !== "") {
+    params.category_slug = String(o.category_slug).trim();
+  }
   if (o.search !== undefined && o.search !== null && String(o.search).trim() !== "") {
     params.search = String(o.search).trim();
   }
