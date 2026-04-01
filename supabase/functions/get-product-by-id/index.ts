@@ -1,6 +1,6 @@
 /**
  * Edge Function: get-product-by-id
- * Accepts product_id (body or query). Returns full product details.
+ * Queries ecommerce.products via the public.ecommerce_products view.
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
@@ -20,29 +20,21 @@ Deno.serve(async (req: Request) => {
   try {
     let body: unknown = {};
     if (req.method === "POST") {
-      try {
-        body = await req.json();
-      } catch {
-        return errorResponse("Invalid JSON body", 400);
-      }
+      try { body = await req.json(); } catch { return errorResponse("Invalid JSON body", 400); }
     } else {
       const url = new URL(req.url);
       const product_id = url.searchParams.get("product_id");
-      if (!product_id) {
-        return errorResponse("product_id is required", 400);
-      }
+      if (!product_id) return errorResponse("product_id is required", 400);
       body = { product_id };
     }
 
     const validated = validateGetProductByIdParams(body);
-    if (!validated.valid) {
-      return errorResponse(validated.error, 400);
-    }
+    if (!validated.valid) return errorResponse(validated.error, 400);
 
     const supabase = createSupabaseServiceRoleClient();
+
     const { data: product, error } = await supabase
-      .schema("ecommerce")
-      .from("products")
+      .from("ecommerce_products")
       .select("*")
       .eq("id", validated.params.product_id)
       .single();
@@ -69,6 +61,7 @@ Deno.serve(async (req: Request) => {
       image_url: row.image_url ?? null,
       gallery_urls: row.gallery_urls ?? [],
       category_id: row.category_id ?? null,
+      category_slug: row.category_slug ?? null,
       is_active: Boolean(row.is_active),
       weight_grams: row.weight_grams != null ? Number(row.weight_grams) : null,
       tags: row.tags ?? [],

@@ -1,17 +1,15 @@
 /**
  * CORS headers for Supabase Edge Functions.
  *
- * CORS_ORIGIN env var can restrict origins in production (e.g. "https://yourapp.com").
- * Falls back to "*" so local development always works without extra config.
+ * Always uses "*" so every origin (including localhost:8080) is allowed.
+ * To lock down to specific origins in production, handle origin matching
+ * per-request via getCorsDynamicHeaders() below.
  */
-const allowedOrigin =
-  (typeof Deno !== "undefined" ? Deno.env.get("CORS_ORIGIN") : undefined) ?? "*";
-
 export const corsHeaders: Record<string, string> = {
-  "Access-Control-Allow-Origin": allowedOrigin,
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, x-webhook-signature, apikey, content-type",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+  "Access-Control-Allow-Methods": "POST, GET, PUT, PATCH, DELETE, OPTIONS",
   "Access-Control-Max-Age": "86400",
 };
 
