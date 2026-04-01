@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff, Loader2, ShoppingBag, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail, Lock, Eye, EyeOff, Loader2, ShoppingBag, Sparkles, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import {
   authItemVariants,
 } from "@/components/auth/authMotion";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 
 const LoginPage = () => {
@@ -24,11 +25,19 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [noAccountFound, setNoAccountFound] = useState(false);
 
   const from = (location.state as { from?: string })?.from ?? "/";
 
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (noAccountFound) setNoAccountFound(false);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setNoAccountFound(false);
+
     if (!email || !password) {
       toast.error("Please fill in all fields");
       return;
@@ -36,11 +45,22 @@ const LoginPage = () => {
 
     setSubmitting(true);
     const { error } = await login(email, password);
-    setSubmitting(false);
 
     if (error) {
-      toast.error(error.message ?? "Login failed. Please try again.");
+      // Check whether the email is registered so we can show a specific message
+      const { data: isRegistered } = await supabase.rpc("check_email_registered", {
+        p_email: email,
+      });
+
+      setSubmitting(false);
+
+      if (isRegistered === false) {
+        setNoAccountFound(true);
+      } else {
+        toast.error("Incorrect password. Please try again.");
+      }
     } else {
+      setSubmitting(false);
       toast.success("Welcome back!");
       navigate(from, { replace: true });
     }
@@ -124,12 +144,44 @@ const LoginPage = () => {
                   autoComplete="email"
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                   className="pl-9 transition-shadow duration-200 focus-visible:ring-primary/40"
                   disabled={submitting}
                 />
               </div>
             </motion.div>
+
+            <AnimatePresence>
+              {noAccountFound && (
+                <motion.div
+                  key="no-account-banner"
+                  initial={{ opacity: 0, y: -6, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: "auto" }}
+                  exit={{ opacity: 0, y: -6, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-col gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-950/40">
+                    <div className="flex items-center gap-2">
+                      <UserX className="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+                      <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+                        No account found with this email
+                      </p>
+                    </div>
+                    <p className="pl-6 text-xs text-red-600 dark:text-red-400">
+                      This email isn't registered.{" "}
+                      <Link
+                        to="/signup"
+                        className="font-semibold underline underline-offset-2 hover:text-red-800 dark:hover:text-red-200"
+                      >
+                        Create an account
+                      </Link>{" "}
+                      to get started.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <motion.div variants={authFieldVariants} className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
