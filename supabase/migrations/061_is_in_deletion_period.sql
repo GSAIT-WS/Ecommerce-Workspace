@@ -277,7 +277,7 @@ BEGIN
 END;
 $$;
 
-COMMENT ON FUNCTION ecommerce.get_cart_ims_items IS
+COMMENT ON FUNCTION ecommerce.get_cart_ims_items(uuid, uuid, text) IS
   'Returns IMS reservation payload for cart. No order created. '
   'Blocks products that are is_in_deletion_period=true or is_active=false. '
   'Used by place-order Edge Function to call IMS reserve API before creating order.';
@@ -585,7 +585,7 @@ EXCEPTION
 END;
 $$;
 
-COMMENT ON FUNCTION ecommerce.place_order IS
+COMMENT ON FUNCTION ecommerce.place_order(uuid, uuid, text, text, uuid) IS
   'Creates order from cart. Blocks products that are is_in_deletion_period=true '
   'or is_active=false. When p_order_id provided, uses it (for IMS-first flow). '
   'Edge Function must call IMS reserve API BEFORE this, then pass the reserved order_id.';
