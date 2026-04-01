@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback, useRef, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import offerSlide1 from "@/assets/offer-slide-1.jpg";
 import offerSlide2 from "@/assets/offer-slide-2.jpg";
 import offerSlide3 from "@/assets/offer-slide-3.jpg";
 import offerSlide4 from "@/assets/offer-slide-4.jpg";
 
+// Offer slides — link to /search so CTAs always navigate correctly.
+// Replace with real offers from backend when available.
 const offerSlides = [
   {
     image: offerSlide1,
@@ -13,6 +16,7 @@ const offerSlides = [
     title: "Peanut Millet Protein Bar",
     description: "Crunchy peanuts & millet crispies — your daily protein fix at a special price.",
     cta: "Shop Now",
+    ctaLink: "/search",
   },
   {
     image: offerSlide2,
@@ -20,6 +24,7 @@ const offerSlides = [
     title: "Sesame Millet Energy Bar",
     description: "Toasted sesame goodness meets wholesome millet. Light, crunchy & nutritious.",
     cta: "Grab Deal",
+    ctaLink: "/search",
   },
   {
     image: offerSlide3,
@@ -27,6 +32,7 @@ const offerSlides = [
     title: "Coconut Millet Bar",
     description: "Tropical coconut flakes with millet crispies. Naturally sweet & energizing.",
     cta: "Shop Now",
+    ctaLink: "/search",
   },
   {
     image: offerSlide4,
@@ -34,6 +40,7 @@ const offerSlides = [
     title: "Super Seeds Bar",
     description: "Watermelon, pumpkin & flax seeds with dates. The ultimate superfood bar.",
     cta: "Try Now",
+    ctaLink: "/search",
   },
 ];
 
@@ -121,8 +128,11 @@ const OffersSection = memo(() => {
                 <p className="mb-4 max-w-sm font-body text-sm text-card/80">
                   {slide.description}
                 </p>
-                <Button className="rounded-full bg-primary px-6 font-body font-semibold text-primary-foreground hover:bg-primary/90">
-                  {slide.cta}
+                <Button
+                  className="rounded-full bg-primary px-6 font-body font-semibold text-primary-foreground hover:bg-primary/90"
+                  asChild
+                >
+                  <Link to={slide.ctaLink}>{slide.cta}</Link>
                 </Button>
               </div>
             </div>

@@ -9,12 +9,14 @@ import OffersSection from "@/components/OffersSection";
 import CustomerReviews from "@/components/CustomerReviews";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
+import NoAddressBanner from "@/components/address/NoAddressBanner";
 
 const Index = () => (
   <div className="min-h-screen bg-background">
     <Navbar />
     <PageTransition>
       <HeroSection />
+      <NoAddressBanner />
       <CategoriesSection />
       {/* Combo & Gifts CTA */}
       <section className="py-8 md:py-12">

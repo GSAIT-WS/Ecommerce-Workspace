@@ -1,9 +1,5 @@
-import productProteinBar from "@/assets/product-protein-bar.jpg";
-import productMilletBar from "@/assets/product-millet-bar.jpg";
-import productChikki from "@/assets/product-chikki.jpg";
-import productHealthyMix from "@/assets/product-healthy-mix.jpg";
-import productCombo from "@/assets/product-combo.jpg";
-import productMultigrainSnack from "@/assets/product-multigrain-snack.jpg";
+// Placeholder for product images (replace with real images later)
+const PRODUCT_IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
 
 export type OrderStatus = "confirmed" | "packed" | "shipped" | "delivered";
 
@@ -55,7 +51,7 @@ export const dummyOrders: Order[] = [
         variant: "Pack of 6 • Dark Chocolate",
         quantity: 2,
         price: 129,
-        image: productProteinBar,
+        image: PRODUCT_IMAGE_PLACEHOLDER,
       },
       {
         id: "5",
@@ -63,7 +59,7 @@ export const dummyOrders: Order[] = [
         variant: "Pack of 4 • Classic",
         quantity: 1,
         price: 99,
-        image: productMilletBar,
+        image: PRODUCT_IMAGE_PLACEHOLDER,
       },
     ],
     subtotal: 357,
@@ -97,7 +93,7 @@ export const dummyOrders: Order[] = [
         variant: "Pack of 12 • Original",
         quantity: 1,
         price: 149,
-        image: productChikki,
+        image: PRODUCT_IMAGE_PLACEHOLDER,
       },
       {
         id: "4",
@@ -105,7 +101,7 @@ export const dummyOrders: Order[] = [
         variant: "250g • Premium",
         quantity: 2,
         price: 199,
-        image: productHealthyMix,
+        image: PRODUCT_IMAGE_PLACEHOLDER,
       },
     ],
     subtotal: 547,
@@ -134,7 +130,7 @@ export const dummyOrders: Order[] = [
         variant: "Mixed • 8 Bars",
         quantity: 1,
         price: 399,
-        image: productCombo,
+        image: PRODUCT_IMAGE_PLACEHOLDER,
       },
     ],
     subtotal: 399,
@@ -163,7 +159,7 @@ export const dummyOrders: Order[] = [
         variant: "Pack of 10 • Masala",
         quantity: 3,
         price: 179,
-        image: productMultigrainSnack,
+        image: PRODUCT_IMAGE_PLACEHOLDER,
       },
       {
         id: "1",
@@ -171,7 +167,7 @@ export const dummyOrders: Order[] = [
         variant: "Pack of 6 • Almond",
         quantity: 1,
         price: 129,
-        image: productProteinBar,
+        image: PRODUCT_IMAGE_PLACEHOLDER,
       },
     ],
     subtotal: 666,
@@ -200,7 +196,7 @@ export const dummyOrders: Order[] = [
         variant: "Pack of 8 • Jaggery",
         quantity: 2,
         price: 189,
-        image: productMilletBar,
+        image: PRODUCT_IMAGE_PLACEHOLDER,
       },
     ],
     subtotal: 378,

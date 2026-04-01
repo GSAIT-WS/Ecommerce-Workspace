@@ -19,12 +19,16 @@ import {
   Clock,
   ChevronRight,
   Sparkles,
+  Home,
+  Briefcase,
+  Plus,
 } from "lucide-react";
 import { Moon, Sun } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProfileMenuItem from "@/components/profile/ProfileMenuItem";
 import ProfileSection from "@/components/profile/ProfileSection";
+import AddressFormModal from "@/components/address/AddressFormModal";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,36 +43,84 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  userProfile,
   healthPreferences,
-  savedAddresses,
   notificationSettings,
 } from "@/data/user";
 import { toast } from "sonner";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
+import { useAddress } from "@/context/AddressContext";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/lib/supabaseClient";
+import { apiCall } from "@/lib/api";
+
+const addressLabelIcon = (label?: string) => {
+  switch (label?.toLowerCase()) {
+    case "work": return Briefcase;
+    case "other": return MapPin;
+    default: return Home;
+  }
+};
 
 const ProfilePage = () => {
   const [notifications, setNotifications] = useState(notificationSettings);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
+  const { user, session, logout } = useAuth();
+  const navigate = useNavigate();
 
+  const displayName = user?.user_metadata?.full_name as string | undefined
+    ?? user?.email?.split("@")[0]
+    ?? "User";
+  const displayEmail = user?.email ?? "";
+  const displayPhone = (user?.user_metadata?.phone as string | undefined) ?? "";
+  const displayAvatar = (user?.user_metadata?.avatar_url as string | undefined) ?? "";
+  const joinedDate = user?.created_at
+    ? new Date(user.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    : "";
+
+  const { addresses: savedAddresses, refreshAddresses } = useAddress();
   const activePreferences = healthPreferences.filter((p) => p.enabled);
-  const defaultAddress = savedAddresses.find((a) => a.isDefault);
+  const defaultAddress = savedAddresses.find((a) => a.is_default) ?? savedAddresses[0];
 
   const handleNotificationChange = (key: keyof typeof notifications) => {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
     toast.success("Notification settings updated");
   };
 
-  const handleLogout = () => {
-    toast.success("Logged out successfully");
+  const handleLogout = async () => {
     setShowLogoutDialog(false);
+    await logout();
+    navigate("/login", { replace: true });
   };
 
-  const handleDeleteAccount = () => {
-    toast.success("Account deletion request submitted");
-    setShowDeleteDialog(false);
+  const handleDeleteAccount = async () => {
+    setDeletingAccount(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token ?? null;
+
+      const { error } = await apiCall("/delete-account", {
+        method: "DELETE",
+        token,
+      });
+
+      if (error) {
+        toast.error(error);
+        setDeletingAccount(false);
+        return;
+      }
+
+      setShowDeleteDialog(false);
+      await logout();
+      navigate("/signup", { replace: true });
+    } catch {
+      toast.error("Failed to delete account. Please try again.");
+      setDeletingAccount(false);
+    }
   };
 
   return (
@@ -85,24 +137,24 @@ const ProfilePage = () => {
           <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 shadow-sm">
             <div className="flex items-center gap-4">
               <Avatar className="h-20 w-20 border-4 border-background shadow-lg">
-                <AvatarImage src={userProfile.avatar} alt={userProfile.name} />
+                <AvatarImage src={displayAvatar} alt={displayName} />
                 <AvatarFallback className="bg-primary text-xl font-bold text-primary-foreground">
-                  {userProfile.name
+                  {displayName
                     .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
+                    .map((n: string) => n[0])
+                    .join("")
+                    .toUpperCase()
+                    .slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <h1 className="text-xl font-bold text-foreground">
-                  {userProfile.name}
+                  {displayName}
                 </h1>
-                <p className="text-sm text-muted-foreground">
-                  {userProfile.phone}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {userProfile.email}
-                </p>
+                {displayPhone && (
+                  <p className="text-sm text-muted-foreground">{displayPhone}</p>
+                )}
+                <p className="text-sm text-muted-foreground">{displayEmail}</p>
               </div>
             </div>
             <div className="mt-4 flex gap-2">
@@ -113,10 +165,86 @@ const ProfilePage = () => {
                 </Link>
               </Button>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Member since {userProfile.joinedDate}
-            </p>
+            {joinedDate && (
+              <p className="mt-3 text-xs text-muted-foreground">
+                Member since {joinedDate}
+              </p>
+            )}
           </div>
+
+          {/* ── Addresses ── */}
+          <ProfileSection title="Saved Addresses">
+            {savedAddresses.length === 0 ? (
+              /* Empty state */
+              <div className="px-4 py-5 text-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <MapPin className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <p className="text-sm font-medium text-foreground">No saved addresses yet</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Add a delivery address for faster checkout
+                </p>
+                <Button
+                  size="sm"
+                  className="mt-3 rounded-full"
+                  onClick={() => setShowAddModal(true)}
+                >
+                  <Plus className="mr-1.5 h-3.5 w-3.5" />
+                  Add Address
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* Show up to 3 addresses inline */}
+                {savedAddresses.slice(0, 3).map((addr, idx) => {
+                  const Icon = addressLabelIcon(addr.label);
+                  return (
+                    <div key={addr.id}>
+                      {idx > 0 && <div className="mx-4 border-t border-border" />}
+                      <div className="flex items-center gap-3 px-4 py-3">
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${addr.is_default ? "bg-primary/10" : "bg-muted"}`}>
+                          <Icon className={`h-4 w-4 ${addr.is_default ? "text-primary" : "text-muted-foreground"}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium text-foreground">{addr.label ?? "Home"}</p>
+                            {addr.is_default && (
+                              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                                Default
+                              </span>
+                            )}
+                          </div>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {addr.address_line1}, {addr.city}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Actions row */}
+                <div className="mx-4 border-t border-border" />
+                <div className="flex items-center gap-2 px-4 py-3">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full text-xs"
+                    onClick={() => setShowAddModal(true)}
+                  >
+                    <Plus className="mr-1 h-3.5 w-3.5" />
+                    Add New
+                  </Button>
+                  <Button size="sm" variant="ghost" className="rounded-full text-xs" asChild>
+                    <Link to="/profile/addresses" className="flex items-center gap-1">
+                      Manage all
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
+                </div>
+              </>
+            )}
+          </ProfileSection>
 
           {/* Orders & Activity */}
           <ProfileSection title="Orders & Activity">
@@ -146,20 +274,6 @@ const ProfilePage = () => {
                   : "Set your dietary preferences"
               }
               href="/profile/preferences"
-            />
-          </ProfileSection>
-
-          {/* Addresses */}
-          <ProfileSection title="Addresses">
-            <ProfileMenuItem
-              icon={MapPin}
-              label="Saved Addresses"
-              subtitle={
-                defaultAddress
-                  ? `${defaultAddress.label}: ${defaultAddress.address.substring(0, 30)}...`
-                  : "Add delivery addresses"
-              }
-              href="/profile/addresses"
             />
           </ProfileSection>
 
@@ -353,6 +467,18 @@ const ProfilePage = () => {
         </motion.div>
       </main>
 
+      {/* Add Address Modal (from Profile) */}
+      <AddressFormModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        token={session?.access_token ?? null}
+        onSuccess={async () => {
+          setShowAddModal(false);
+          await refreshAddresses();
+          toast.success("Address saved!");
+        }}
+      />
+
       {/* Logout Dialog */}
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
@@ -370,7 +496,7 @@ const ProfilePage = () => {
       </AlertDialog>
 
       {/* Delete Account Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <AlertDialog open={showDeleteDialog} onOpenChange={(open) => { if (!deletingAccount) setShowDeleteDialog(open); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Account</AlertDialogTitle>
@@ -380,12 +506,13 @@ const ProfilePage = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deletingAccount}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteAccount}
+              disabled={deletingAccount}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete Account
+              {deletingAccount ? "Deleting…" : "Delete Account"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

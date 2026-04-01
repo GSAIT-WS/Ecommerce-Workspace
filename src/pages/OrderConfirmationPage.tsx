@@ -7,8 +7,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import OrderStatusTimeline from "@/components/checkout/OrderStatusTimeline";
 import AnimatedCheckmark from "@/components/AnimatedCheckmark";
-import productProteinBar from "@/assets/product-protein-bar.jpg";
-import productMilletBar from "@/assets/product-millet-bar.jpg";
+
+// Placeholder for product images (replace with real images later)
+const PRODUCT_IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
 
 // Dummy order data
 const orderData = {
@@ -30,7 +31,7 @@ const orderData = {
       variant: "Pack of 6 • Chocolate",
       quantity: 2,
       price: 298,
-      image: productProteinBar,
+      image: PRODUCT_IMAGE_PLACEHOLDER,
     },
     {
       id: "5",
@@ -38,7 +39,7 @@ const orderData = {
       variant: "Pack of 4 • Original",
       quantity: 1,
       price: 139,
-      image: productMilletBar,
+      image: PRODUCT_IMAGE_PLACEHOLDER,
     },
   ],
   address: {

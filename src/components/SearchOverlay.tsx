@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { allProducts, searchProducts } from "@/data/products";
+import { fetchProducts } from "@/lib/productsApi";
+import type { Product } from "@/lib/productsApi";
 
 // Category images
 import categoryProteinImg from "@/assets/category-protein-bars.jpg";
@@ -48,6 +49,8 @@ const trendingSearches = [
 
 const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
   const [query, setQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState([
     "Peanut butter protein",
     "Multigrain cookies",
@@ -76,6 +79,26 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
     };
   }, [isOpen, onClose]);
 
+  // Debounced product search via API
+  useEffect(() => {
+    if (!query.trim()) {
+      setFilteredProducts([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const { items } = await fetchProducts({ search: query.trim(), limit: 6 });
+        setFilteredProducts(items);
+      } catch {
+        setFilteredProducts([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
+
   const handleSearch = (searchTerm: string) => {
     if (searchTerm.trim()) {
       if (!recentSearches.includes(searchTerm)) {
@@ -102,9 +125,6 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
   const clearHistory = () => {
     setRecentSearches([]);
   };
-
-  // Filter products using the shared search function
-  const filteredProducts = query ? searchProducts(query).slice(0, 6) : [];
 
   const filteredCategories = query
     ? categories.filter((c) =>
@@ -189,7 +209,12 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                     transition={{ duration: 0.2 }}
                   >
                     {/* Suggested Products */}
-                    {filteredProducts.length > 0 && (
+                    {searchLoading && (
+                      <div className="py-4 font-body text-sm text-muted-foreground">
+                        Searching...
+                      </div>
+                    )}
+                    {!searchLoading && filteredProducts.length > 0 && (
                       <div>
                         <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                           Suggested Products

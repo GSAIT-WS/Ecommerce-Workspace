@@ -7,7 +7,8 @@ import ProductCard from "@/components/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { allProducts, searchProducts, getProductsByCategory, getPopularProducts, categories } from "@/data/products";
+import { useProducts, useCategories } from "@/hooks/useProducts";
+import { categories } from "@/data/categories";
 
 const filterTags = [
   { label: "All", value: "all" },
@@ -40,21 +41,18 @@ const SearchPage = () => {
     setLocalQuery(query);
   }, [query]);
 
-  // Get filtered products based on query or category
+  // Fetch products from API (category + search)
+  const { data: productsData, isLoading, error } = useProducts({
+    category_slug: categoryParam || undefined,
+    search: query || undefined,
+    limit: 200,
+  });
+  const apiProducts = productsData?.items ?? [];
+
+  // Client-side: tag filter and sorting
   const getFilteredProducts = () => {
-    let products = allProducts;
+    let products = apiProducts;
 
-    // Filter by category if specified
-    if (categoryParam) {
-      products = getProductsByCategory(categoryParam);
-    }
-
-    // Filter by search query
-    if (query) {
-      products = searchProducts(query);
-    }
-
-    // Apply additional tag filter
     if (activeFilter !== "all") {
       products = products.filter((product) => {
         const tagMatch = product.tag.toLowerCase().includes(activeFilter.replace("-", " "));
@@ -63,7 +61,6 @@ const SearchPage = () => {
       });
     }
 
-    // Apply sorting
     switch (activeSort) {
       case "Price: Low to High":
         products = [...products].sort((a, b) => a.price - b.price);
@@ -82,12 +79,16 @@ const SearchPage = () => {
   };
 
   const filteredProducts = getFilteredProducts();
-  const popularProducts = getPopularProducts();
+  const popularProducts = apiProducts.filter((p) => p.rating >= 4.5).slice(0, 6);
 
-  // Get category name for display
+  const { data: apiCategories } = useCategories();
+  const categoryList = apiCategories?.length
+    ? apiCategories.map((c) => ({ slug: c.slug, name: c.name }))
+    : categories;
+
   const getCategoryName = () => {
     if (categoryParam) {
-      const cat = categories.find((c) => c.slug === categoryParam);
+      const cat = categoryList.find((c) => c.slug === categoryParam);
       return cat?.name || categoryParam;
     }
     return null;
@@ -291,7 +292,15 @@ const SearchPage = () => {
       {/* Search Results Grid */}
       <section className="py-8">
         <div className="container mx-auto px-4 md:px-8">
-          {filteredProducts.length > 0 ? (
+          {isLoading ? (
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="aspect-square animate-pulse rounded-2xl bg-muted" />
+              ))}
+            </div>
+          ) : error ? (
+            <p className="py-8 text-center font-body text-muted-foreground">Unable to load products. Please try again later.</p>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} {...product} />
@@ -314,7 +323,7 @@ const SearchPage = () => {
                   <span className="font-body text-sm text-muted-foreground">
                     Browse categories:
                   </span>
-                  {categories.map((cat) => (
+                  {categoryList.map((cat) => (
                     <Link
                       key={cat.slug}
                       to={`/search?category=${cat.slug}`}
