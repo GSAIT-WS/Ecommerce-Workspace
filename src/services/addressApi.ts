@@ -81,7 +81,9 @@ export function clearGuestAddresses(): void {
 }
 
 export function isGuestAddressId(id: string): boolean {
-  return id.startsWith("guest-");
+  // "guest-*"  → unauthenticated user saved locally
+  // "local-*"  → authenticated user saved locally as API fallback
+  return id.startsWith("guest-") || id.startsWith("local-");
 }
 
 // ─── Authenticated API calls ─────────────────────────────────────────────────
@@ -125,17 +127,48 @@ export async function addAddress(
     longitude: data.longitude ?? null,
   };
 
-  const result = await apiCall<{ address_id?: string }>("/add-address", {
-    method: "POST",
-    body,
-    token,
+  console.log("[CrunchX] addAddress: sending POST /add-address", {
+    recipient_name: body.recipient_name,
+    city: body.city,
+    postal_code: body.postal_code,
   });
 
+  const result = await apiCall<{ success?: boolean; data?: { address_id?: string } }>(
+    "/add-address",
+    { method: "POST", body, token }
+  );
+
+  console.log("[CrunchX] addAddress: response →", { status: result.status, error: result.error, data: result.data });
+
   if (result.error) {
-    return { error: result.error };
+    // API failed — fall back to localStorage so the UI keeps working
+    console.warn("[CrunchX] addAddress: API error, saving to localStorage as fallback:", result.error);
+    const fallback: ApiAddress = {
+      id: `local-${Date.now()}`,
+      recipient_name: body.recipient_name as string,
+      phone: body.phone as string,
+      address_line1: body.address_line1 as string,
+      address_line2: (body.address_line2 as string | undefined) ?? null,
+      city: body.city as string,
+      state: body.state as string,
+      postal_code: body.postal_code as string,
+      label: (body.label as string) || "Home",
+      is_default: !!body.is_default,
+      latitude: (body.latitude as number | null) ?? null,
+      longitude: (body.longitude as number | null) ?? null,
+    };
+    saveGuestAddress(fallback);
+    // Propagate a friendly error so callers can show a softer message
+    return { addressId: fallback.id, error: result.error };
   }
-  const addressId = (result.data as { address_id?: string })?.address_id;
-  return addressId ? { addressId } : { error: "Invalid response from server" };
+
+  // The Edge Function wraps the payload as { success: true, data: { address_id } }
+  const addressId = result.data?.data?.address_id;
+  if (!addressId) {
+    console.warn("[CrunchX] addAddress: unexpected response shape", result.data);
+    return { error: "Invalid response from server" };
+  }
+  return { addressId };
 }
 
 export async function updateAddress(

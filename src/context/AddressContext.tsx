@@ -49,9 +49,21 @@ export function AddressProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       try {
         const { addresses: fetched } = await getMyAddresses(token);
-        const addrs = fetched ?? [];
-        setAddresses(addrs);
-        autoSelect(addrs);
+        const apiAddrs = fetched ?? [];
+
+        // Merge any locally-saved fallback addresses (saved when API was down)
+        // so they remain visible until the backend syncs them.
+        const localFallbacks = loadGuestAddresses().filter((a) =>
+          a.id.startsWith("local-")
+        );
+        const merged = [
+          ...apiAddrs,
+          // Only include fallbacks whose id isn't already in the API result
+          ...localFallbacks.filter((lf) => !apiAddrs.some((a) => a.id === lf.id)),
+        ];
+
+        setAddresses(merged);
+        autoSelect(merged);
       } finally {
         setLoading(false);
         setLoaded(true);
