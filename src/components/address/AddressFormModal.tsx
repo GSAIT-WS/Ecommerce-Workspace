@@ -39,9 +39,10 @@ const addressSchema = z.object({
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
   postal_code: z.string().regex(/^\d{6}$/, "Pincode must be 6 digits"),
-  country: z.string().default("IN"),
-  label: z.enum(["Home", "Work", "Other"]).default("Home"),
-  is_default: z.boolean().default(false),
+  // Keep these required to match react-hook-form's value type and the resolver output.
+  country: z.string().min(1),
+  label: z.enum(["Home", "Work", "Other"]),
+  is_default: z.boolean(),
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
 });
