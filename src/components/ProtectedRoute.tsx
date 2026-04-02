@@ -37,7 +37,8 @@ export const PublicRoute = ({ children }: { children: ReactNode }) => {
 
   if (loading) return <AuthSpinner />;
 
-  if (user) return <Navigate to="/" replace />;
+  // Already signed in — send to homepage, no reason to see login/signup
+  if (user) return <Navigate to="/home" replace />;
 
   return <>{children}</>;
 };

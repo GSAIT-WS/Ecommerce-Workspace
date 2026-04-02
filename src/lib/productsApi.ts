@@ -4,9 +4,7 @@
  */
 
 import { apiCall } from "./api";
-
-const PRODUCT_IMAGE_PLACEHOLDER =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
+import { PRODUCT_IMAGE_PLACEHOLDER } from "./productImagePlaceholder";
 
 /** Raw product from list-products / get-product-by-id */
 export interface ApiProduct {
@@ -21,6 +19,7 @@ export interface ApiProduct {
   category_id: string | null;
   category_slug?: string | null;
   is_active: boolean;
+  is_in_deletion_period: boolean;
   weight_grams: number | null;
   tags: string[];
   created_at: string;
@@ -36,7 +35,10 @@ export interface Product {
   originalPrice?: number;
   rating: number;
   image: string;
+  galleryImages?: string[];
   category: string;
+  isActive: boolean;
+  isInDeletionPeriod: boolean;
   protein?: string;
   calories?: number;
   dietType?: string;
@@ -45,6 +47,9 @@ export interface Product {
 
 export function mapApiProductToProduct(row: ApiProduct): Product {
   const tag = Array.isArray(row.tags) && row.tags.length > 0 ? row.tags[0] : "Product";
+  const galleryImages = Array.isArray(row.gallery_urls)
+    ? row.gallery_urls.filter((u): u is string => typeof u === "string" && u.length > 0)
+    : [];
   return {
     id: row.id,
     name: row.name,
@@ -53,7 +58,10 @@ export function mapApiProductToProduct(row: ApiProduct): Product {
     originalPrice: row.compare_at_price ?? undefined,
     rating: 4.5,
     image: row.image_url || PRODUCT_IMAGE_PLACEHOLDER,
+    galleryImages,
     category: row.category_slug || "",
+    isActive: row.is_active,
+    isInDeletionPeriod: row.is_in_deletion_period,
     protein: row.weight_grams != null ? `${Math.round(row.weight_grams / 10)}g` : undefined,
     calories: row.weight_grams ?? undefined,
     dietType: tag,

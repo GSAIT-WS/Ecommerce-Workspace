@@ -11,7 +11,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { faqs } from "@/data/user";
-import { toast } from "sonner";
+
+const SUPPORT_PHONE_DISPLAY = "+91 80 1234 5678";
+const SUPPORT_PHONE_TEL = "+918012345678";
 
 const HelpCenterPage = () => {
   const navigate = useNavigate();
@@ -48,35 +50,39 @@ const HelpCenterPage = () => {
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 py-4"
-              onClick={() => toast.info("Chat support coming soon!")}
+              onClick={() => navigate("/contact")}
             >
               <MessageCircle className="h-6 w-6 text-primary" />
-              <span>Live Chat</span>
+              <span>Message us</span>
               <span className="text-xs text-muted-foreground">
-                Available 9am-9pm
+                Contact form — we reply within 24h
               </span>
             </Button>
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 py-4"
-              onClick={() => toast.info("Calling +91 1800-XXX-XXXX")}
+              asChild
             >
-              <Phone className="h-6 w-6 text-primary" />
-              <span>Call Us</span>
-              <span className="text-xs text-muted-foreground">
-                1800-XXX-XXXX
-              </span>
+              <a href={`tel:${SUPPORT_PHONE_TEL}`}>
+                <Phone className="h-6 w-6 text-primary" />
+                <span>Call Us</span>
+                <span className="text-xs text-muted-foreground">
+                  {SUPPORT_PHONE_DISPLAY}
+                </span>
+              </a>
             </Button>
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 py-4"
-              onClick={() => toast.info("Email: support@crunchx.in")}
+              asChild
             >
-              <Mail className="h-6 w-6 text-primary" />
-              <span>Email</span>
-              <span className="text-xs text-muted-foreground">
-                24hr response
-              </span>
+              <a href="mailto:hello@crunchx.in">
+                <Mail className="h-6 w-6 text-primary" />
+                <span>Email</span>
+                <span className="text-xs text-muted-foreground">
+                  hello@crunchx.in
+                </span>
+              </a>
             </Button>
           </div>
 
@@ -103,10 +109,7 @@ const HelpCenterPage = () => {
             <p className="mt-1 text-sm text-muted-foreground">
               Our support team is always ready to assist you
             </p>
-            <Button
-              className="mt-4"
-              onClick={() => toast.info("Support ticket form coming soon!")}
-            >
+            <Button className="mt-4" onClick={() => navigate("/contact")}>
               <MessageCircle className="mr-2 h-4 w-4" />
               Contact Support
             </Button>
