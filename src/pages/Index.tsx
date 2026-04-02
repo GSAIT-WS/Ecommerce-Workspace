@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import { Gift, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CategoriesSection from "@/components/CategoriesSection";
@@ -10,42 +9,71 @@ import CustomerReviews from "@/components/CustomerReviews";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import NoAddressBanner from "@/components/address/NoAddressBanner";
+import CombosGiftsBanner from "@/components/home/CombosGiftsBanner";
+
+const rise = {
+  hidden: { opacity: 0, y: 28 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
+const staggerContainer = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.08, delayChildren: 0.06 },
+  },
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.42, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
 
 const Index = () => (
   <div className="min-h-screen bg-background">
     <Navbar />
     <PageTransition>
       <HeroSection />
-      <NoAddressBanner />
-      <CategoriesSection />
-      {/* Combo & Gifts CTA */}
-      <section className="py-8 md:py-12">
-        <div className="container mx-auto px-4 md:px-8">
-          <Link
-            to="/build-combo"
-            className="group relative flex items-center justify-between overflow-hidden rounded-2xl border border-border bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/20 p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md md:p-8"
-          >
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-primary transition-transform group-hover:scale-110">
-                <Gift className="h-7 w-7" />
-              </div>
-              <div>
-                <h3 className="font-display text-lg font-bold text-foreground md:text-xl">
-                  Combos &amp; Gifts
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  Build your own combo &amp; save up to 20%
-                </p>
-              </div>
-            </div>
-            <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-      </section>
-      <FeaturedProducts />
-      <TrustSection />
-      <OffersSection />
-      <CustomerReviews />
+      <motion.div
+        variants={rise}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <NoAddressBanner />
+      </motion.div>
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.15 }}
+      >
+        <motion.div variants={staggerItem}>
+          <CategoriesSection />
+        </motion.div>
+        <motion.div variants={staggerItem} className="py-8 md:py-12">
+          <CombosGiftsBanner />
+        </motion.div>
+        <motion.div variants={staggerItem}>
+          <FeaturedProducts />
+        </motion.div>
+        <motion.div variants={staggerItem}>
+          <TrustSection />
+        </motion.div>
+        <motion.div variants={staggerItem}>
+          <OffersSection />
+        </motion.div>
+        <motion.div variants={staggerItem}>
+          <CustomerReviews />
+        </motion.div>
+      </motion.div>
     </PageTransition>
     <Footer />
   </div>

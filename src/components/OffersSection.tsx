@@ -47,13 +47,13 @@ const offerSlides = [
 const miniOffers = [
   {
     value: "20%",
-    colorClass: "bg-primary/10 text-primary",
+    colorClass: "bg-primary/15 text-primary ring-1 ring-primary/20",
     title: "First Order Discount",
     subtitle: "Use code CRUNCHFIRST at checkout",
   },
   {
     value: "Free",
-    colorClass: "bg-secondary/10 text-secondary",
+    colorClass: "bg-secondary/15 text-secondary ring-1 ring-secondary/25",
     title: "Free Delivery",
     subtitle: "On all orders above ₹499 across India",
   },
@@ -90,7 +90,7 @@ const OffersSection = memo(() => {
   const slide = offerSlides[current];
 
   return (
-    <section className="bg-muted/50 py-16 md:py-20">
+    <section className="bg-muted/55 py-16 dark:bg-muted/25 md:py-20">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-10 text-center">
           <h2 className="mb-2 font-display text-3xl font-bold text-foreground md:text-4xl">
@@ -117,19 +117,19 @@ const OffersSection = memo(() => {
                 loading="lazy"
               />
             ))}
-            <div className="absolute inset-0 flex items-center bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent p-8 md:p-12">
+            <div className="absolute inset-0 flex items-center bg-banner-scrim-soft p-8 md:p-12">
               <div key={`offer-${current}`} className="animate-fade-in-up">
-                <span className="mb-2 inline-block rounded-full bg-accent px-3 py-1 font-body text-xs font-bold text-accent-foreground">
+                <span className="mb-2 inline-block rounded-full bg-accent px-3 py-1 font-body text-xs font-bold text-accent-foreground shadow-sm shadow-black/20">
                   {slide.badge}
                 </span>
-                <h3 className="mb-2 font-display text-2xl font-bold text-card md:text-3xl">
+                <h3 className="mb-2 font-display text-2xl font-bold text-white drop-shadow-sm md:text-3xl">
                   {slide.title}
                 </h3>
-                <p className="mb-4 max-w-sm font-body text-sm text-card/80">
+                <p className="mb-4 max-w-sm font-body text-sm text-white/88">
                   {slide.description}
                 </p>
                 <Button
-                  className="rounded-full bg-primary px-6 font-body font-semibold text-primary-foreground hover:bg-primary/90"
+                  className="rounded-full bg-primary px-6 font-body font-semibold text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
                   asChild
                 >
                   <Link to={slide.ctaLink}>{slide.cta}</Link>
@@ -139,14 +139,14 @@ const OffersSection = memo(() => {
 
             <button
               onClick={handlePrev}
-              className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-card/20 text-card backdrop-blur-sm transition-colors hover:bg-card/40"
+              className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white backdrop-blur-md transition-colors hover:bg-black/50"
               aria-label="Previous offer"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={handleNext}
-              className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-card/20 text-card backdrop-blur-sm transition-colors hover:bg-card/40"
+              className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white backdrop-blur-md transition-colors hover:bg-black/50"
               aria-label="Next offer"
             >
               <ChevronRight className="h-4 w-4" />
@@ -158,7 +158,7 @@ const OffersSection = memo(() => {
                   key={i}
                   onClick={() => handleDot(i)}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === current ? "w-6 bg-card" : "w-1.5 bg-card/40"
+                    i === current ? "w-6 bg-white shadow-sm shadow-white/25" : "w-1.5 bg-white/40"
                   }`}
                   aria-label={`Go to offer ${i + 1}`}
                 />

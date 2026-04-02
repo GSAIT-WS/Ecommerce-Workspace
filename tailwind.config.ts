@@ -80,11 +80,20 @@ export default {
           from: { opacity: "0", transform: "translateY(20px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        "combo-border-spin": {
+          to: { transform: "rotate(360deg)" },
+        },
+        "gradient-pan": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in-up": "fade-in-up 0.6s ease-out forwards",
+        "combo-border-spin": "combo-border-spin 14s linear infinite",
+        "gradient-pan": "gradient-pan 7s ease infinite",
       },
     },
   },

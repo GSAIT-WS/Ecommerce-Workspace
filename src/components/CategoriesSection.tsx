@@ -1,11 +1,43 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Dumbbell, Wheat, Heart, Package } from "lucide-react";
 
+const MotionLink = motion.create(Link);
+
+/** Icon tiles use only theme tokens (primary / secondary / accent / muted) — no extra hue families. */
 const categories = [
-  { name: "Protein Bars", icon: Dumbbell, color: "bg-primary/10 text-primary", slug: "protein-bars" },
-  { name: "Multigrain Snacks", icon: Wheat, color: "bg-secondary/10 text-secondary", slug: "multigrain" },
-  { name: "Healthy Foods", icon: Heart, color: "bg-accent/30 text-accent-foreground", slug: "healthy-foods" },
-  { name: "Combos & Value Packs", icon: Package, color: "bg-muted text-muted-foreground", slug: "combos" },
+  {
+    name: "Protein Bars",
+    icon: Dumbbell,
+    slug: "protein-bars",
+    mesh: "from-primary/20 via-primary/8 to-muted",
+    iconClass: "text-primary",
+    blob: "bg-primary/15",
+  },
+  {
+    name: "Multigrain Snacks",
+    icon: Wheat,
+    slug: "multigrain",
+    mesh: "from-secondary/18 via-secondary/7 to-muted",
+    iconClass: "text-secondary",
+    blob: "bg-secondary/12",
+  },
+  {
+    name: "Healthy Foods",
+    icon: Heart,
+    slug: "healthy-foods",
+    mesh: "from-accent/22 via-accent/9 to-muted",
+    iconClass: "text-accent-foreground",
+    blob: "bg-accent/14",
+  },
+  {
+    name: "Combos & Value Packs",
+    icon: Package,
+    slug: "combos",
+    mesh: "from-primary/12 via-secondary/10 to-accent/14",
+    iconClass: "text-primary",
+    blob: "bg-primary/10",
+  },
 ];
 
 const CategoriesSection = () => (
@@ -18,17 +50,55 @@ const CategoriesSection = () => (
         <p className="font-body text-muted-foreground">Find exactly what fuels your lifestyle</p>
       </div>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-        {categories.map((cat) => (
-          <Link
+        {categories.map((cat, i) => (
+          <MotionLink
             key={cat.name}
             to={`/search?category=${cat.slug}`}
-            className="group flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md md:p-8"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ delay: i * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -6, transition: { type: "spring", stiffness: 400, damping: 22 } }}
+            whileTap={{ scale: 0.98 }}
+            className="group relative flex flex-col items-center gap-4 overflow-hidden rounded-2xl border border-border/80 bg-card p-6 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:border-primary/25 hover:shadow-md hover:shadow-primary/5 dark:ring-white/[0.06] md:p-8"
           >
-            <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${cat.color} transition-transform group-hover:scale-110`}>
-              <cat.icon className="h-7 w-7" />
+            <div
+              className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full ${cat.blob} blur-2xl transition-all duration-500 group-hover:scale-110 group-hover:opacity-90`}
+              aria-hidden
+            />
+            <div className="relative flex flex-col items-center gap-4">
+              <motion.div
+                className="relative"
+                whileHover={{ rotate: [0, -5, 5, -2, 0] }}
+                transition={{ duration: 0.55, ease: "easeInOut" }}
+              >
+                <div
+                  className={`absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br ${cat.mesh} opacity-60 blur-md transition-opacity duration-300 group-hover:opacity-80`}
+                  aria-hidden
+                />
+                <div
+                  className={`relative flex h-[4.25rem] w-[4.25rem] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${cat.mesh} shadow-sm ring-1 ring-border/60 transition-[box-shadow] duration-300 group-hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.2),0_8px_24px_-8px_hsl(var(--foreground)/0.12)] dark:ring-border/80 dark:group-hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.25),0_8px_28px_-8px_hsl(0_0%_0%/0.35)]`}
+                >
+                  <div
+                    className="absolute inset-[2px] rounded-[0.9rem] bg-card/55 backdrop-blur-[2px] transition-opacity duration-300 dark:bg-card/40 group-hover:opacity-70"
+                    aria-hidden
+                  />
+                  {/* Edge vignette on hover: borders go dull, center stays clear for the icon */}
+                  <div
+                    className="pointer-events-none absolute inset-0 z-[2] rounded-2xl opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 bg-[radial-gradient(circle_at_50%_50%,transparent_32%,hsl(var(--muted)/0.45)_65%,hsl(var(--muted)/0.82)_100%)] dark:bg-[radial-gradient(circle_at_50%_50%,transparent_30%,hsl(var(--foreground)/0.06)_58%,hsl(var(--foreground)/0.18)_100%)]"
+                    aria-hidden
+                  />
+                  <cat.icon
+                    className={`relative z-[3] h-8 w-8 opacity-90 transition-all duration-300 ease-out group-hover:scale-[1.12] group-hover:opacity-100 group-hover:brightness-110 group-hover:drop-shadow-[0_2px_14px_hsl(var(--primary)/0.35)] dark:group-hover:drop-shadow-[0_2px_18px_hsl(var(--primary)/0.45)] ${cat.iconClass}`}
+                    strokeWidth={1.65}
+                  />
+                </div>
+              </motion.div>
+              <span className="relative text-center font-body text-sm font-semibold text-foreground md:text-base">
+                {cat.name}
+              </span>
             </div>
-            <span className="font-body text-sm font-semibold text-foreground md:text-base">{cat.name}</span>
-          </Link>
+          </MotionLink>
         ))}
       </div>
     </div>
