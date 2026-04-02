@@ -6,21 +6,13 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import type { Session, User, AuthError } from "@supabase/supabase-js";
+import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  login: (
-    email: string,
-    password: string
-  ) => Promise<{ error: AuthError | null }>;
-  signup: (
-    email: string,
-    password: string
-  ) => Promise<{ error: AuthError | null }>;
   logout: () => Promise<void>;
 }
 
@@ -56,19 +48,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
-  }, []);
-
-  const signup = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    return { error };
-  }, []);
-
   const logout = useCallback(async () => {
     setUser(null);
     setSession(null);
@@ -76,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, session, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

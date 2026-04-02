@@ -59,8 +59,9 @@ const App = () => (
             {/* Global one-time address prompt shown after login when user has no addresses */}
             <PostLoginAddressPrompt />
             <Routes>
-              {/* Public routes */}
+              {/* Public routes — accessible to everyone, authenticated or not */}
               <Route path="/" element={<Index />} />
+              <Route path="/home" element={<Index />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />

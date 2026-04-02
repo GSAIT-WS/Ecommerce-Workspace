@@ -33,6 +33,9 @@ import { useCart } from "@/context/CartContext";
 import { toast } from "@/components/ui/sonner";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
+import { PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImagePlaceholder";
+import { validateBulkInquiryForm } from "@/lib/bulkInquiryValidation";
+import { submitBulkInquiry } from "@/services/bulkInquiryApi";
 
 // ── Bulk Order helpers ──────────────────────────────────────────────────────
 const BULK_TIERS = [
@@ -54,8 +57,13 @@ interface BulkInquiryForm {
   message: string;
 }
 
-// Placeholder for product images (replace with real images later)
-const PRODUCT_IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
+function buildProductGallery(primary: string, gallery: string[] | undefined): string[] {
+  const main = primary || PRODUCT_IMAGE_PLACEHOLDER;
+  const rest = (gallery ?? []).filter((u) => u && u !== main);
+  const out = [main, ...rest];
+  while (out.length < 4) out.push(PRODUCT_IMAGE_PLACEHOLDER);
+  return out.slice(0, 4);
+}
 
 // Extended product details (for PDP display)
 const productDetails: Record<string, {
@@ -198,6 +206,7 @@ const ProductDetailPage = () => {
   const [bulkError, setBulkError] = useState<string>("");
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [inquirySubmitting, setInquirySubmitting] = useState(false);
   const [inquiryForm, setInquiryForm] = useState<BulkInquiryForm>({
     name: "", business: "", phone: "", email: "", quantity: "", message: "",
   });
@@ -209,7 +218,7 @@ const ProductDetailPage = () => {
     ? {
         ...baseProduct,
         ...details,
-        images: [baseProduct.image, PRODUCT_IMAGE_PLACEHOLDER, PRODUCT_IMAGE_PLACEHOLDER, PRODUCT_IMAGE_PLACEHOLDER],
+        images: buildProductGallery(baseProduct.image, baseProduct.galleryImages),
         tags: [baseProduct.tag, ...details.tags.slice(1)],
       }
     : null;
@@ -325,13 +334,38 @@ const ProductDetailPage = () => {
     bulkSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const handleInquirySubmit = (e: React.FormEvent) => {
+  const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const validationError = validateBulkInquiryForm(inquiryForm);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+    setInquirySubmitting(true);
+    const result = await submitBulkInquiry({
+      product_id: product.id,
+      product_name: product.name,
+      name: inquiryForm.name.trim(),
+      business: inquiryForm.business.trim(),
+      phone: inquiryForm.phone.trim(),
+      email: inquiryForm.email.trim(),
+      quantity: inquiryForm.quantity.trim(),
+      message: inquiryForm.message.trim(),
+    });
+    setInquirySubmitting(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    if (result.viaEmail) {
+      toast.info("We opened your email app with a pre-filled message.");
+    }
     setInquirySubmitted(true);
   };
 
   const handleInquiryClose = () => {
     setInquiryOpen(false);
+    setInquirySubmitting(false);
     setTimeout(() => setInquirySubmitted(false), 300);
   };
 
@@ -1172,9 +1206,13 @@ const ProductDetailPage = () => {
                     className="w-full rounded-xl border border-input bg-background px-3 py-2 font-body text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                   />
                 </div>
-                <Button type="submit" className="w-full rounded-xl py-5 font-body text-base font-semibold">
+                <Button
+                  type="submit"
+                  disabled={inquirySubmitting}
+                  className="w-full rounded-xl py-5 font-body text-base font-semibold"
+                >
                   <Send className="mr-2 h-4 w-4" />
-                  Submit Inquiry
+                  {inquirySubmitting ? "Submitting…" : "Submit Inquiry"}
                 </Button>
               </motion.form>
             )}
