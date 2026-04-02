@@ -6,77 +6,94 @@
 
 @layer base {
   :root {
-    --background: 40 33% 96%;
-    --foreground: 25 30% 12%;
+    /* Warmer, slightly more saturated “snack brand” palette */
+    --background: 42 38% 97%;
+    --foreground: 24 28% 11%;
 
-    --card: 40 30% 99%;
-    --card-foreground: 25 30% 12%;
+    --card: 40 35% 99%;
+    --card-foreground: 24 28% 11%;
 
-    --popover: 40 30% 99%;
-    --popover-foreground: 25 30% 12%;
+    --popover: 40 35% 99%;
+    --popover-foreground: 24 28% 11%;
 
-    --primary: 36 72% 48%;
-    --primary-foreground: 40 30% 99%;
+    --primary: 32 88% 50%;
+    --primary-foreground: 42 40% 99%;
 
-    --secondary: 145 30% 42%;
-    --secondary-foreground: 40 30% 99%;
+    --secondary: 152 36% 40%;
+    --secondary-foreground: 42 40% 99%;
 
-    --muted: 38 25% 91%;
-    --muted-foreground: 25 15% 45%;
+    --muted: 38 28% 90%;
+    --muted-foreground: 25 14% 42%;
 
-    --accent: 48 85% 65%;
-    --accent-foreground: 25 30% 12%;
+    --accent: 46 92% 62%;
+    --accent-foreground: 24 28% 11%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 35 20% 87%;
-    --input: 35 20% 87%;
-    --ring: 36 72% 48%;
+    --border: 34 22% 86%;
+    --input: 34 22% 86%;
+    --ring: 32 88% 50%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 40 30% 97%;
-    --sidebar-foreground: 25 30% 12%;
-    --sidebar-primary: 36 72% 48%;
-    --sidebar-primary-foreground: 40 30% 99%;
-    --sidebar-accent: 38 25% 91%;
-    --sidebar-accent-foreground: 25 30% 12%;
-    --sidebar-border: 35 20% 87%;
-    --sidebar-ring: 36 72% 48%;
+    --sidebar-background: 42 32% 97%;
+    --sidebar-foreground: 24 28% 11%;
+    --sidebar-primary: 32 88% 50%;
+    --sidebar-primary-foreground: 42 40% 99%;
+    --sidebar-accent: 38 28% 92%;
+    --sidebar-accent-foreground: 24 28% 11%;
+    --sidebar-border: 34 22% 86%;
+    --sidebar-ring: 32 88% 50%;
+
+    /* Photo banners: always a dark scrim (readable text), never “foreground” tint */
+    --banner-scrim-a: 24 30% 8%;
+    --banner-scrim-b: 24 26% 10%;
+    --banner-scrim-c: 24 22% 14%;
+    --banner-scrim-opacity-a: 0.78;
+    --banner-scrim-opacity-b: 0.38;
+    --banner-scrim-opacity-c: 0.12;
 
     --font-display: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Plus Jakarta Sans', sans-serif;
   }
 
   .dark {
-    --background: 25 20% 8%;
-    --foreground: 40 30% 95%;
-    --card: 25 18% 12%;
-    --card-foreground: 40 30% 95%;
-    --popover: 25 18% 12%;
-    --popover-foreground: 40 30% 95%;
-    --primary: 36 72% 48%;
-    --primary-foreground: 40 30% 99%;
-    --secondary: 145 30% 35%;
-    --secondary-foreground: 40 30% 99%;
-    --muted: 25 15% 18%;
-    --muted-foreground: 38 15% 60%;
-    --accent: 48 85% 55%;
-    --accent-foreground: 25 30% 12%;
+    --background: 24 22% 7%;
+    --foreground: 42 35% 96%;
+    --card: 24 20% 11%;
+    --card-foreground: 42 35% 96%;
+    --popover: 24 20% 11%;
+    --popover-foreground: 42 35% 96%;
+    --primary: 34 90% 54%;
+    --primary-foreground: 24 24% 8%;
+    --secondary: 152 34% 42%;
+    --secondary-foreground: 42 40% 98%;
+    --muted: 24 16% 16%;
+    --muted-foreground: 38 12% 62%;
+    --accent: 48 88% 58%;
+    --accent-foreground: 24 28% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 25 15% 20%;
-    --input: 25 15% 20%;
-    --ring: 36 72% 48%;
-    --sidebar-background: 25 18% 10%;
-    --sidebar-foreground: 40 30% 95%;
-    --sidebar-primary: 36 72% 48%;
-    --sidebar-primary-foreground: 40 30% 99%;
-    --sidebar-accent: 25 15% 18%;
-    --sidebar-accent-foreground: 40 30% 95%;
-    --sidebar-border: 25 15% 20%;
-    --sidebar-ring: 36 72% 48%;
+    --border: 24 14% 18%;
+    --input: 24 14% 18%;
+    --ring: 34 90% 54%;
+    --sidebar-background: 24 20% 9%;
+    --sidebar-foreground: 42 35% 96%;
+    --sidebar-primary: 34 90% 54%;
+    --sidebar-primary-foreground: 24 24% 8%;
+    --sidebar-accent: 24 16% 16%;
+    --sidebar-accent-foreground: 42 35% 96%;
+    --sidebar-border: 24 14% 18%;
+    --sidebar-ring: 34 90% 54%;
+
+    /* Deep scrim only — removes washed / white corners on hero & offer banners */
+    --banner-scrim-a: 24 28% 4%;
+    --banner-scrim-b: 24 24% 6%;
+    --banner-scrim-c: 24 20% 9%;
+    --banner-scrim-opacity-a: 0.88;
+    --banner-scrim-opacity-b: 0.5;
+    --banner-scrim-opacity-c: 0.2;
   }
 }
 
@@ -86,10 +103,21 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-family: var(--font-body);
     font-size: 16px;
     line-height: 1.6;
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(ellipse 120% 80% at 100% -15%, hsl(var(--primary) / 0.1), transparent 52%),
+      radial-gradient(ellipse 90% 70% at -5% 105%, hsl(var(--secondary) / 0.08), transparent 48%);
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(ellipse 120% 80% at 100% -15%, hsl(var(--primary) / 0.16), transparent 52%),
+      radial-gradient(ellipse 90% 70% at -5% 105%, hsl(var(--secondary) / 0.12), transparent 48%);
   }
 
   h1 {
@@ -121,6 +149,28 @@
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(36 72% 48%), hsl(48 85% 65%));
+    background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+
+  /** Full-width image banners (hero, offers): theme-aware dark scrim, no light “wash” in dark mode */
+  .bg-banner-scrim {
+    background: linear-gradient(
+      to right,
+      hsl(var(--banner-scrim-a) / var(--banner-scrim-opacity-a)) 0%,
+      hsl(var(--banner-scrim-b) / var(--banner-scrim-opacity-b)) 45%,
+      hsl(var(--banner-scrim-c) / var(--banner-scrim-opacity-c)) 72%,
+      transparent 100%
+    );
+  }
+
+  /** Slightly softer scrim for shorter offer strip */
+  .bg-banner-scrim-soft {
+    background: linear-gradient(
+      to right,
+      hsl(var(--banner-scrim-a) / calc(var(--banner-scrim-opacity-a) * 0.92)) 0%,
+      hsl(var(--banner-scrim-b) / calc(var(--banner-scrim-opacity-b) * 0.95)) 50%,
+      hsl(var(--banner-scrim-c) / calc(var(--banner-scrim-opacity-c) * 1.1)) 75%,
+      transparent 100%
+    );
   }
 }
