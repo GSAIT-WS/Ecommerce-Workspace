@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         void (async () => {
           // Step 1 — ensure a customer_profiles row exists for new customers.
           // IMS staff are silently skipped by the function itself.
-          await supabase.rpc("ensure_customer_profile").catch(() => {});
+          await supabase.rpc("ensure_customer_profile");
 
           // Step 2 — verify this is a legitimate ecommerce customer.
           // Returns false for IMS staff and any account with no customer_profiles row.
