@@ -57,7 +57,9 @@ Deno.serve(async (req: Request) => {
     const { data: orderRow, error: orderError } = await supabase
       .schema("ecommerce")
       .from("orders")
-      .select("*")
+      .select(
+        "id, order_number, customer_id, created_at, updated_at, status, subtotal, discount_amount, shipping_amount, total_amount, shipping_address_snapshot, ims_order_id, shipment_number",
+      )
       .eq("id", order_id)
       .single();
 
@@ -129,6 +131,7 @@ Deno.serve(async (req: Request) => {
 
     const result: GetOrderByIdResult = {
       id: ord.id,
+      ...(ord.order_number != null && { order_number: String(ord.order_number) }),
       user_id: ord.customer_id,
       created_at: ord.created_at,
       updated_at: ord.updated_at,

@@ -35,7 +35,6 @@ export interface Product {
   originalPrice?: number;
   rating: number;
   image: string;
-  /** Extra gallery URLs from the catalog (primary image is `image`). */
   galleryImages?: string[];
   category: string;
   isActive: boolean;

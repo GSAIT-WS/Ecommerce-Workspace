@@ -19,12 +19,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { paymentMethods as initialMethods, PaymentMethod } from "@/data/user";
 import { toast } from "sonner";
 
 const PaymentMethodsPage = () => {
   const navigate = useNavigate();
   const [methods, setMethods] = useState<PaymentMethod[]>(initialMethods);
+  const [addPaymentInfoOpen, setAddPaymentInfoOpen] = useState(false);
+
+  const openAddPaymentInfo = () => setAddPaymentInfoOpen(true);
 
   const getIcon = (type: PaymentMethod["type"]) => {
     switch (type) {
@@ -71,10 +84,7 @@ const PaymentMethodsPage = () => {
               </Button>
               <h1 className="text-xl font-bold">Payment Methods</h1>
             </div>
-            <Button
-              size="sm"
-              onClick={() => toast.info("Add payment method coming soon!")}
-            >
+            <Button size="sm" onClick={openAddPaymentInfo}>
               <Plus className="mr-1 h-4 w-4" />
               Add
             </Button>
@@ -154,10 +164,7 @@ const PaymentMethodsPage = () => {
               <p className="mt-1 text-sm text-muted-foreground">
                 Add a payment method for faster checkout
               </p>
-              <Button
-                className="mt-4"
-                onClick={() => toast.info("Add payment method coming soon!")}
-              >
+              <Button className="mt-4" onClick={openAddPaymentInfo}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Payment Method
               </Button>
@@ -168,6 +175,39 @@ const PaymentMethodsPage = () => {
           <p className="mt-6 text-center text-xs text-muted-foreground">
             🔒 Your payment information is encrypted and secure
           </p>
+
+          <AlertDialog open={addPaymentInfoOpen} onOpenChange={setAddPaymentInfoOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Add a payment method</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Saved cards and UPI IDs are added when you pay at checkout. Complete a purchase there
+                  to store a method for next time.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="flex-col gap-2 sm:flex-row sm:justify-end">
+                <AlertDialogCancel className="mt-0">Close</AlertDialogCancel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setAddPaymentInfoOpen(false);
+                    navigate("/search");
+                  }}
+                >
+                  Browse products
+                </Button>
+                <AlertDialogAction
+                  onClick={() => {
+                    setAddPaymentInfoOpen(false);
+                    navigate("/checkout");
+                  }}
+                >
+                  Go to checkout
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </motion.div>
       </main>
 

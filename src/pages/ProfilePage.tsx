@@ -409,8 +409,8 @@ const ProfilePage = () => {
             <ProfileMenuItem
               icon={HelpCircle}
               label="Contact Support"
-              subtitle="Chat or call us"
-              onClick={() => toast.info("Support chat coming soon!")}
+              subtitle="Message or call us"
+              href="/contact"
             />
           </ProfileSection>
 
