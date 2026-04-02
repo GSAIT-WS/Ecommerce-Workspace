@@ -6,21 +6,14 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import type { Session, User, AuthError } from "@supabase/supabase-js";
+import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
+import { toast } from "sonner";
 
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  login: (
-    email: string,
-    password: string
-  ) => Promise<{ error: AuthError | null }>;
-  signup: (
-    email: string,
-    password: string
-  ) => Promise<{ error: AuthError | null }>;
   logout: () => Promise<void>;
 }
 
@@ -40,26 +33,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      if (event === "SIGNED_IN" && session) {
+        void (async () => {
+          // Step 1 — ensure a customer_profiles row exists for new customers.
+          // IMS staff are silently skipped by the function itself.
+          await supabase.rpc("ensure_customer_profile").catch(() => {});
+
+          // Step 2 — verify this is a legitimate ecommerce customer.
+          // Returns false for IMS staff and any account with no customer_profiles row.
+          const { data: isCustomer, error: guardError } = await supabase.rpc(
+            "is_ecommerce_customer"
+          );
+
+          if (guardError) {
+            // Network / DB error — do not lock out the user, but log it.
+            console.error("[auth] is_ecommerce_customer check failed:", guardError.message);
+            return;
+          }
+
+          if (isCustomer === false) {
+            // Not an ecommerce customer (IMS staff or no profile).
+            // Sign out immediately to prevent unauthorised access.
+            await supabase.auth.signOut();
+            toast.error(
+              "Access denied. This account is not registered as a CrunchX customer. Please use the IMS portal."
+            );
+          }
+        })();
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  const login = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
-  }, []);
-
-  const signup = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    return { error };
   }, []);
 
   const logout = useCallback(async () => {
@@ -69,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, session, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

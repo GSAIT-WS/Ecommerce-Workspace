@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Package, MapPin, Clock, Phone, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,9 +7,38 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import OrderStatusTimeline from "@/components/checkout/OrderStatusTimeline";
 import AnimatedCheckmark from "@/components/AnimatedCheckmark";
+import type { ApiAddress } from "@/services/addressApi";
+import { PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImagePlaceholder";
 
-// Placeholder for product images (replace with real images later)
-const PRODUCT_IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
+type PaymentMethodId = "upi" | "card" | "netbanking" | "cod";
+
+const paymentMethodLabels: Record<PaymentMethodId, string> = {
+  upi: "UPI",
+  card: "Debit / Credit Card",
+  netbanking: "Net Banking",
+  cod: "Cash on Delivery",
+};
+
+function isOrderPlacedNavState(x: unknown): x is {
+  total: number;
+  selectedAddress?: ApiAddress;
+  paymentMethod: PaymentMethodId;
+} {
+  if (!x || typeof x !== "object") return false;
+  const o = x as Record<string, unknown>;
+  if (typeof o.total !== "number" || typeof o.paymentMethod !== "string") return false;
+  return o.paymentMethod in paymentMethodLabels;
+}
+
+function formatApiAddress(a: ApiAddress) {
+  return {
+    name: a.recipient_name,
+    phone: a.phone,
+    address: [a.address_line1, a.address_line2].filter(Boolean).join(", "),
+    landmark: `${a.city}, ${a.state}`,
+    pincode: a.postal_code,
+  };
+}
 
 // Dummy order data
 const orderData = {
@@ -57,6 +86,20 @@ const orderData = {
 };
 
 const OrderConfirmationPage = () => {
+  const location = useLocation();
+  const placed = isOrderPlacedNavState(location.state) ? location.state : null;
+
+  const displayTotal = placed?.total ?? orderData.total;
+  const displayAddress = placed?.selectedAddress
+    ? formatApiAddress(placed.selectedAddress)
+    : orderData.address;
+  const displayPayment = placed
+    ? {
+        method: paymentMethodLabels[placed.paymentMethod],
+        status: placed.paymentMethod === "cod" ? "Pay on delivery" : "Paid",
+      }
+    : orderData.payment;
+
   const [showConfetti, setShowConfetti] = useState(true);
 
   useEffect(() => {
@@ -190,7 +233,7 @@ const OrderConfirmationPage = () => {
               <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
                 <span className="font-display font-bold text-foreground">Total Paid</span>
                 <span className="font-display text-xl font-bold text-primary">
-                  ₹{orderData.total}
+                  ₹{displayTotal}
                 </span>
               </div>
             </motion.div>
@@ -212,20 +255,20 @@ const OrderConfirmationPage = () => {
                 <MapPin className="mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground" />
                 <div>
                   <p className="font-display font-semibold text-foreground">
-                    {orderData.address.name}
+                    {displayAddress.name}
                   </p>
                   <p className="mt-1 font-body text-sm text-muted-foreground">
-                    {orderData.address.address}
+                    {displayAddress.address}
                   </p>
                   <p className="font-body text-sm text-muted-foreground">
-                    {orderData.address.landmark}
+                    {displayAddress.landmark}
                   </p>
                   <p className="font-body text-sm text-muted-foreground">
-                    {orderData.address.pincode}
+                    {displayAddress.pincode}
                   </p>
                   <p className="mt-2 flex items-center gap-2 font-body text-sm text-foreground">
                     <Phone className="h-4 w-4" />
-                    {orderData.address.phone}
+                    {displayAddress.phone}
                   </p>
                 </div>
               </div>
@@ -247,11 +290,11 @@ const OrderConfirmationPage = () => {
                     Payment Method
                   </p>
                   <p className="font-display font-semibold text-foreground">
-                    {orderData.payment.method}
+                    {displayPayment.method}
                   </p>
                 </div>
                 <span className="rounded-full bg-secondary/10 px-3 py-1 font-body text-sm font-semibold text-secondary">
-                  {orderData.payment.status}
+                  {displayPayment.status}
                 </span>
               </div>
             </motion.div>

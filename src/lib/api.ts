@@ -2,6 +2,7 @@
  * API configuration for Supabase Edge Functions
  */
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
+const SUPABASE_ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim() || "";
 const FUNCTIONS_BASE = SUPABASE_URL ? `${SUPABASE_URL.replace(/\/$/, "")}/functions/v1` : "";
 
 export function getFunctionsBase(): string {
@@ -60,10 +61,10 @@ export async function apiCall<T = unknown>(
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    // Always send the anon key so Edge Functions can verify the request
+    "apikey": SUPABASE_ANON_KEY,
+    "Authorization": `Bearer ${token || SUPABASE_ANON_KEY}`,
   };
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
 
   try {
     const res = await fetch(url, {

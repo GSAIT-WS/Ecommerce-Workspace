@@ -84,6 +84,7 @@ Deno.serve(async (req: Request) => {
       category_id: row.category_id ?? null,
       category_slug: row.category_slug ?? null,
       is_active: Boolean(row.is_active),
+      is_in_deletion_period: Boolean(row.is_in_deletion_period),
       weight_grams: row.weight_grams != null ? Number(row.weight_grams) : null,
       tags: row.tags ?? [],
       created_at: row.created_at,

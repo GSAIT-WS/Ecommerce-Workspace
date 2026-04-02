@@ -14,9 +14,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import OrderStatusTimeline from "@/components/checkout/OrderStatusTimeline";
-
-// Placeholder for product images (replace with real images later)
-const PRODUCT_IMAGE_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
+import { PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImagePlaceholder";
 
 type OrderStatus = "confirmed" | "packed" | "shipped" | "delivered";
 
