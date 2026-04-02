@@ -79,6 +79,61 @@ Deno.serve(async (req: Request) => {
 
     const totalNum = Number((order as { total_amount: number }).total_amount);
     const amountCents = Math.round(totalNum * 100);
+    const stripeSecret = Deno.env.get("STRIPE_SECRET_KEY")?.trim();
+
+    if (stripeSecret) {
+      const Stripe = (await import("https://esm.sh/stripe@14.21.0")).default;
+      const stripe = new Stripe(stripeSecret, {
+        apiVersion: "2023-10-16",
+        httpClient: Stripe.createFetchHttpClient(),
+      });
+
+      const pi = await stripe.paymentIntents.create({
+        amount: amountCents,
+        currency: "inr",
+        metadata: { order_id },
+        automatic_payment_methods: { enabled: true },
+      });
+
+      const { data: attempt, error: insertError } = await supabase
+        .schema("ecommerce")
+        .from("payment_attempts")
+        .insert({
+          order_id,
+          external_id: pi.id,
+          amount: totalNum,
+          currency: "INR",
+          status: "pending",
+          provider: "stripe",
+        })
+        .select("id")
+        .single();
+
+      if (insertError) {
+        try {
+          await stripe.paymentIntents.cancel(pi.id);
+        } catch {
+          /* best-effort */
+        }
+        return jsonResponse(
+          { success: false, error: "insert_failed", message: insertError.message },
+          500,
+        );
+      }
+
+      const result: CreatePaymentIntentResult = {
+        success: true,
+        payment_intent_id: pi.id,
+        client_secret: pi.client_secret ?? undefined,
+        amount_cents: amountCents,
+        currency: "INR",
+        order_id,
+        provider: "stripe",
+      };
+
+      return successResponse(result, 201);
+    }
+
     const externalId = `pi_mock_${crypto.randomUUID().replace(/-/g, "")}`;
 
     const { data: attempt, error: insertError } = await supabase
@@ -109,6 +164,7 @@ Deno.serve(async (req: Request) => {
       amount_cents: amountCents,
       currency: "INR",
       order_id,
+      provider: "mock",
     };
 
     return successResponse(result, 201);

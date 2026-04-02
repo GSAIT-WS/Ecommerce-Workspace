@@ -231,6 +231,8 @@ export const SHIPMENT_STATUS_LABELS: Record<ShipmentStatus["status"], string> = 
 /** Full order detail for get-order-by-id */
 export interface GetOrderByIdResult {
   id: string;
+  /** Human-readable order number from DB (when selected) */
+  order_number?: string;
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -260,14 +262,14 @@ export interface CreatePaymentIntentParams {
   order_id: string;
 }
 
-/** Success response for create-payment-intent (Stripe-ready or mock) */
+/** Payload inside `successResponse` for create-payment-intent (Stripe or mock). */
 export interface CreatePaymentIntentResult {
-  success: true;
   payment_intent_id: string;
   client_secret?: string;
   amount_cents: number;
   currency: string;
   order_id: string;
+  provider?: "stripe" | "mock";
 }
 
 /** Request body for payment-webhook (provider event payload) */
