@@ -116,25 +116,32 @@ const MapPickerModal = ({
 
         <div className="h-[320px] w-full relative">
           <MapContainer
-            center={position}
-            zoom={15}
-            className="h-full w-full rounded-b-lg"
-            scrollWheelZoom={true}
+            {...({
+              center: position,
+              zoom: 15,
+              className: "h-full w-full rounded-b-lg",
+              scrollWheelZoom: true,
+            } as any)}
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              {...({
+                attribution:
+                  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              } as any)}
             />
             <Marker
-              position={position}
-              draggable
-              eventHandlers={{
-                dragend: (e) => {
-                  const m = e.target;
-                  const { lat, lng } = m.getLatLng();
-                  handlePositionChange(lat, lng);
+              {...({
+                position,
+                draggable: true,
+                eventHandlers: {
+                  dragend: (e: any) => {
+                    const m = e.target;
+                    const { lat, lng } = m.getLatLng();
+                    handlePositionChange(lat, lng);
+                  },
                 },
-              }}
+              } as any)}
             />
             <MapClickHandler onPositionChange={handlePositionChange} />
           </MapContainer>
