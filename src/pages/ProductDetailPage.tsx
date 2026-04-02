@@ -353,7 +353,7 @@ const ProductDetailPage = () => {
       message: inquiryForm.message.trim(),
     });
     setInquirySubmitting(false);
-    if (!result.ok) {
+    if (result.ok === false) {
       toast.error(result.error);
       return;
     }
