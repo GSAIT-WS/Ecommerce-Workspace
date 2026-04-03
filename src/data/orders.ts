@@ -1,6 +1,25 @@
 import { PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImagePlaceholder";
 
-export type OrderStatus = "confirmed" | "packed" | "shipped" | "delivered";
+export type OrderStatus =
+  | "pending"
+  | "confirmed"
+  | "packed"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
+
+const VALID_STATUSES: OrderStatus[] = [
+  "pending",
+  "confirmed",
+  "packed",
+  "shipped",
+  "delivered",
+  "cancelled",
+];
+
+export function normalizeOrderStatus(raw: string): OrderStatus {
+  return VALID_STATUSES.includes(raw as OrderStatus) ? (raw as OrderStatus) : "pending";
+}
 
 export interface OrderItem {
   id: string;
@@ -221,20 +240,24 @@ export const getOrderById = (id: string): Order | undefined => {
 
 export const getStatusLabel = (status: OrderStatus): string => {
   const labels: Record<OrderStatus, string> = {
+    pending: "Pending",
     confirmed: "Order Confirmed",
     packed: "Packed",
     shipped: "Out for Delivery",
     delivered: "Delivered",
+    cancelled: "Cancelled",
   };
   return labels[status];
 };
 
 export const getStatusColor = (status: OrderStatus): string => {
   const colors: Record<OrderStatus, string> = {
+    pending: "bg-muted text-muted-foreground",
     confirmed: "bg-blue-100 text-blue-700",
     packed: "bg-amber-100 text-amber-700",
     shipped: "bg-purple-100 text-purple-700",
     delivered: "bg-secondary/20 text-secondary",
+    cancelled: "bg-destructive/15 text-destructive",
   };
   return colors[status];
 };

@@ -58,13 +58,17 @@ const CheckoutPage = () => {
     (a) => a.id === selectedAddressId
   );
 
-  const canProceed = addresses.length > 0 && !!selectedAddressId;
+  const canProceed = addresses.length > 0 && !!selectedAddressId && !!token;
 
   const handleProceedToPayment = () => {
+    if (!token) {
+      return;
+    }
     navigate("/payment", {
       state: {
         selectedAddress,
         couponDiscount,
+        couponCode: appliedCoupon,
         total,
         subtotal,
         delivery,
@@ -400,6 +404,14 @@ const CheckoutPage = () => {
               </div>
 
               {/* CTA */}
+              {!token && addresses.length > 0 && selectedAddressId && (
+                <p className="mb-3 rounded-xl border border-border bg-muted/40 px-3 py-2 font-body text-xs text-muted-foreground">
+                  <Link to="/login" state={{ from: "/checkout" }} className="font-semibold text-primary underline">
+                    Sign in
+                  </Link>{" "}
+                  to place your order and sync your cart with your account.
+                </p>
+              )}
               <Button
                 onClick={handleProceedToPayment}
                 disabled={!canProceed}
@@ -408,8 +420,10 @@ const CheckoutPage = () => {
                 {addresses.length === 0
                   ? "Add address to continue"
                   : !selectedAddressId
-                  ? "Select an address"
-                  : "Proceed to Payment"}
+                    ? "Select an address"
+                    : !token
+                      ? "Sign in to continue"
+                      : "Proceed to Payment"}
               </Button>
 
               <div className="mt-4 flex items-center justify-center gap-2 text-muted-foreground">
@@ -435,8 +449,10 @@ const CheckoutPage = () => {
           {addresses.length === 0
             ? "Add address to continue"
             : !selectedAddressId
-            ? "Select an address"
-            : "Proceed to Payment"}
+              ? "Select an address"
+              : !token
+                ? "Sign in to continue"
+                : "Proceed to Payment"}
         </Button>
       </div>
 

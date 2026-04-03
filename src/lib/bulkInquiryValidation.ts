@@ -15,7 +15,7 @@ export function validateBulkInquiryForm(form: BulkInquiryFormInput): string | nu
   if (phoneDigits.length < 10) return "Please enter a valid phone number.";
   if (!/\S+@\S+\.\S+/.test(form.email?.trim() ?? "")) return "Please enter a valid email.";
   const qty = parseInt(form.quantity?.trim() ?? "", 10);
-  if (Number.isNaN(qty) || qty < 1) return "Please enter a valid quantity.";
+  if (Number.isNaN(qty) || qty < 25) return "Minimum quantity is 25 units.";
   if (!form.message?.trim()) return "Please add a short message.";
   return null;
 }

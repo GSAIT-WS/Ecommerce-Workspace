@@ -1,6 +1,5 @@
-import { Check, Package, Truck, MapPin, Clock } from "lucide-react";
-
-type OrderStatus = "confirmed" | "packed" | "shipped" | "delivered";
+import { Check, Package, Truck, MapPin, Clock, XCircle } from "lucide-react";
+import type { OrderStatus } from "@/data/orders";
 
 interface TimelineStep {
   id: OrderStatus;
@@ -11,6 +10,13 @@ interface TimelineStep {
 }
 
 const timelineSteps: TimelineStep[] = [
+  {
+    id: "pending",
+    label: "Order Placed",
+    description: "We received your order",
+    icon: Clock,
+    time: "Processing",
+  },
   {
     id: "confirmed",
     label: "Order Confirmed",
@@ -23,21 +29,21 @@ const timelineSteps: TimelineStep[] = [
     label: "Packed",
     description: "Your order is being packed",
     icon: Package,
-    time: "Expected in 10 mins",
+    time: "Expected soon",
   },
   {
     id: "shipped",
     label: "Out for Delivery",
     description: "Your order is on the way",
     icon: Truck,
-    time: "Expected in 25 mins",
+    time: "In transit",
   },
   {
     id: "delivered",
     label: "Delivered",
     description: "Order delivered successfully",
     icon: MapPin,
-    time: "Expected in 45 mins",
+    time: "Completed",
   },
 ];
 
@@ -46,28 +52,41 @@ interface OrderStatusTimelineProps {
 }
 
 const OrderStatusTimeline = ({ currentStatus }: OrderStatusTimelineProps) => {
+  if (currentStatus === "cancelled") {
+    return (
+      <div className="flex gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4">
+        <XCircle className="h-6 w-6 shrink-0 text-destructive" />
+        <div>
+          <p className="font-display font-semibold text-foreground">Order cancelled</p>
+          <p className="font-body text-sm text-muted-foreground">
+            This order is no longer active. Contact support if you need help.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const currentIndex = timelineSteps.findIndex((step) => step.id === currentStatus);
+  const safeIndex = currentIndex < 0 ? 0 : currentIndex;
 
   return (
     <div className="space-y-0">
       {timelineSteps.map((step, index) => {
-        const isCompleted = index <= currentIndex;
-        const isCurrent = index === currentIndex;
+        const isCompleted = index <= safeIndex;
+        const isCurrent = index === safeIndex;
         const isLast = index === timelineSteps.length - 1;
         const Icon = step.icon;
 
         return (
           <div key={step.id} className="relative flex gap-4">
-            {/* Connector line */}
             {!isLast && (
               <div
                 className={`absolute left-5 top-10 h-full w-0.5 ${
-                  index < currentIndex ? "bg-secondary" : "bg-border"
+                  index < safeIndex ? "bg-secondary" : "bg-border"
                 }`}
               />
             )}
 
-            {/* Icon */}
             <div
               className={`relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border-2 transition-all ${
                 isCompleted
@@ -78,7 +97,6 @@ const OrderStatusTimeline = ({ currentStatus }: OrderStatusTimelineProps) => {
               <Icon className="h-5 w-5" />
             </div>
 
-            {/* Content */}
             <div className={`pb-8 ${isLast ? "pb-0" : ""}`}>
               <div className="flex items-center gap-2">
                 <p
@@ -95,16 +113,14 @@ const OrderStatusTimeline = ({ currentStatus }: OrderStatusTimelineProps) => {
                   </span>
                 )}
               </div>
-              <p className="font-body text-sm text-muted-foreground">
-                {step.description}
-              </p>
+              <p className="font-body text-sm text-muted-foreground">{step.description}</p>
               {step.time && (
                 <p
                   className={`mt-1 font-body text-xs ${
                     isCompleted ? "text-secondary" : "text-muted-foreground"
                   }`}
                 >
-                  {isCompleted && index < currentIndex ? "Completed" : step.time}
+                  {isCompleted && index < safeIndex ? "Completed" : step.time}
                 </p>
               )}
             </div>
