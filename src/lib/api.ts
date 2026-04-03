@@ -13,6 +13,21 @@ export function hasApiConfig(): boolean {
   return !!SUPABASE_URL;
 }
 
+/** Parse Edge Function JSON body `{ success, data?, error? }` */
+export function unwrapEdgeData<T>(body: unknown): { ok: true; data: T } | { ok: false; error: string } {
+  if (!body || typeof body !== "object") {
+    return { ok: false, error: "Invalid response" };
+  }
+  const o = body as Record<string, unknown>;
+  if (o.success === true && "data" in o) {
+    return { ok: true, data: o.data as T };
+  }
+  if (o.success === false && typeof o.error === "string") {
+    return { ok: false, error: o.error };
+  }
+  return { ok: false, error: "Invalid response" };
+}
+
 /** Map raw browser/network errors to user-friendly messages */
 function friendlyError(raw: string): string {
   if (

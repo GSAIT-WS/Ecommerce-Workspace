@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -14,79 +14,143 @@ import {
   Home,
   Building2,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import OrderStatusTimeline from "@/components/checkout/OrderStatusTimeline";
-import { getOrderById, getStatusLabel, getStatusColor, Order, OrderStatus, dummyOrders } from "@/data/orders";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import { getOrderByIdApi } from "@/services/orderApi";
+import { getStatusLabel, getStatusColor, normalizeOrderStatus, type OrderStatus } from "@/data/orders";
 import { toast } from "sonner";
+
+const PRODUCT_PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
+
+function parseShippingSnapshot(s: unknown): {
+  name: string;
+  phone: string;
+  address: string;
+  landmark: string;
+  pincode: string;
+  type: "home" | "work";
+} {
+  if (!s || typeof s !== "object") {
+    return {
+      name: "—",
+      phone: "—",
+      address: "—",
+      landmark: "",
+      pincode: "—",
+      type: "home",
+    };
+  }
+  const j = s as Record<string, unknown>;
+  const label = String(j.label ?? "").toLowerCase();
+  return {
+    name: String(j.recipient_name ?? j.name ?? "—"),
+    phone: String(j.phone ?? "—"),
+    address: [j.address_line1, j.address_line2].filter(Boolean).join(", ") || "—",
+    landmark: [j.city, j.state].filter(Boolean).join(", ") || "",
+    pincode: String(j.postal_code ?? "—"),
+    type: label === "work" ? "work" : "home",
+  };
+}
 
 const OrderDetailPage = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
+  const { session, loading: authLoading } = useAuth();
   const { addToCart } = useCart();
   const timelineRef = useRef<HTMLDivElement>(null);
+  const token = session?.access_token ?? null;
 
-  const [order, setOrder] = useState<Order | undefined>(undefined);
-  const [currentStatus, setCurrentStatus] = useState<OrderStatus>("confirmed");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<OrderStatus>("pending");
+  const [orderNumber, setOrderNumber] = useState("");
+  const [placedAt, setPlacedAt] = useState<Date | null>(null);
+  const [items, setItems] = useState<
+    { id: string; productId: string | null; name: string; quantity: number; unitPrice: number; lineTotal: number }[]
+  >([]);
+  const [subtotal, setSubtotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [deliveryCharge, setDeliveryCharge] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [address, setAddress] = useState<ReturnType<typeof parseShippingSnapshot> | null>(null);
+  const [shipment, setShipment] = useState<Record<string, unknown> | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    const foundOrder = getOrderById(orderId || "");
-    if (foundOrder) {
-      setOrder(foundOrder);
-      setCurrentStatus(foundOrder.status);
-    } else {
-      // Use the first order as fallback for demo
-      setOrder(dummyOrders[0]);
-      setCurrentStatus(dummyOrders[0].status);
+  const load = async () => {
+    if (!orderId || !token) return;
+    setError(null);
+    const res = await getOrderByIdApi(token, orderId);
+    if (res.error || !res.order) {
+      setError(res.error ?? "Order not found");
+      setLoading(false);
+      return;
     }
-  }, [orderId]);
+    const o = res.order;
+    setOrderNumber(o.order_number ?? o.id.slice(0, 8).toUpperCase());
+    setPlacedAt(new Date(o.created_at));
+    setCurrentStatus(normalizeOrderStatus(o.order_status));
+    setItems(
+      (o.items ?? []).map((it) => ({
+        id: String(it.id),
+        productId: it.product_id,
+        name: it.product_name ?? "Item",
+        quantity: it.quantity,
+        unitPrice: it.unit_price,
+        lineTotal: it.line_total,
+      })),
+    );
+    setSubtotal(o.subtotal);
+    setDiscount(o.discount_amount);
+    setDeliveryCharge(o.shipping_amount);
+    setTotal(o.total);
+    setAddress(parseShippingSnapshot(o.shipping_address));
+    setShipment(o.shipment && typeof o.shipment === "object" ? o.shipment : null);
+    setLoading(false);
+  };
 
-  // Simulate status progression for active orders
   useEffect(() => {
-    if (!order || order.status === "delivered") return;
+    if (!token || !orderId) return;
+    setLoading(true);
+    void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load when id/token ready
+  }, [orderId, token]);
 
-    const statuses: OrderStatus[] = ["confirmed", "packed", "shipped", "delivered"];
-    let currentIndex = statuses.indexOf(order.status);
-
-    const interval = setInterval(() => {
-      if (currentIndex < statuses.length - 1) {
-        currentIndex++;
-        setCurrentStatus(statuses[currentIndex]);
-      }
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [order]);
-
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
+    if (!token || !orderId) return;
     setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 1000);
+    await load();
+    setIsRefreshing(false);
   };
 
   const handleReorder = () => {
-    if (!order) return;
+    const withProducts = items.filter((i) => i.productId);
+    if (withProducts.length === 0) {
+      toast.error("Cannot reorder — product links missing for these items.");
+      return;
+    }
 
-    order.items.forEach((item) => {
+    withProducts.forEach((item) => {
+      if (!item.productId) return;
       for (let i = 0; i < item.quantity; i++) {
         addToCart({
-          id: item.id,
+          id: item.productId,
           name: item.name,
-          tag: item.variant,
-          price: item.price,
-          image: item.image,
+          tag: "",
+          price: item.unitPrice,
+          image: PRODUCT_PLACEHOLDER,
         });
       }
     });
 
-    toast.success("Items added to cart", {
-      description: `${order.items.length} item(s) added`,
-    });
-
+    toast.success("Items added to cart");
     navigate("/cart");
   };
 
@@ -94,32 +158,66 @@ const OrderDetailPage = () => {
     timelineRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  if (!order) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="container mx-auto flex items-center justify-center px-4 py-20">
-          <p className="font-body text-muted-foreground">Loading order details...</p>
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
         <Footer />
       </div>
     );
   }
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-IN", {
+  if (!token) {
+    return <Navigate to="/login" state={{ from: `/order/${orderId ?? ""}` }} replace />;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto flex items-center justify-center px-4 py-20">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !address) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <p className="font-body text-destructive">{error ?? "Unable to load order."}</p>
+          <Button asChild className="mt-6">
+            <Link to="/orders">Back to orders</Link>
+          </Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString("en-IN", {
       day: "numeric",
       month: "long",
       year: "numeric",
     });
-  };
+
+  const deliveryPartner =
+    shipment && typeof shipment.tracking_notes === "string"
+      ? { name: "Delivery", phone: "", vehicleNumber: String(shipment.shipment_number ?? "") }
+      : null;
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8 md:py-12">
-        {/* Header */}
         <div className="mb-8">
           <Link
             to="/orders"
@@ -131,32 +229,23 @@ const OrderDetailPage = () => {
           <div className="mt-4 flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">
-                  {order.id}
-                </h1>
+                <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">{orderNumber}</h1>
                 <Badge className={`${getStatusColor(currentStatus)} border-0 font-body`}>
                   {getStatusLabel(currentStatus)}
                 </Badge>
               </div>
-              <p className="mt-1 font-body text-muted-foreground">
-                Ordered on {formatDate(order.date)}
-              </p>
+              {placedAt && (
+                <p className="mt-1 font-body text-muted-foreground">Ordered on {formatDate(placedAt)}</p>
+              )}
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleRefresh}
-              className="rounded-full"
-            >
+            <Button variant="outline" size="icon" onClick={() => void handleRefresh()} className="rounded-full">
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
             </Button>
           </div>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Estimated Delivery Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -174,15 +263,11 @@ const OrderDetailPage = () => {
                       : "bg-primary text-primary-foreground"
                   }`}
                 >
-                  {currentStatus === "delivered" ? (
-                    <Package className="h-7 w-7" />
-                  ) : (
-                    <Clock className="h-7 w-7" />
-                  )}
+                  {currentStatus === "delivered" ? <Package className="h-7 w-7" /> : <Clock className="h-7 w-7" />}
                 </div>
                 <div className="flex-1">
                   <p className="font-body text-sm text-muted-foreground">
-                    {currentStatus === "delivered" ? "Delivered" : "Estimated Delivery"}
+                    {currentStatus === "delivered" ? "Delivered" : "Estimated / status"}
                   </p>
                   <p
                     className={`font-display text-xl font-bold md:text-2xl ${
@@ -190,17 +275,14 @@ const OrderDetailPage = () => {
                     }`}
                   >
                     {currentStatus === "delivered"
-                      ? "Order Delivered! 🎉"
-                      : order.estimatedDelivery}
+                      ? "Order delivered"
+                      : shipment?.estimated_delivery
+                        ? String(shipment.estimated_delivery)
+                        : "We’ll update you as the order progresses"}
                   </p>
                 </div>
-                {currentStatus !== "delivered" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={scrollToTimeline}
-                    className="gap-1 rounded-xl font-body"
-                  >
+                {currentStatus !== "delivered" && currentStatus !== "cancelled" && (
+                  <Button variant="outline" size="sm" onClick={scrollToTimeline} className="gap-1 rounded-xl font-body">
                     Track
                     <ChevronDown className="h-4 w-4" />
                   </Button>
@@ -208,7 +290,6 @@ const OrderDetailPage = () => {
               </div>
             </motion.div>
 
-            {/* Order Status Timeline */}
             <motion.div
               ref={timelineRef}
               initial={{ opacity: 0, y: 20 }}
@@ -216,139 +297,96 @@ const OrderDetailPage = () => {
               transition={{ delay: 0.1 }}
               className="rounded-2xl border border-border bg-card p-6"
             >
-              <h2 className="mb-6 font-display text-xl font-bold text-foreground">
-                Delivery Status
-              </h2>
+              <h2 className="mb-6 font-display text-xl font-bold text-foreground">Delivery Status</h2>
               <OrderStatusTimeline currentStatus={currentStatus} />
             </motion.div>
 
-            {/* Delivery Partner (shown when shipped) */}
-            {(currentStatus === "shipped" || currentStatus === "delivered") &&
-              order.deliveryPartner && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="rounded-2xl border border-border bg-card p-6"
-                >
-                  <h2 className="mb-4 font-display text-lg font-bold text-foreground">
-                    Delivery Partner
-                  </h2>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted font-display text-lg font-bold text-foreground">
-                        {order.deliveryPartner.name.charAt(0)}
-                      </div>
-                      <div>
-                        <p className="font-display font-semibold text-foreground">
-                          {order.deliveryPartner.name}
-                        </p>
-                        <p className="font-body text-sm text-muted-foreground">
-                          {order.deliveryPartner.vehicleNumber}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                      >
-                        <Phone className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                      >
-                        <MessageCircle className="h-4 w-4" />
-                      </Button>
-                    </div>
+            {(currentStatus === "shipped" || currentStatus === "delivered") && deliveryPartner && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl border border-border bg-card p-6"
+              >
+                <h2 className="mb-4 font-display text-lg font-bold text-foreground">Delivery</h2>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-display font-semibold text-foreground">{deliveryPartner.name}</p>
+                    {deliveryPartner.vehicleNumber ? (
+                      <p className="font-body text-sm text-muted-foreground">{deliveryPartner.vehicleNumber}</p>
+                    ) : null}
                   </div>
-                </motion.div>
-              )}
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="icon" className="rounded-full">
+                      <Phone className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="icon" className="rounded-full">
+                      <MessageCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
-            {/* Order Items */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="rounded-2xl border border-border bg-card p-6"
             >
-              <h2 className="mb-4 font-display text-lg font-bold text-foreground">
-                Order Items
-              </h2>
+              <h2 className="mb-4 font-display text-lg font-bold text-foreground">Order Items</h2>
               <div className="space-y-4">
-                {order.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-4 rounded-xl border border-border bg-background p-3"
-                  >
+                {items.map((item) => (
+                  <div key={item.id} className="flex items-center gap-4 rounded-xl border border-border bg-background p-3">
                     <img
-                      src={item.image}
+                      src={PRODUCT_PLACEHOLDER}
                       alt={item.name}
                       className="h-16 w-16 rounded-xl object-cover"
                     />
                     <div className="flex-1">
-                      <p className="font-display font-semibold text-foreground">
-                        {item.name}
-                      </p>
-                      <p className="font-body text-sm text-muted-foreground">
-                        {item.variant}
-                      </p>
-                      <p className="font-body text-sm text-muted-foreground">
-                        Qty: {item.quantity}
-                      </p>
+                      <p className="font-display font-semibold text-foreground">{item.name}</p>
+                      <p className="font-body text-sm text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
-                    <p className="font-display font-bold text-foreground">
-                      ₹{item.price * item.quantity}
-                    </p>
+                    <p className="font-display font-bold text-foreground">₹{item.lineTotal}</p>
                   </div>
                 ))}
               </div>
 
-              {/* Price Breakdown */}
               <div className="mt-6 space-y-2 border-t border-border pt-4">
                 <div className="flex justify-between font-body text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-foreground">₹{order.subtotal}</span>
+                  <span className="text-foreground">₹{subtotal}</span>
                 </div>
                 <div className="flex justify-between font-body text-sm">
                   <span className="text-muted-foreground">Delivery</span>
-                  <span className={order.deliveryCharge === 0 ? "text-secondary" : "text-foreground"}>
-                    {order.deliveryCharge === 0 ? "FREE" : `₹${order.deliveryCharge}`}
+                  <span className={deliveryCharge === 0 ? "text-secondary" : "text-foreground"}>
+                    {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
                   </span>
                 </div>
-                {order.discount > 0 && (
+                {discount > 0 && (
                   <div className="flex justify-between font-body text-sm">
                     <span className="text-muted-foreground">Discount</span>
-                    <span className="text-secondary">-₹{order.discount}</span>
+                    <span className="text-secondary">-₹{discount}</span>
                   </div>
                 )}
                 <div className="flex justify-between border-t border-border pt-2">
                   <span className="font-display font-bold text-foreground">Total</span>
-                  <span className="font-display text-lg font-bold text-primary">
-                    ₹{order.total}
-                  </span>
+                  <span className="font-display text-lg font-bold text-primary">₹{total}</span>
                 </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Right Column - Sidebar */}
           <div className="space-y-6">
-            {/* Delivery Address */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="rounded-2xl border border-border bg-card p-6"
             >
-              <h2 className="mb-4 font-display text-lg font-bold text-foreground">
-                Delivery Address
-              </h2>
+              <h2 className="mb-4 font-display text-lg font-bold text-foreground">Delivery Address</h2>
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted">
-                  {order.address.type === "home" ? (
+                  {address.type === "home" ? (
                     <Home className="h-5 w-5 text-muted-foreground" />
                   ) : (
                     <Building2 className="h-5 w-5 text-muted-foreground" />
@@ -356,84 +394,62 @@ const OrderDetailPage = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="font-display font-semibold text-foreground">
-                      {order.address.name}
-                    </p>
+                    <p className="font-display font-semibold text-foreground">{address.name}</p>
                     <Badge variant="outline" className="text-xs capitalize">
-                      {order.address.type}
+                      {address.type}
                     </Badge>
                   </div>
-                  <p className="mt-1 font-body text-sm text-muted-foreground">
-                    {order.address.address}
-                  </p>
-                  <p className="font-body text-sm text-muted-foreground">
-                    {order.address.landmark}
-                  </p>
-                  <p className="font-body text-sm text-muted-foreground">
-                    {order.address.pincode}
-                  </p>
+                  <p className="mt-1 font-body text-sm text-muted-foreground">{address.address}</p>
+                  {address.landmark ? (
+                    <p className="font-body text-sm text-muted-foreground">{address.landmark}</p>
+                  ) : null}
+                  <p className="font-body text-sm text-muted-foreground">{address.pincode}</p>
                   <p className="mt-2 flex items-center gap-2 font-body text-sm text-foreground">
                     <Phone className="h-4 w-4" />
-                    {order.address.phone}
+                    {address.phone}
                   </p>
                 </div>
               </div>
             </motion.div>
 
-            {/* Payment Method */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35 }}
               className="rounded-2xl border border-border bg-card p-6"
             >
-              <h2 className="mb-4 font-display text-lg font-bold text-foreground">
-                Payment Method
-              </h2>
+              <h2 className="mb-4 font-display text-lg font-bold text-foreground">Payment</h2>
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted">
                   <CreditCard className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <p className="font-body text-foreground">{order.paymentMethod}</p>
+                <p className="font-body text-foreground">Paid via checkout</p>
               </div>
             </motion.div>
 
-            {/* Help Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="rounded-2xl border border-border bg-card p-6"
             >
-              <h2 className="mb-4 font-display text-lg font-bold text-foreground">
-                Need Help?
-              </h2>
+              <h2 className="mb-4 font-display text-lg font-bold text-foreground">Need Help?</h2>
               <div className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 rounded-xl font-body"
-                >
+                <Button variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
                   <Phone className="h-4 w-4" />
                   Call Support
                 </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 rounded-xl font-body"
-                >
+                <Button variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
                   <MessageCircle className="h-4 w-4" />
                   Chat with Us
                 </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 rounded-xl font-body"
-                >
+                <Button variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
                   <HelpCircle className="h-4 w-4" />
                   FAQs
                 </Button>
               </div>
             </motion.div>
 
-            {/* Action Buttons */}
             <div className="space-y-3">
               <Button
                 onClick={handleReorder}
@@ -442,11 +458,7 @@ const OrderDetailPage = () => {
                 <RefreshCw className="h-4 w-4" />
                 Reorder
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="w-full rounded-full py-6 font-body"
-              >
+              <Button asChild variant="outline" className="w-full rounded-full py-6 font-body">
                 <Link to="/">Continue Shopping</Link>
               </Button>
             </div>

@@ -1,71 +1,287 @@
 import { useCallback, useState } from "react";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
-import { ArrowLeft, ShieldCheck, Lock, MapPin } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Lock, MapPin, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PaymentMethodCard from "@/components/checkout/PaymentMethodCard";
-import PaymentProcessing from "@/components/checkout/PaymentProcessing";
+import { StripePaymentForm } from "@/components/checkout/StripePaymentForm";
+import { Button } from "@/components/ui/button";
 import type { ApiAddress } from "@/services/addressApi";
+import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
+import {
+  syncLocalCartToServer,
+  placeOrder,
+  createPaymentIntent,
+  confirmMockPayment,
+  finalizeCodOrder,
+  type PlacedOrder,
+} from "@/services/checkoutApi";
+import { toast } from "sonner";
+import type { OrderStatus } from "@/data/orders";
+import type { CartItem } from "@/context/CartContext";
 
 type PaymentMethod = "upi" | "card" | "netbanking" | "cod";
 
 type CheckoutPaymentState = {
   selectedAddress?: ApiAddress;
   couponDiscount: number;
+  couponCode: string | null;
   total: number;
   subtotal: number;
   delivery: number;
 };
 
+type StripePayState = {
+  clientSecret: string;
+  paymentIntentId: string;
+  order: PlacedOrder;
+};
+
 function isCheckoutPaymentState(s: unknown): s is CheckoutPaymentState {
   if (!s || typeof s !== "object") return false;
   const o = s as Record<string, unknown>;
+  const couponOk =
+    o.couponCode === null ||
+    o.couponCode === undefined ||
+    typeof o.couponCode === "string";
   return (
     typeof o.total === "number" &&
     typeof o.subtotal === "number" &&
     typeof o.delivery === "number" &&
-    typeof o.couponDiscount === "number"
+    typeof o.couponDiscount === "number" &&
+    couponOk
+  );
+}
+
+function isMockIntent(intent: {
+  payment_intent_id: string;
+  provider?: string;
+}): boolean {
+  return (
+    intent.provider === "mock" ||
+    intent.payment_intent_id.startsWith("pi_mock")
   );
 }
 
 const PaymentPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { session } = useAuth();
+  const { items: cartItems, clearCart } = useCart();
+  const token = session?.access_token ?? null;
+
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("upi");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processError, setProcessError] = useState<string | null>(null);
+  const [processStep, setProcessStep] = useState("");
+  const [stripePay, setStripePay] = useState<StripePayState | null>(null);
 
   const checkout = isCheckoutPaymentState(location.state) ? location.state : null;
+  const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.trim() ?? "";
 
-  const handleProcessingComplete = useCallback(() => {
-    if (!checkout) {
+  const goToConfirmation = useCallback(
+    (
+      order: PlacedOrder,
+      orderStatus: OrderStatus,
+      snap: CheckoutPaymentState,
+      items: CartItem[],
+      method: PaymentMethod,
+    ) => {
+      const itemSnapshot = items.map((i) => ({
+        id: i.id,
+        name: i.name,
+        tag: i.tag,
+        quantity: i.quantity,
+        lineTotal: i.price * i.quantity,
+        image: i.image,
+      }));
+      clearCart();
+      navigate("/order-confirmation", {
+        replace: true,
+        state: {
+          orderId: order.id,
+          orderNumber: order.order_number,
+          orderStatus,
+          total: snap.total,
+          subtotal: snap.subtotal,
+          delivery: snap.delivery,
+          couponDiscount: snap.couponDiscount,
+          selectedAddress: snap.selectedAddress,
+          paymentMethod: method,
+          items: itemSnapshot,
+        },
+      });
+    },
+    [clearCart, navigate],
+  );
+
+  const runCheckout = useCallback(async () => {
+    if (!checkout || !token) return;
+    const addr = checkout.selectedAddress;
+    if (!addr?.id) {
+      toast.error("Please select a saved address.");
       navigate("/checkout", { replace: true });
       return;
     }
-    navigate("/order-confirmation", {
-      replace: true,
-      state: {
-        total: checkout.total,
-        subtotal: checkout.subtotal,
-        delivery: checkout.delivery,
-        couponDiscount: checkout.couponDiscount,
-        selectedAddress: checkout.selectedAddress,
-        paymentMethod: selectedMethod,
-      },
+
+    setProcessError(null);
+    setStripePay(null);
+    setIsProcessing(true);
+    setProcessStep("Syncing your cart…");
+
+    const sync = await syncLocalCartToServer(token, cartItems);
+    if (sync.error) {
+      setProcessError(sync.error);
+      setIsProcessing(false);
+      toast.error(sync.error);
+      return;
+    }
+
+    setProcessStep("Placing your order…");
+    const placed = await placeOrder(token, {
+      shipping_address_id: addr.id,
+      coupon_code: checkout.couponCode,
     });
-  }, [navigate, checkout, selectedMethod]);
+
+    if (placed.error || !placed.order) {
+      const msg = placed.error ?? "Could not place order.";
+      setProcessError(msg);
+      setIsProcessing(false);
+      toast.error(msg);
+      return;
+    }
+
+    const order = placed.order;
+    let orderStatus: OrderStatus = (order.status as OrderStatus) ?? "pending";
+
+    if (selectedMethod === "cod") {
+      setProcessStep("Confirming cash on delivery…");
+      const cod = await finalizeCodOrder(token, order.id);
+      if (cod.error) {
+        setProcessError(cod.error);
+        setIsProcessing(false);
+        toast.error(cod.error);
+        return;
+      }
+      orderStatus = "confirmed";
+      setIsProcessing(false);
+      goToConfirmation(order, orderStatus, checkout, cartItems, selectedMethod);
+      return;
+    }
+
+    setProcessStep("Starting payment…");
+    const pi = await createPaymentIntent(token, order.id);
+    const intent = pi.intent;
+    if (pi.error || !intent?.payment_intent_id) {
+      const msg = pi.error ?? "Could not start payment.";
+      setProcessError(msg);
+      setIsProcessing(false);
+      toast.error(msg);
+      return;
+    }
+
+    if (isMockIntent(intent)) {
+      setProcessStep("Confirming payment…");
+      const paid = await confirmMockPayment(token, intent.payment_intent_id);
+      if (paid.error) {
+        setProcessError(paid.error);
+        setIsProcessing(false);
+        toast.error(paid.error);
+        return;
+      }
+      orderStatus = "confirmed";
+      setIsProcessing(false);
+      goToConfirmation(order, orderStatus, checkout, cartItems, selectedMethod);
+      return;
+    }
+
+    if (!intent.client_secret) {
+      const msg = "Server did not return a payment client secret.";
+      setProcessError(msg);
+      setIsProcessing(false);
+      toast.error(msg);
+      return;
+    }
+
+    if (!stripePublishableKey) {
+      const msg =
+        "Stripe checkout requires VITE_STRIPE_PUBLISHABLE_KEY. Set it in your env or omit STRIPE_SECRET_KEY on the server to use mock payment.";
+      setProcessError(msg);
+      setIsProcessing(false);
+      toast.error(msg);
+      return;
+    }
+
+    setIsProcessing(false);
+    setStripePay({
+      clientSecret: intent.client_secret,
+      paymentIntentId: intent.payment_intent_id,
+      order,
+    });
+  }, [
+    checkout,
+    token,
+    cartItems,
+    selectedMethod,
+    goToConfirmation,
+    navigate,
+    stripePublishableKey,
+  ]);
 
   const handleProceed = () => {
-    setIsProcessing(true);
+    void runCheckout();
   };
+
+  const handleStripeSuccess = useCallback(async () => {
+    if (!checkout || !token || !stripePay) return;
+    const paid = await confirmMockPayment(token, stripePay.paymentIntentId);
+    if (paid.error) {
+      toast.error(paid.error);
+      throw new Error(paid.error);
+    }
+    setStripePay(null);
+    goToConfirmation(stripePay.order, "confirmed", checkout, cartItems, selectedMethod);
+  }, [checkout, token, stripePay, goToConfirmation, cartItems, selectedMethod]);
 
   if (!checkout) {
     return <Navigate to="/checkout" replace />;
   }
 
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-16 text-center">
+          <h1 className="font-display text-2xl font-bold text-foreground">Sign in required</h1>
+          <p className="mt-2 font-body text-muted-foreground">
+            Log in to complete payment and place your order.
+          </p>
+          <Button asChild className="mt-6">
+            <Link to="/login" state={{ from: "/checkout" }}>
+              Sign in
+            </Link>
+          </Button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   const { total, subtotal, delivery, couponDiscount, selectedAddress } = checkout;
 
   if (isProcessing) {
-    return <PaymentProcessing onComplete={handleProcessingComplete} />;
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background px-6">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="mt-6 text-center font-display text-lg font-semibold text-foreground">
+          {processStep || "Please wait…"}
+        </p>
+        <p className="mt-2 text-center font-body text-sm text-muted-foreground">
+          Do not close this window.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -88,6 +304,39 @@ const PaymentPage = () => {
             Choose your preferred payment method
           </p>
         </div>
+
+        {processError && (
+          <div className="mb-6 rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-3 font-body text-sm text-destructive">
+            {processError}
+          </div>
+        )}
+
+        {stripePay && stripePublishableKey ? (
+          <div className="mb-8 rounded-2xl border border-border bg-card p-6">
+            <h2 className="mb-2 font-display text-xl font-bold text-foreground">Complete payment</h2>
+            <p className="mb-6 font-body text-sm text-muted-foreground">
+              Your order is reserved. Pay securely with Stripe (test cards work in test mode).
+            </p>
+            <StripePaymentForm
+              publishableKey={stripePublishableKey}
+              clientSecret={stripePay.clientSecret}
+              amountLabel={`₹${total}`}
+              onSuccess={handleStripeSuccess}
+              onError={(m) => toast.error(m)}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              className="mt-4 font-body text-muted-foreground"
+              onClick={() => setStripePay(null)}
+            >
+              Cancel — return to payment options
+            </Button>
+            <p className="mt-2 font-body text-xs text-muted-foreground">
+              If you cancel, the order stays pending until you pay from your account orders.
+            </p>
+          </div>
+        ) : null}
 
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-4">
