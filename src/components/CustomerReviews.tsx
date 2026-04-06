@@ -38,9 +38,9 @@ const CustomerReviews = () => {
   }, []);
 
   return (
-    <section className="overflow-hidden bg-muted/50 py-12 md:py-16">
+    <section className="overflow-hidden border-t border-border/40 bg-background py-10 md:py-14">
       <div className="container mx-auto px-4 md:px-8">
-        <h2 className="mb-8 text-center font-display text-2xl font-bold text-foreground md:text-3xl">
+        <h2 className="mb-6 text-center font-display text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
           Loved by CrunchX Customers
         </h2>
       </div>
@@ -49,7 +49,7 @@ const CustomerReviews = () => {
           {doubled.map((t, i) => (
             <div
               key={i}
-              className="w-72 shrink-0 rounded-xl bg-card p-5 shadow-sm transition-all duration-300 hover:scale-[0.97] hover:opacity-80"
+              className="w-72 shrink-0 rounded-2xl border border-border/50 bg-gradient-to-b from-card to-muted/30 p-5 shadow-card transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/15 hover:shadow-card-hover"
             >
               <div className="mb-2 flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, s) => (

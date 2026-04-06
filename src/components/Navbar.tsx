@@ -35,7 +35,7 @@ const Navbar = () => {
     <>
       <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      <header className="sticky top-0 z-50 border-b border-border bg-card/90 backdrop-blur-md">
+      <header className="sticky top-0 z-50 border-b border-border/60 bg-card/92 shadow-sm backdrop-blur-md transition-shadow duration-300">
         <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-8">
 
           {/* Left: Logo + Delivery chip (desktop) */}
@@ -78,7 +78,7 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-foreground/70 hover:text-primary"
+              className="text-foreground/70 transition-colors duration-300 hover:text-primary [&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:scale-110"
               onClick={() => setSearchOpen(true)}
             >
               <Search className="h-5 w-5" />
@@ -87,7 +87,7 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-foreground/70 hover:text-primary"
+              className="relative text-foreground/70 transition-colors duration-300 hover:text-primary [&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:scale-110"
               asChild
             >
               <Link to="/cart">
@@ -105,7 +105,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden text-foreground/70 hover:text-primary md:flex"
+                  className="hidden text-foreground/70 transition-colors duration-300 hover:text-primary md:flex [&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:scale-110"
                   asChild
                 >
                   <Link to="/profile">
@@ -115,7 +115,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden text-foreground/70 hover:text-destructive md:flex"
+                  className="hidden text-foreground/70 transition-colors duration-300 hover:text-destructive md:flex [&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:scale-110"
                   onClick={handleLogout}
                   title="Logout"
                 >

@@ -58,7 +58,7 @@ const Index = () => (
         <motion.div variants={staggerItem}>
           <CategoriesSection />
         </motion.div>
-        <motion.div variants={staggerItem} className="py-8 md:py-12">
+        <motion.div variants={staggerItem} className="py-5 md:py-8">
           <CombosGiftsBanner />
         </motion.div>
         <motion.div variants={staggerItem}>
