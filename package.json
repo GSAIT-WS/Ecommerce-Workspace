@@ -8,7 +8,8 @@
     "build": "if exist crunchx-healthy-home\\package.json (npm run build --prefix crunchx-healthy-home) else (tsc -b && vite build)",
     "preview": "if exist crunchx-healthy-home\\package.json (npm run preview --prefix crunchx-healthy-home) else (vite preview)",
     "lint": "if exist crunchx-healthy-home\\package.json (npm run lint --prefix crunchx-healthy-home) else (eslint .)",
-    "test": "if exist crunchx-healthy-home\\package.json (npm run test --prefix crunchx-healthy-home) else (vitest)"
+    "test": "if exist crunchx-healthy-home\\package.json (npm run test --prefix crunchx-healthy-home) else (vitest)",
+    "create-test-user": "node scripts/create-ecommerce-test-user.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
