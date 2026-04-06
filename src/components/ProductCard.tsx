@@ -38,7 +38,7 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, rating, image 
   return (
     <Link 
       to={`/product/${id}`}
-      className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg"
+      className="group block overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-b from-card to-primary/[0.02] shadow-card transition-all duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] hover:border-primary/20 hover:shadow-card-hover dark:to-secondary/[0.04]"
     >
       <div className="relative aspect-square overflow-hidden bg-muted">
         <img

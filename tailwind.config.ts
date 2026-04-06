@@ -18,6 +18,10 @@ export default {
         body: ['Plus Jakarta Sans', 'sans-serif'],
       },
       colors: {
+        surface: {
+          subtle: "hsl(var(--surface-subtle))",
+          muted: "hsl(var(--surface-muted))",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -67,6 +71,18 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        card: "0 4px 20px -6px hsl(var(--foreground) / 0.07), 0 0 0 1px hsl(var(--border) / 0.55)",
+        "card-hover":
+          "0 14px 36px -10px hsl(var(--primary) / 0.18), 0 0 0 1px hsl(var(--primary) / 0.14)",
+        lift: "0 6px 20px -8px hsl(var(--foreground) / 0.12), 0 2px 8px -4px hsl(var(--foreground) / 0.06)",
+      },
+      transitionDuration: {
+        DEFAULT: "300ms",
+      },
+      transitionTimingFunction: {
+        smooth: "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -111,6 +127,17 @@ export default {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        /** Very slow badge pulse — Offers & Combos discount pill */
+        "offer-badge-pulse": {
+          "0%, 100%": {
+            boxShadow:
+              "inset 0 2px 4px rgba(255,255,255,0.42), inset 0 -3px 6px rgba(0,0,0,0.14), 0 0 0 0 hsl(36 78% 46% / 0.2)",
+          },
+          "50%": {
+            boxShadow:
+              "inset 0 2px 5px rgba(255,255,255,0.48), inset 0 -3px 5px rgba(0,0,0,0.12), 0 0 0 10px hsl(36 78% 46% / 0.06)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -124,6 +151,7 @@ export default {
         float: "float 3.5s ease-in-out infinite",
         "pulse-soft": "pulse-soft 4s ease-in-out infinite",
         shimmer: "shimmer 2.5s linear infinite",
+        "offer-badge-pulse": "offer-badge-pulse 5.5s ease-in-out infinite",
       },
     },
   },

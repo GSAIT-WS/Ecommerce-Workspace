@@ -41,15 +41,17 @@ const categories = [
 ];
 
 const CategoriesSection = () => (
-  <section className="py-16 md:py-20">
+  <section className="bg-surface-muted/40 py-12 md:py-16">
     <div className="container mx-auto px-4 md:px-8">
-      <div className="mb-10 text-center">
-        <h2 className="mb-2 font-display text-3xl font-bold text-foreground md:text-4xl">
+      <div className="mb-8 text-center">
+        <h2 className="mb-2 font-display text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
           Shop by Category
         </h2>
-        <p className="font-body text-muted-foreground">Find exactly what fuels your lifestyle</p>
+        <p className="font-body text-[15px] leading-relaxed text-muted-foreground">
+          Find exactly what fuels your lifestyle
+        </p>
       </div>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+      <div className="grid grid-cols-2 gap-3.5 md:grid-cols-4 md:gap-5">
         {categories.map((cat, i) => (
           <MotionLink
             key={cat.name}
@@ -58,9 +60,13 @@ const CategoriesSection = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ delay: i * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            whileHover={{ y: -6, transition: { type: "spring", stiffness: 400, damping: 22 } }}
+            whileHover={{
+              scale: 1.035,
+              y: -5,
+              transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+            }}
             whileTap={{ scale: 0.98 }}
-            className="group relative flex flex-col items-center gap-4 overflow-hidden rounded-2xl border border-border/80 bg-card p-6 shadow-sm ring-1 ring-black/[0.03] transition-shadow hover:border-primary/25 hover:shadow-md hover:shadow-primary/5 dark:ring-white/[0.06] md:p-8"
+            className="group relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-primary/[0.04] p-6 shadow-card ring-1 ring-black/[0.04] transition-[box-shadow,border-color] duration-300 ease-out hover:border-primary/30 hover:shadow-card-hover dark:from-card dark:via-card dark:to-secondary/[0.06] dark:ring-white/[0.06] md:gap-4 md:p-8"
           >
             <div
               className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full ${cat.blob} blur-2xl transition-all duration-500 group-hover:scale-110 group-hover:opacity-90`}

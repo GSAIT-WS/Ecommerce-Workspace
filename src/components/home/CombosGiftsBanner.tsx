@@ -9,7 +9,7 @@ const CombosGiftsBanner = () => (
     <motion.div
       whileHover={{ y: -3 }}
       transition={{ type: "spring", stiffness: 380, damping: 24 }}
-      className="relative overflow-hidden rounded-2xl p-[2px] shadow-md shadow-primary/5"
+      className="relative overflow-hidden rounded-2xl p-[2px] shadow-card ring-1 ring-border/30"
     >
       <div className="absolute inset-0 opacity-95" aria-hidden>
         <div

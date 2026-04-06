@@ -1,18 +1,18 @@
 import { memo, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroSlide1 from "@/assets/hero-slide-1.jpg";
 import heroSlide2 from "@/assets/hero-slide-2.jpg";
 import heroSlide3 from "@/assets/hero-slide-3.jpg";
 import heroSlide4 from "@/assets/hero-slide-4.jpg";
 
-const AUTOPLAY_MS = 5500;
+/** Longer interval so each slide is readable with slow track motion */
+const AUTOPLAY_MS = 9000;
 
-/** Slide track: long, smooth ease */
+/** Slide track: horizontal pan (same ease & direction); slower “slow motion” */
 const SLIDE_TRANSITION = {
-  duration: 1.05,
+  duration: 2.45,
   ease: [0.16, 1, 0.3, 1] as const,
 };
 
@@ -71,11 +71,10 @@ const textBlockVariants = {
 
 const HeroSection = memo(() => {
   const [current, setCurrent] = useState(0);
-  /** After any tap on the banner (or using arrows/dots), autoplay stops — only manual navigation. */
+  /** After any tap on the banner (except links/dots), autoplay stops — use dots to navigate. */
   const [manualMode, setManualMode] = useState(false);
 
   const next = useCallback(() => setCurrent((c) => (c + 1) % slides.length), []);
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + slides.length) % slides.length), []);
 
   useEffect(() => {
     if (manualMode) return;
@@ -85,20 +84,12 @@ const HeroSection = memo(() => {
 
   const goManual = () => setManualMode(true);
 
-  const handlePrev = () => {
-    goManual();
-    prev();
-  };
-  const handleNext = () => {
-    goManual();
-    next();
-  };
   const handleDot = (i: number) => {
     goManual();
     setCurrent(i);
   };
 
-  /** Tap anywhere on the banner (except links & arrow/dot buttons) → pause autoplay, use arrows/dots only. */
+  /** Tap anywhere on the banner (except links & dot buttons) → pause autoplay; use dots to navigate. */
   const handleBannerPointerDown = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).closest("a, button")) return;
     goManual();
@@ -149,9 +140,15 @@ const HeroSection = memo(() => {
           ))}
         </motion.div>
         <div className="pointer-events-none absolute inset-0 bg-banner-scrim" />
+        <div className="pointer-events-none absolute inset-0 bg-hero-depth" aria-hidden />
       </div>
 
-      <div className="pointer-events-none container relative mx-auto flex min-h-[520px] items-center px-4 py-20 md:min-h-[600px] md:px-8">
+      <motion.div
+        className="pointer-events-none container relative mx-auto flex min-h-[500px] items-center px-4 py-16 md:min-h-[580px] md:px-8 md:py-20"
+        initial={{ opacity: 0, y: 22 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      >
         <div className="pointer-events-auto max-w-xl">
           <AnimatePresence mode="wait">
             <motion.div
@@ -162,24 +159,28 @@ const HeroSection = memo(() => {
               exit="exit"
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             >
-              <span className="mb-4 inline-block rounded-full bg-white/15 px-4 py-1.5 font-body text-xs font-semibold uppercase tracking-wider text-accent backdrop-blur-sm ring-1 ring-white/20">
+              <span className="mb-3 inline-block rounded-full bg-white/18 px-4 py-1.5 font-body text-xs font-semibold uppercase tracking-wider text-accent backdrop-blur-sm ring-1 ring-white/25">
                 {slide.badge}
               </span>
-              <h1 className="mb-4 font-display text-4xl font-extrabold leading-tight text-white drop-shadow-sm md:text-5xl lg:text-6xl">
+              <h1 className="mb-3 font-display text-4xl font-extrabold leading-[1.12] tracking-tight text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] md:text-5xl lg:text-6xl">
                 {slide.title}{" "}
-                <span className="text-accent">{slide.highlight}</span>
+                <span className="text-accent drop-shadow-sm">{slide.highlight}</span>
               </h1>
-              <p className="mb-8 max-w-md font-body text-base leading-relaxed text-white/88 md:text-lg">
+              <p className="mb-7 max-w-md font-body text-base leading-relaxed text-white/90 md:text-lg md:leading-relaxed">
                 {slide.description}
               </p>
               <div className="flex flex-wrap gap-3">
-                <Button size="lg" className="rounded-full px-8 font-semibold shadow-lg shadow-primary/25" asChild>
+                <Button
+                  size="lg"
+                  className="rounded-full px-8 font-semibold shadow-lg shadow-black/20"
+                  asChild
+                >
                   <Link to={slide.ctaLink}>{slide.cta}</Link>
                 </Button>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="rounded-full border-2 border-white/45 bg-white/10 px-8 font-semibold text-white backdrop-blur-md hover:bg-white/18 hover:border-white/60"
+                  className="rounded-full border-2 border-white/50 bg-transparent px-8 font-semibold text-white shadow-none ring-0 backdrop-blur-md transition-all duration-300 hover:!scale-[1.02] hover:!border-white/70 hover:!bg-white hover:!text-foreground hover:!shadow-xl"
                   asChild
                 >
                   <Link to={slide.secondaryLink}>{slide.secondaryCta}</Link>
@@ -188,24 +189,7 @@ const HeroSection = memo(() => {
             </motion.div>
           </AnimatePresence>
         </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={handlePrev}
-        className="absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-black/50 md:left-6 md:h-12 md:w-12"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
-      </button>
-      <button
-        type="button"
-        onClick={handleNext}
-        className="absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/35 text-white backdrop-blur-md transition-all duration-300 hover:scale-105 hover:bg-black/50 md:right-6 md:h-12 md:w-12"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
-      </button>
+      </motion.div>
 
       <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
         {slides.map((_, i) => (
