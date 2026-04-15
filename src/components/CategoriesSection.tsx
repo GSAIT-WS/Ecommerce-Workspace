@@ -61,12 +61,12 @@ const CategoriesSection = () => (
             viewport={{ once: true, amount: 0.3 }}
             transition={{ delay: i * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             whileHover={{
-              scale: 1.035,
-              y: -5,
+              scale: 1.02,
+              y: -4,
               transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
             }}
             whileTap={{ scale: 0.98 }}
-            className="group relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-primary/[0.04] p-6 shadow-card ring-1 ring-black/[0.04] transition-[box-shadow,border-color] duration-300 ease-out hover:border-primary/30 hover:shadow-card-hover dark:from-card dark:via-card dark:to-secondary/[0.06] dark:ring-white/[0.06] md:gap-4 md:p-8"
+            className="group relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-primary/[0.04] p-6 shadow-card ring-1 ring-black/[0.04] transition-[box-shadow,border-color,transform] duration-300 ease-in-out hover:border-primary/30 hover:shadow-card-hover dark:from-card dark:via-card dark:to-secondary/[0.06] dark:ring-white/[0.06] md:gap-4 md:p-8"
           >
             <div
               className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full ${cat.blob} blur-2xl transition-all duration-500 group-hover:scale-110 group-hover:opacity-90`}

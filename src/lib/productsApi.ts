@@ -1,6 +1,7 @@
 /**
- * Products API - fetches from ecommerce.products via Edge Functions.
- * New products added to the database appear automatically on next fetch.
+ * Products API — Edge Functions call Postgres RPCs that read `ecommerce.products`
+ * (with `ecommerce.categories` for `category_slug`). Apply migration `075_*` and
+ * deploy `list-products` / `get-product-by-id` so the storefront receives DB rows.
  */
 
 import { apiCall } from "./api";

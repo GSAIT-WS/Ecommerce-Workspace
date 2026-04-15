@@ -180,7 +180,7 @@ const HeroSection = memo(() => {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="rounded-full border-2 border-white/50 bg-transparent px-8 font-semibold text-white shadow-none ring-0 backdrop-blur-md transition-all duration-300 hover:!scale-[1.02] hover:!border-white/70 hover:!bg-white hover:!text-foreground hover:!shadow-xl"
+                  className="rounded-full border-2 border-white/50 bg-transparent px-8 font-semibold text-white shadow-none ring-0 backdrop-blur-md transition-all duration-300 ease-in-out hover:!scale-[1.02] hover:!border-white/70 hover:!bg-white hover:!text-foreground hover:!shadow-xl"
                   asChild
                 >
                   <Link to={slide.secondaryLink}>{slide.secondaryCta}</Link>

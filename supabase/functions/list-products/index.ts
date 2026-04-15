@@ -1,7 +1,6 @@
 /**
  * Edge Function: list-products
- * Queries ecommerce.products via the public.ecommerce_products view
- * (public schema is always exposed to PostgREST).
+ * Reads active products from ecommerce.products (via public.list_store_products RPC).
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
@@ -25,12 +24,12 @@ Deno.serve(async (req: Request) => {
     } else {
       const url = new URL(req.url);
       body = {
-        category_id:   url.searchParams.get("category_id")  ?? undefined,
+        category_id: url.searchParams.get("category_id") ?? undefined,
         category_slug: url.searchParams.get("category_slug") ?? undefined,
-        search:        url.searchParams.get("search")        ?? undefined,
+        search: url.searchParams.get("search") ?? undefined,
         min_price: url.searchParams.get("min_price") ? Number(url.searchParams.get("min_price")) : undefined,
         max_price: url.searchParams.get("max_price") ? Number(url.searchParams.get("max_price")) : undefined,
-        limit:  url.searchParams.get("limit")  ? Number(url.searchParams.get("limit"))  : undefined,
+        limit: url.searchParams.get("limit") ? Number(url.searchParams.get("limit")) : undefined,
         offset: url.searchParams.get("offset") ? Number(url.searchParams.get("offset")) : undefined,
       };
     }
@@ -41,38 +40,25 @@ Deno.serve(async (req: Request) => {
     const { params } = validated;
     const supabase = createSupabaseServiceRoleClient();
 
-    let query = supabase
-      .from("ecommerce_products")
-      .select("*", { count: "exact" })
-      .eq("is_active", true);
+    const { data: rpcData, error: rpcError } = await supabase.rpc("list_store_products", {
+      p_category_id: params.category_id ?? null,
+      p_category_slug: params.category_slug ?? null,
+      p_search: params.search ?? null,
+      p_min_price: params.min_price ?? null,
+      p_max_price: params.max_price ?? null,
+      p_limit: params.limit,
+      p_offset: params.offset,
+    });
 
-    if (params.category_id) {
-      query = query.eq("category_id", params.category_id);
-    }
-    if (params.category_slug && !params.category_id) {
-      query = query.eq("category_slug", params.category_slug);
-    }
-    if (params.search?.trim()) {
-      const escaped = params.search.trim().replace(/[%_\\]/g, "\\$&");
-      query = query.ilike("name", `%${escaped}%`);
-    }
-    if (params.min_price != null) {
-      query = query.gte("price", params.min_price);
-    }
-    if (params.max_price != null) {
-      query = query.lte("price", params.max_price);
+    if (rpcError) {
+      return jsonResponse({ success: false, error: rpcError.message }, 500);
     }
 
-    const { data: items, error, count } = await query
-      .order("created_at", { ascending: false })
-      .range(params.offset, params.offset + params.limit - 1);
+    const payload = rpcData as { items?: unknown[]; total?: number } | null;
+    const rawItems = Array.isArray(payload?.items) ? payload.items : [];
+    const total = typeof payload?.total === "number" ? payload.total : rawItems.length;
 
-    if (error) {
-      return jsonResponse({ success: false, error: error.message }, 500);
-    }
-
-    const total = count ?? items?.length ?? 0;
-    const rows = (items ?? []).map((row: Record<string, unknown>) => ({
+    const rows = rawItems.map((row: Record<string, unknown>) => ({
       id: row.id,
       product_external_id: row.product_external_id ?? null,
       name: row.name,

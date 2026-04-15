@@ -47,14 +47,14 @@ const miniOffers = [
   {
     value: "20%",
     circleClass: "bg-primary/20 text-primary ring-2 ring-primary/25",
-    cardTint: "from-[hsl(38_42%_96%)] via-[hsl(38_38%_97%)] to-primary/[0.06]",
+    cardTint: "from-[hsl(28_48%_97%)] via-[hsl(33_40%_96%)] to-primary/[0.07]",
     title: "First Order Discount",
     subtitle: "Use code CRUNCHFIRST at checkout",
   },
   {
     value: "Free",
     circleClass: "bg-secondary/18 text-secondary ring-2 ring-secondary/30",
-    cardTint: "from-[hsl(148_28%_96%)] via-[hsl(40_30%_97%)] to-secondary/[0.08]",
+    cardTint: "from-[hsl(84_22%_95%)] via-[hsl(33_35%_96%)] to-secondary/[0.1]",
     title: "Free Delivery",
     subtitle: "On all orders above ₹499 across India",
   },
@@ -105,7 +105,7 @@ const OffersSection = memo(() => {
   const slide = offerSlides[current];
 
   return (
-    <section className="border-t border-border/50 bg-[hsl(38_34%_95%)] py-12 shadow-[inset_0_1px_0_0_hsl(var(--border)/0.35)] dark:border-border/30 dark:bg-muted/20 md:py-16">
+    <section className="border-t border-border/50 bg-gradient-to-b from-[hsl(33_40%_93%)] to-[hsl(28_50%_96%)] py-12 shadow-[inset_0_1px_0_0_hsl(var(--border)/0.35)] dark:border-border/30 dark:from-muted/25 dark:to-background md:py-16">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-8 text-center">
           <h2 className="mb-2 font-display text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
@@ -203,7 +203,7 @@ const OffersSection = memo(() => {
           {miniOffers.map((offer, i) => (
             <div
               key={i}
-              className={`group flex items-center gap-4 rounded-2xl border border-border/60 bg-gradient-to-br ${offer.cardTint} p-6 shadow-card transition-all duration-300 ease-out hover:scale-[1.02] hover:-translate-y-1 hover:border-primary/25 hover:shadow-card-hover md:p-7`}
+              className={`group flex items-center gap-4 rounded-2xl border border-border/60 bg-gradient-to-br ${offer.cardTint} p-6 shadow-card transition-all duration-300 ease-in-out hover:scale-[1.02] hover:-translate-y-1 hover:border-primary/25 hover:shadow-card-hover md:p-7`}
             >
               <div
                 className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full font-display text-2xl font-bold shadow-[inset_0_2px_4px_rgba(255,255,255,0.45),inset_0_-2px_5px_rgba(0,0,0,0.08)] transition-transform duration-300 ease-out group-hover:scale-105 ${offer.circleClass}`}

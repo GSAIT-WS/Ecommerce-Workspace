@@ -82,8 +82,8 @@ const ProductListCard = ({
                 key={i}
                 className={`h-3.5 w-3.5 ${
                   i < Math.floor(rating)
-                    ? "fill-accent text-accent"
-                    : "fill-muted text-muted"
+                    ? "fill-primary text-primary"
+                    : "fill-muted text-muted-foreground/25"
                 }`}
               />
             ))}
