@@ -38,7 +38,7 @@ const CustomerReviews = () => {
   }, []);
 
   return (
-    <section className="overflow-hidden border-t border-border/40 bg-background py-10 md:py-14">
+    <section className="overflow-hidden border-t border-border/40 bg-gradient-to-b from-background via-[hsl(28_48%_97%)] to-surface-muted/80 py-10 md:py-14">
       <div className="container mx-auto px-4 md:px-8">
         <h2 className="mb-6 text-center font-display text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
           Loved by CrunchX Customers
@@ -49,18 +49,18 @@ const CustomerReviews = () => {
           {doubled.map((t, i) => (
             <div
               key={i}
-              className="w-72 shrink-0 rounded-2xl border border-border/50 bg-gradient-to-b from-card to-muted/30 p-5 shadow-card transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/15 hover:shadow-card-hover"
+              className="w-72 shrink-0 rounded-2xl border border-border/50 bg-gradient-to-br from-[hsl(28_55%_99%)] via-card to-[hsl(33_38%_94%)] p-5 shadow-card transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:scale-[1.02] hover:border-primary/20 hover:shadow-card-hover"
             >
-              <div className="mb-2 flex gap-0.5">
+              <div className="mb-3 flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, s) => (
                   <Star
                     key={s}
-                    className={`h-4 w-4 ${s < t.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`}
+                    className={`h-4 w-4 ${s < t.rating ? "fill-primary text-primary" : "text-muted-foreground/35"}`}
                   />
                 ))}
               </div>
-              <p className="mb-3 text-sm leading-relaxed text-foreground/80">"{t.text}"</p>
-              <p className="text-xs font-semibold text-foreground">{t.name}</p>
+              <p className="mb-4 text-sm leading-[1.7] text-foreground/85">"{t.text}"</p>
+              <p className="text-xs font-semibold tracking-wide text-foreground/95">{t.name}</p>
             </div>
           ))}
         </div>

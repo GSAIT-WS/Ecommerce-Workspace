@@ -19,7 +19,7 @@ const benefits = [
     icon: Leaf,
     title: "Ethically Sourced",
     desc: "Directly from tribal FPOs in Lambasingi, Andhra Pradesh",
-    iconWrap: "bg-accent/18 ring-1 ring-accent/30",
+    iconWrap: "bg-[hsl(84_24%_63%_/_0.22)] ring-1 ring-secondary/25",
     iconClass: "text-secondary",
   },
   {
@@ -53,10 +53,10 @@ const TrustSection = () => (
         {benefits.map((b) => (
           <div
             key={b.title}
-            className="group flex flex-col items-center rounded-2xl border border-border/60 bg-gradient-to-b from-card to-primary/[0.03] p-7 text-center shadow-card transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/25 hover:shadow-card-hover dark:to-secondary/[0.04]"
+            className="group flex flex-col items-center rounded-2xl border border-border/60 bg-gradient-to-b from-card to-primary/[0.03] p-7 text-center shadow-card transition-all duration-300 ease-in-out hover:-translate-y-1 hover:scale-[1.02] hover:border-primary/25 hover:shadow-card-hover dark:to-secondary/[0.04]"
           >
             <div
-              className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl transition-transform duration-300 ease-out group-hover:scale-110 ${b.iconWrap}`}
+              className={`mb-4 flex h-14 w-14 items-center justify-center rounded-full transition-transform duration-300 ease-in-out group-hover:scale-110 ${b.iconWrap}`}
             >
               <b.icon className={`h-7 w-7 ${b.iconClass}`} strokeWidth={1.65} />
             </div>

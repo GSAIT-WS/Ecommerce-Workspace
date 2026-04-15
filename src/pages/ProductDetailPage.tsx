@@ -492,8 +492,8 @@ const ProductDetailPage = () => {
                       key={i}
                       className={`h-5 w-5 ${
                         i < Math.floor(product.rating)
-                          ? "fill-accent text-accent"
-                          : "fill-muted text-muted"
+                          ? "fill-primary text-primary"
+                          : "fill-muted text-muted-foreground/25"
                       }`}
                     />
                   ))}
@@ -796,8 +796,8 @@ const ProductDetailPage = () => {
                             key={i}
                             className={`h-5 w-5 ${
                               i < Math.floor(product.rating)
-                                ? "fill-accent text-accent"
-                                : "fill-muted text-muted"
+                                ? "fill-primary text-primary"
+                                : "fill-muted text-muted-foreground/25"
                             }`}
                           />
                         ))}
@@ -814,7 +814,7 @@ const ProductDetailPage = () => {
                             <span className="w-3 font-body text-sm text-muted-foreground">
                               {item.stars}
                             </span>
-                            <Star className="h-4 w-4 fill-accent text-accent" />
+                            <Star className="h-4 w-4 fill-primary text-primary" />
                             <Progress value={item.percentage} className="h-2 flex-1" />
                             <span className="w-10 text-right font-body text-sm text-muted-foreground">
                               {item.percentage}%
@@ -865,8 +865,8 @@ const ProductDetailPage = () => {
                                 key={i}
                                 className={`h-4 w-4 ${
                                   i < review.rating
-                                    ? "fill-accent text-accent"
-                                    : "fill-muted text-muted"
+                                    ? "fill-primary text-primary"
+                                    : "fill-muted text-muted-foreground/25"
                                 }`}
                               />
                             ))}

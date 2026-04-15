@@ -56,7 +56,7 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, rating, image 
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
               key={i}
-              className={`h-3.5 w-3.5 ${i < Math.floor(rating) ? "fill-accent text-accent" : "fill-muted text-muted"}`}
+              className={`h-3.5 w-3.5 ${i < Math.floor(rating) ? "fill-primary text-primary" : "fill-muted text-muted-foreground/25"}`}
             />
           ))}
           <span className="ml-1 font-body text-xs text-muted-foreground">{rating.toFixed(1)}</span>

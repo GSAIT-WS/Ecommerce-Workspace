@@ -6,49 +6,49 @@
 
 @layer base {
   :root {
-    /* Organic e‑commerce: warm neutrals + sage + soft gold */
-    --background: 40 36% 97%;
-    --foreground: 24 26% 12%;
+    /* CRUNCHX — premium organic palette (#C89B3C gold, #D4A017 amber, olives & warm neutrals) */
+    --background: 28 56% 96%; /* Soft Cream #FFF3E9 */
+    --foreground: 25 32% 20%; /* Rich Brown #5A3E2B — readable on cream */
 
-    --card: 42 40% 99%;
-    --card-foreground: 24 26% 12%;
+    --card: 28 45% 99%;
+    --card-foreground: 25 32% 20%;
 
-    --popover: 42 40% 99%;
-    --popover-foreground: 24 26% 12%;
+    --popover: 28 45% 99%;
+    --popover-foreground: 25 32% 20%;
 
-    --primary: 34 78% 46%;
-    --primary-foreground: 42 45% 99%;
+    --primary: 39 56% 51%; /* Deep Gold #C89B3C */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 148 32% 38%;
-    --secondary-foreground: 42 45% 99%;
+    --secondary: 72 49% 32%; /* Muted Olive #6B7A2B */
+    --secondary-foreground: 40 42% 98%;
 
-    --muted: 38 26% 91%;
-    --muted-foreground: 25 12% 38%;
+    --muted: 33 38% 92%; /* Warm Beige / soft neutral */
+    --muted-foreground: 16 22% 36%; /* Neutral Brown #6D4C41 — secondary text */
 
-    --accent: 44 88% 58%;
-    --accent-foreground: 24 26% 12%;
+    --accent: 44 78% 46%; /* Warm Amber #D4A017 */
+    --accent-foreground: 25 28% 14%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 36 20% 88%;
-    --input: 36 20% 88%;
-    --ring: 34 78% 46%;
+    --border: 30 26% 87%;
+    --input: 30 26% 87%;
+    --ring: 39 56% 51%;
 
-    --radius: 0.75rem;
+    --radius: 0.8125rem; /* ~13px — within 10–14px system */
 
     /* Section surfaces (subtle alternation without layout change) */
-    --surface-subtle: 38 28% 94%;
-    --surface-muted: 40 22% 96%;
+    --surface-subtle: 33 42% 93%; /* Warm Beige #F5E6D3 tint */
+    --surface-muted: 0 0% 96%; /* Light Grey #F5F5F5 */
 
-    --sidebar-background: 42 32% 97%;
-    --sidebar-foreground: 24 28% 11%;
-    --sidebar-primary: 34 78% 46%;
-    --sidebar-primary-foreground: 42 45% 99%;
-    --sidebar-accent: 38 26% 92%;
-    --sidebar-accent-foreground: 24 26% 12%;
-    --sidebar-border: 36 20% 88%;
-    --sidebar-ring: 34 78% 46%;
+    --sidebar-background: 28 50% 97%;
+    --sidebar-foreground: 25 30% 18%;
+    --sidebar-primary: 39 56% 51%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 33 35% 92%;
+    --sidebar-accent-foreground: 25 30% 18%;
+    --sidebar-border: 30 26% 87%;
+    --sidebar-ring: 39 56% 51%;
 
     /* Photo banners: always a dark scrim (readable text), never “foreground” tint */
     --banner-scrim-a: 24 30% 8%;
@@ -71,27 +71,27 @@
     --card-foreground: 42 35% 96%;
     --popover: 24 20% 11%;
     --popover-foreground: 42 35% 96%;
-    --primary: 34 90% 54%;
+    --primary: 39 58% 58%;
     --primary-foreground: 24 24% 8%;
-    --secondary: 152 34% 42%;
-    --secondary-foreground: 42 40% 98%;
+    --secondary: 72 42% 44%;
+    --secondary-foreground: 24 22% 8%;
     --muted: 24 16% 16%;
-    --muted-foreground: 38 12% 62%;
-    --accent: 48 88% 58%;
+    --muted-foreground: 38 14% 65%;
+    --accent: 44 72% 52%;
     --accent-foreground: 24 28% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 24 14% 18%;
     --input: 24 14% 18%;
-    --ring: 34 90% 54%;
+    --ring: 39 58% 58%;
     --sidebar-background: 24 20% 9%;
     --sidebar-foreground: 42 35% 96%;
-    --sidebar-primary: 34 90% 54%;
+    --sidebar-primary: 39 58% 58%;
     --sidebar-primary-foreground: 24 24% 8%;
     --sidebar-accent: 24 16% 16%;
     --sidebar-accent-foreground: 42 35% 96%;
     --sidebar-border: 24 14% 18%;
-    --sidebar-ring: 34 90% 54%;
+    --sidebar-ring: 39 58% 58%;
 
     /* Deep scrim only — removes washed / white corners on hero & offer banners */
     --banner-scrim-a: 24 28% 4%;
@@ -116,9 +116,9 @@
     letter-spacing: -0.01em;
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(ellipse 120% 80% at 100% -15%, hsl(var(--primary) / 0.08), transparent 52%),
-      radial-gradient(ellipse 90% 70% at -5% 105%, hsl(var(--secondary) / 0.06), transparent 48%),
-      radial-gradient(ellipse 70% 50% at 50% 100%, hsl(var(--accent) / 0.04), transparent 55%);
+      radial-gradient(ellipse 120% 80% at 100% -15%, hsl(var(--primary) / 0.09), transparent 52%),
+      radial-gradient(ellipse 90% 70% at -5% 105%, hsl(var(--secondary) / 0.07), transparent 48%),
+      radial-gradient(ellipse 70% 50% at 50% 100%, hsl(var(--accent) / 0.05), transparent 55%);
     background-attachment: fixed;
   }
 
@@ -164,18 +164,25 @@
     background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
   }
 
-  /** Full-width image banners (hero, offers): theme-aware dark scrim, no light “wash” in dark mode */
+  /** Full-width image banners (hero, offers): dark scrim + subtle gold/amber warmth for readability */
   .bg-banner-scrim {
     background: linear-gradient(
-      to right,
-      hsl(var(--banner-scrim-a) / var(--banner-scrim-opacity-a)) 0%,
-      hsl(var(--banner-scrim-b) / var(--banner-scrim-opacity-b)) 45%,
-      hsl(var(--banner-scrim-c) / var(--banner-scrim-opacity-c)) 72%,
-      transparent 100%
-    );
+        105deg,
+        hsl(28 45% 8% / 0.82) 0%,
+        hsl(32 38% 12% / 0.5) 42%,
+        hsl(38 35% 14% / 0.22) 68%,
+        transparent 92%
+      ),
+      linear-gradient(
+        to right,
+        hsl(var(--banner-scrim-a) / var(--banner-scrim-opacity-a)) 0%,
+        hsl(var(--banner-scrim-b) / var(--banner-scrim-opacity-b)) 45%,
+        hsl(var(--banner-scrim-c) / var(--banner-scrim-opacity-c)) 72%,
+        transparent 100%
+      );
   }
 
-  /** Extra legibility: warm bottom + top vignette on hero imagery */
+  /** Extra legibility: warm bottom + top vignette + gold wash on hero imagery */
   .bg-hero-depth {
     background: linear-gradient(
         to bottom,
@@ -189,8 +196,9 @@
       ),
       linear-gradient(
         to right,
-        hsl(32 40% 12% / 0.12) 0%,
-        transparent 55%
+        hsl(39 56% 42% / 0.14) 0%,
+        hsl(44 78% 48% / 0.06) 38%,
+        transparent 58%
       );
   }
 
@@ -205,22 +213,22 @@
     );
   }
 
-  /** Offers carousel: warm gold wash + readable left column (no layout change) */
+  /** Offers carousel: gold/amber wash + readable left column (no layout change) */
   .bg-offers-carousel-overlay {
     background:
       linear-gradient(
         105deg,
-        hsl(38 55% 12% / 0.72) 0%,
-        hsl(38 40% 14% / 0.38) 38%,
+        hsl(32 48% 10% / 0.76) 0%,
+        hsl(36 38% 13% / 0.42) 38%,
         transparent 68%
       ),
       linear-gradient(
         90deg,
-        hsl(38 72% 52% / 0.16) 0%,
-        hsl(34 65% 55% / 0.06) 42%,
-        transparent 70%
+        hsl(39 56% 48% / 0.2) 0%,
+        hsl(44 78% 50% / 0.1) 44%,
+        transparent 72%
       ),
-      linear-gradient(to top, hsl(24 22% 8% / 0.28) 0%, transparent 42%);
+      linear-gradient(to top, hsl(24 22% 8% / 0.3) 0%, transparent 42%);
   }
 
   /* Auth page glass pill */

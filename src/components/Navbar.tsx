@@ -35,7 +35,7 @@ const Navbar = () => {
     <>
       <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-card/92 shadow-sm backdrop-blur-md transition-shadow duration-300">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 shadow-sm backdrop-blur-md transition-all duration-300 ease-in-out">
         <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-8">
 
           {/* Left: Logo + Delivery chip (desktop) */}
@@ -61,7 +61,7 @@ const Navbar = () => {
               <Link
                 key={link.label}
                 to={link.href}
-                className={`font-body text-sm font-medium transition-colors hover:text-primary ${
+                className={`font-body text-sm font-medium transition-all duration-300 ease-in-out hover:text-primary ${
                   location.pathname === link.href
                     ? "text-primary"
                     : "text-foreground/70"
@@ -78,7 +78,7 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-foreground/70 transition-colors duration-300 hover:text-primary [&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:scale-110"
+              className="text-foreground/70 transition-all duration-300 ease-in-out hover:text-primary [&_svg]:transition-transform [&_svg]:duration-300 [&_svg]:ease-in-out hover:[&_svg]:scale-110"
               onClick={() => setSearchOpen(true)}
             >
               <Search className="h-5 w-5" />
@@ -87,7 +87,7 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-foreground/70 transition-colors duration-300 hover:text-primary [&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:scale-110"
+              className="relative text-foreground/70 transition-all duration-300 ease-in-out hover:text-primary [&_svg]:transition-transform [&_svg]:duration-300 [&_svg]:ease-in-out hover:[&_svg]:scale-110"
               asChild
             >
               <Link to="/cart">
@@ -105,7 +105,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden text-foreground/70 transition-colors duration-300 hover:text-primary md:flex [&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:scale-110"
+                  className="hidden text-foreground/70 transition-all duration-300 ease-in-out hover:text-primary md:flex [&_svg]:transition-transform [&_svg]:duration-300 [&_svg]:ease-in-out hover:[&_svg]:scale-110"
                   asChild
                 >
                   <Link to="/profile">
@@ -115,7 +115,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden text-foreground/70 transition-colors duration-300 hover:text-destructive md:flex [&_svg]:transition-transform [&_svg]:duration-300 hover:[&_svg]:scale-110"
+                  className="hidden text-foreground/70 transition-all duration-300 ease-in-out hover:text-destructive md:flex [&_svg]:transition-transform [&_svg]:duration-300 [&_svg]:ease-in-out hover:[&_svg]:scale-110"
                   onClick={handleLogout}
                   title="Logout"
                 >
@@ -126,7 +126,7 @@ const Navbar = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="hidden text-foreground/70 hover:text-primary md:flex"
+                className="hidden text-foreground/70 transition-all duration-300 ease-in-out hover:text-primary md:flex"
                 asChild
               >
                 <Link to="/login">Sign In</Link>
@@ -151,7 +151,7 @@ const Navbar = () => {
 
         {/* ── Mobile Drawer ── */}
         {mobileOpen && (
-          <nav className="border-t border-border bg-card px-4 py-4 md:hidden">
+          <nav className="border-t border-border bg-background px-4 py-4 md:hidden">
 
             {/* Delivery chip in mobile menu */}
             {user && (
@@ -171,7 +171,7 @@ const Navbar = () => {
                 key={link.label}
                 to={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`block py-2 font-body text-sm font-medium transition-colors hover:text-primary ${
+                className={`block py-2 font-body text-sm font-medium transition-all duration-300 ease-in-out hover:text-primary ${
                   location.pathname === link.href
                     ? "text-primary"
                     : "text-foreground/70"

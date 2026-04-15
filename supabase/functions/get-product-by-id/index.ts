@@ -1,6 +1,6 @@
 /**
  * Edge Function: get-product-by-id
- * Queries ecommerce.products via the public.ecommerce_products view.
+ * Reads a single row from ecommerce.products (via public.get_store_product_by_id RPC).
  */
 
 import { corsHeaders } from "../_shared/cors.ts";
@@ -33,20 +33,15 @@ Deno.serve(async (req: Request) => {
 
     const supabase = createSupabaseServiceRoleClient();
 
-    const { data: product, error } = await supabase
-      .from("ecommerce_products")
-      .select("*")
-      .eq("id", validated.params.product_id)
-      .single();
+    const { data: product, error } = await supabase.rpc("get_store_product_by_id", {
+      p_product_id: validated.params.product_id,
+    });
 
     if (error) {
-      if (error.code === "PGRST116") {
-        return jsonResponse({ success: false, error: "Product not found" }, 404);
-      }
       return jsonResponse({ success: false, error: error.message }, 500);
     }
 
-    if (!product) {
+    if (!product || (typeof product === "object" && product !== null && Object.keys(product as object).length === 0)) {
       return jsonResponse({ success: false, error: "Product not found" }, 404);
     }
 
