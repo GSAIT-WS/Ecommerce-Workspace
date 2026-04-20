@@ -280,7 +280,7 @@ const OrderConfirmationPage = () => {
                 variant="outline"
                 className="w-full rounded-full py-6 font-body font-semibold"
               >
-                <Link to={`/order-tracking?orderId=${encodeURIComponent(placed.orderId)}`}>
+                <Link to={`/order/${placed.orderId}`}>
                   Track delivery
                 </Link>
               </Button>
@@ -301,7 +301,9 @@ const OrderConfirmationPage = () => {
             >
               <p className="font-body text-sm text-muted-foreground">
                 Need help?{" "}
-                <span className="cursor-pointer text-primary underline">Contact Support</span>
+                <Link to="/contact" className="text-primary underline">
+                  Contact Support
+                </Link>
               </p>
             </motion.div>
           </div>

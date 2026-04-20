@@ -29,6 +29,7 @@ import { toast } from "sonner";
 
 const PRODUCT_PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
+const SUPPORT_PHONE_TEL = "+918012345678";
 
 function parseShippingSnapshot(s: unknown): {
   name: string;
@@ -128,6 +129,7 @@ const OrderDetailPage = () => {
     setIsRefreshing(true);
     await load();
     setIsRefreshing(false);
+    toast.success("Order details refreshed");
   };
 
   const handleReorder = () => {
@@ -316,11 +318,15 @@ const OrderDetailPage = () => {
                     ) : null}
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="icon" className="rounded-full">
-                      <Phone className="h-4 w-4" />
+                    <Button asChild variant="outline" size="icon" className="rounded-full">
+                      <a href={`tel:${SUPPORT_PHONE_TEL}`} aria-label="Call support">
+                        <Phone className="h-4 w-4" />
+                      </a>
                     </Button>
-                    <Button variant="outline" size="icon" className="rounded-full">
-                      <MessageCircle className="h-4 w-4" />
+                    <Button asChild variant="outline" size="icon" className="rounded-full">
+                      <Link to="/contact" aria-label="Open support chat">
+                        <MessageCircle className="h-4 w-4" />
+                      </Link>
                     </Button>
                   </div>
                 </div>
@@ -435,17 +441,23 @@ const OrderDetailPage = () => {
             >
               <h2 className="mb-4 font-display text-lg font-bold text-foreground">Need Help?</h2>
               <div className="space-y-3">
-                <Button variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
-                  <Phone className="h-4 w-4" />
-                  Call Support
+                <Button asChild variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
+                  <a href={`tel:${SUPPORT_PHONE_TEL}`}>
+                    <Phone className="h-4 w-4" />
+                    Call Support
+                  </a>
                 </Button>
-                <Button variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
-                  <MessageCircle className="h-4 w-4" />
-                  Chat with Us
+                <Button asChild variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
+                  <Link to="/contact">
+                    <MessageCircle className="h-4 w-4" />
+                    Chat with Us
+                  </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
-                  <HelpCircle className="h-4 w-4" />
-                  FAQs
+                <Button asChild variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
+                  <Link to="/profile/help">
+                    <HelpCircle className="h-4 w-4" />
+                    FAQs
+                  </Link>
                 </Button>
               </div>
             </motion.div>

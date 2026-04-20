@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Truck, MapPin, Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { FREE_SHIPPING_THRESHOLD, STANDARD_DELIVERY_FEE } from "@/lib/shipping";
 
 const ShippingInfoPage = () => {
   return (
@@ -63,7 +64,8 @@ const ShippingInfoPage = () => {
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">Shipping Charges</h3>
                 <p>
-                  Free shipping on orders above ₹499. Orders below ₹499 are charged ₹49 as shipping fee.
+                  Free shipping on orders of ₹{FREE_SHIPPING_THRESHOLD} and above. Orders below ₹
+                  {FREE_SHIPPING_THRESHOLD} are charged ₹{STANDARD_DELIVERY_FEE} as shipping fee.
                 </p>
               </div>
 

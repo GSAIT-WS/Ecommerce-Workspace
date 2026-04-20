@@ -19,6 +19,7 @@ import {
 } from "@/services/cartApi";
 import { clearServerCart } from "@/services/checkoutApi";
 import { useAuth } from "@/context/AuthContext";
+import { FREE_SHIPPING_THRESHOLD, STANDARD_DELIVERY_FEE } from "@/lib/shipping";
 
 const CART_STORAGE_KEY = "crunchx_cart";
 const PENDING_MERGE_KEY = "crunchx_pending_cart_merge";
@@ -291,7 +292,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getDeliveryCharge = useCallback(() => {
     const subtotal = getSubtotal();
-    return subtotal > 499 ? 0 : 49;
+    return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_DELIVERY_FEE;
   }, [getSubtotal]);
 
   const getSavings = useCallback(() => {
