@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/context/CartContext";
 import { toast } from "@/components/ui/sonner";
 import emptyCartIllustration from "@/assets/empty-cart-illustration.jpg";
+import { getAmountLeftForFreeShipping } from "@/lib/shipping";
 
 const trustBadges = [
   { icon: Leaf, label: "100% Natural" },
@@ -22,6 +23,7 @@ const CartPage = () => {
   const shipping = getDeliveryCharge();
   const savings = getSavings();
   const total = getCartTotal();
+  const amountLeftForFreeShipping = getAmountLeftForFreeShipping(subtotal);
 
   return (
     <div className="min-h-screen bg-background">
@@ -161,7 +163,7 @@ const CartPage = () => {
                   )}
                   {shipping > 0 && (
                     <p className="font-body text-xs text-secondary pt-2">
-                      ✓ Add ₹{500 - subtotal} more for free shipping!
+                      ✓ Add ₹{amountLeftForFreeShipping} more for free shipping!
                     </p>
                   )}
                 </div>

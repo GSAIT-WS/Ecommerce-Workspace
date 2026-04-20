@@ -292,18 +292,24 @@ const OrderTrackingPage = () => {
                   </div>
                   <div className="flex gap-2">
                     <Button
+                      asChild
                       variant="outline"
                       size="icon"
                       className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     >
-                      <Phone className="h-4 w-4" />
+                      <a href="tel:+918012345678" aria-label="Call support">
+                        <Phone className="h-4 w-4" />
+                      </a>
                     </Button>
                     <Button
+                      asChild
                       variant="outline"
                       size="icon"
                       className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     >
-                      <MessageCircle className="h-4 w-4" />
+                      <Link to="/contact" aria-label="Open support chat">
+                        <MessageCircle className="h-4 w-4" />
+                      </Link>
                     </Button>
                   </div>
                 </div>
@@ -375,19 +381,20 @@ const OrderTrackingPage = () => {
             >
               <h2 className="mb-4 font-display text-lg font-bold text-foreground">Need Help?</h2>
               <div className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 rounded-xl font-body"
-                >
-                  <Phone className="h-4 w-4" />
-                  Call Support
+                <Button asChild variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
+                  <a href="tel:+918012345678">
+                    <Phone className="h-4 w-4" />
+                    Call Support
+                  </a>
                 </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-3 rounded-xl font-body"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Chat with Us
+                <Button asChild variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
+                  <Link to="/contact">
+                    <MessageCircle className="h-4 w-4" />
+                    Chat with Us
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
+                  <Link to="/profile/help">FAQs</Link>
                 </Button>
               </div>
             </motion.div>

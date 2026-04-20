@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, Lock, MapPin, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -20,16 +20,12 @@ import {
 import { toast } from "sonner";
 import type { OrderStatus } from "@/data/orders";
 import type { CartItem } from "@/context/CartContext";
+import { isCheckoutPaymentState, type CheckoutPaymentState } from "@/lib/checkoutFlow";
 
 type PaymentMethod = "upi" | "card" | "netbanking" | "cod";
 
-type CheckoutPaymentState = {
+type PaymentRouteState = CheckoutPaymentState & {
   selectedAddress?: ApiAddress;
-  couponDiscount: number;
-  couponCode: string | null;
-  total: number;
-  subtotal: number;
-  delivery: number;
 };
 
 type StripePayState = {
@@ -37,22 +33,6 @@ type StripePayState = {
   paymentIntentId: string;
   order: PlacedOrder;
 };
-
-function isCheckoutPaymentState(s: unknown): s is CheckoutPaymentState {
-  if (!s || typeof s !== "object") return false;
-  const o = s as Record<string, unknown>;
-  const couponOk =
-    o.couponCode === null ||
-    o.couponCode === undefined ||
-    typeof o.couponCode === "string";
-  return (
-    typeof o.total === "number" &&
-    typeof o.subtotal === "number" &&
-    typeof o.delivery === "number" &&
-    typeof o.couponDiscount === "number" &&
-    couponOk
-  );
-}
 
 function isMockIntent(intent: {
   payment_intent_id: string;
@@ -76,15 +56,18 @@ const PaymentPage = () => {
   const [processError, setProcessError] = useState<string | null>(null);
   const [processStep, setProcessStep] = useState("");
   const [stripePay, setStripePay] = useState<StripePayState | null>(null);
+  const checkoutLockRef = useRef(false);
 
-  const checkout = isCheckoutPaymentState(location.state) ? location.state : null;
+  const checkout = isCheckoutPaymentState(location.state)
+    ? (location.state as PaymentRouteState)
+    : null;
   const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.trim() ?? "";
 
   const goToConfirmation = useCallback(
     (
       order: PlacedOrder,
       orderStatus: OrderStatus,
-      snap: CheckoutPaymentState,
+      snap: PaymentRouteState,
       items: CartItem[],
       method: PaymentMethod,
     ) => {
@@ -117,11 +100,13 @@ const PaymentPage = () => {
   );
 
   const runCheckout = useCallback(async () => {
-    if (!checkout || !token) return;
+    if (!checkout || !token || checkoutLockRef.current) return;
+    checkoutLockRef.current = true;
     const addr = checkout.selectedAddress;
     if (!addr?.id) {
       toast.error("Please select a saved address.");
       navigate("/checkout", { replace: true });
+      checkoutLockRef.current = false;
       return;
     }
 
@@ -135,6 +120,7 @@ const PaymentPage = () => {
       setProcessError(sync.error);
       setIsProcessing(false);
       toast.error(sync.error);
+      checkoutLockRef.current = false;
       return;
     }
 
@@ -149,6 +135,7 @@ const PaymentPage = () => {
       setProcessError(msg);
       setIsProcessing(false);
       toast.error(msg);
+      checkoutLockRef.current = false;
       return;
     }
 
@@ -162,10 +149,12 @@ const PaymentPage = () => {
         setProcessError(cod.error);
         setIsProcessing(false);
         toast.error(cod.error);
+        checkoutLockRef.current = false;
         return;
       }
       orderStatus = "confirmed";
       setIsProcessing(false);
+      checkoutLockRef.current = false;
       goToConfirmation(order, orderStatus, checkout, cartItems, selectedMethod);
       return;
     }
@@ -178,6 +167,7 @@ const PaymentPage = () => {
       setProcessError(msg);
       setIsProcessing(false);
       toast.error(msg);
+      checkoutLockRef.current = false;
       return;
     }
 
@@ -188,10 +178,12 @@ const PaymentPage = () => {
         setProcessError(paid.error);
         setIsProcessing(false);
         toast.error(paid.error);
+        checkoutLockRef.current = false;
         return;
       }
       orderStatus = "confirmed";
       setIsProcessing(false);
+      checkoutLockRef.current = false;
       goToConfirmation(order, orderStatus, checkout, cartItems, selectedMethod);
       return;
     }
@@ -201,6 +193,7 @@ const PaymentPage = () => {
       setProcessError(msg);
       setIsProcessing(false);
       toast.error(msg);
+      checkoutLockRef.current = false;
       return;
     }
 
@@ -210,10 +203,12 @@ const PaymentPage = () => {
       setProcessError(msg);
       setIsProcessing(false);
       toast.error(msg);
+      checkoutLockRef.current = false;
       return;
     }
 
     setIsProcessing(false);
+    checkoutLockRef.current = false;
     setStripePay({
       clientSecret: intent.client_secret,
       paymentIntentId: intent.payment_intent_id,
@@ -301,7 +296,7 @@ const PaymentPage = () => {
             Payment
           </h1>
           <p className="mt-2 font-body text-muted-foreground">
-            Choose your preferred payment method
+            Choose a payment method. You will enter payment credentials only on the secure gateway step.
           </p>
         </div>
 
@@ -429,9 +424,29 @@ const PaymentPage = () => {
               <div className="mt-6 rounded-xl bg-muted/50 p-4">
                 <p className="font-body text-xs text-muted-foreground">
                   By placing this order, you agree to our{" "}
-                  <span className="text-primary underline">Terms of Service</span> and{" "}
-                  <span className="text-primary underline">Privacy Policy</span>.
+                  <Link to="/terms-of-service" className="text-primary underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link to="/privacy-policy" className="text-primary underline">
+                    Privacy Policy
+                  </Link>
+                  .
                 </p>
+              </div>
+              <div className="mt-4 space-y-2 rounded-xl border border-border bg-background p-4">
+                <p className="font-body text-xs font-semibold text-foreground">Need help?</p>
+                <div className="flex flex-wrap gap-3 text-xs">
+                  <a href="tel:+918012345678" className="font-body text-primary underline">
+                    Call support
+                  </a>
+                  <Link to="/contact" className="font-body text-primary underline">
+                    Contact support
+                  </Link>
+                  <Link to="/profile/help" className="font-body text-primary underline">
+                    FAQ
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

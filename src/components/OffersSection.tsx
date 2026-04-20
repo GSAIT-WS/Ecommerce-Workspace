@@ -5,6 +5,7 @@ import offerSlide1 from "@/assets/offer-slide-1.jpg";
 import offerSlide2 from "@/assets/offer-slide-2.jpg";
 import offerSlide3 from "@/assets/offer-slide-3.jpg";
 import offerSlide4 from "@/assets/offer-slide-4.jpg";
+import { FREE_SHIPPING_THRESHOLD } from "@/lib/shipping";
 
 // Offer slides — link to /search so CTAs always navigate correctly.
 // Replace with real offers from backend when available.
@@ -56,7 +57,7 @@ const miniOffers = [
     circleClass: "bg-secondary/18 text-secondary ring-2 ring-secondary/30",
     cardTint: "from-[hsl(84_22%_95%)] via-[hsl(33_35%_96%)] to-secondary/[0.1]",
     title: "Free Delivery",
-    subtitle: "On all orders above ₹499 across India",
+    subtitle: `On all orders of ₹${FREE_SHIPPING_THRESHOLD}+ across India`,
   },
 ];
 

@@ -13,6 +13,8 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useAddress } from "@/context/AddressContext";
 import type { ApiAddress } from "@/services/addressApi";
+import { toast } from "sonner";
+import { canProceedFromCheckout, getCheckoutCtaLabel } from "@/lib/checkoutFlow";
 
 const labelIcon = (label?: string) => {
   switch (label?.toLowerCase()) {
@@ -58,10 +60,28 @@ const CheckoutPage = () => {
     (a) => a.id === selectedAddressId
   );
 
-  const canProceed = addresses.length > 0 && !!selectedAddressId && !!token;
+  const canProceed = canProceedFromCheckout({
+    addressesCount: addresses.length,
+    selectedAddressId,
+    hasToken: Boolean(token),
+  });
+  const ctaLabel = getCheckoutCtaLabel({
+    addressesCount: addresses.length,
+    selectedAddressId,
+    hasToken: Boolean(token),
+  });
 
   const handleProceedToPayment = () => {
+    if (addresses.length === 0) {
+      toast.error("Add a delivery address to continue.");
+      return;
+    }
+    if (!selectedAddressId) {
+      toast.error("Select a delivery address to continue.");
+      return;
+    }
     if (!token) {
+      toast.error("Sign in to continue to payment.");
       return;
     }
     navigate("/payment", {
@@ -417,13 +437,7 @@ const CheckoutPage = () => {
                 disabled={!canProceed}
                 className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground"
               >
-                {addresses.length === 0
-                  ? "Add address to continue"
-                  : !selectedAddressId
-                    ? "Select an address"
-                    : !token
-                      ? "Sign in to continue"
-                      : "Proceed to Payment"}
+                {ctaLabel}
               </Button>
 
               <div className="mt-4 flex items-center justify-center gap-2 text-muted-foreground">
@@ -446,13 +460,7 @@ const CheckoutPage = () => {
           disabled={!canProceed}
           className="w-full rounded-full bg-primary py-6 font-body font-semibold text-primary-foreground"
         >
-          {addresses.length === 0
-            ? "Add address to continue"
-            : !selectedAddressId
-              ? "Select an address"
-              : !token
-                ? "Sign in to continue"
-                : "Proceed to Payment"}
+          {ctaLabel}
         </Button>
       </div>
 
