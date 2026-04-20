@@ -64,8 +64,18 @@ supabase/functions/
 │
 ├── create-payment-intent/         # POST — Create payment attempt for order
 ├── payment-webhook/               # POST — Handle payment gateway callbacks
+│
+├── add-address/                   # POST — Insert into `ecommerce.addresses` (RPC)
+├── update-address/                # POST | PUT | PATCH — Update `ecommerce.addresses`
+├── delete-address/                # POST | DELETE — Remove from `ecommerce.addresses`
+├── set-default-address/           # POST — Mark default row in `ecommerce.addresses`
+├── get-my-addresses/              # POST | GET — List caller’s `ecommerce.addresses`
 └── README.md
 ```
+
+### Customer addresses (`ecommerce.addresses`)
+
+All address Edge Functions use **`createSupabaseServiceRoleClient().schema("ecommerce").rpc(...)`** so rows are read and written only in **`ecommerce.addresses`** (via `ecommerce.add_customer_address`, `ecommerce.update_customer_address`, `ecommerce.delete_customer_address`, `ecommerce.set_default_address`, `ecommerce.get_my_addresses`). The web app calls these through `src/services/addressApi.ts`.
 
 ---
 

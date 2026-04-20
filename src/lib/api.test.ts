@@ -11,7 +11,7 @@ describe("unwrapEdgeData", () => {
   it("returns error when success is false", () => {
     const r = unwrapEdgeData({ success: false, error: "bad" });
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.error).toBe("bad");
+    if (r.ok === false) expect(r.error).toBe("bad");
   });
 
   it("rejects invalid bodies", () => {

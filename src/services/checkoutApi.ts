@@ -13,7 +13,7 @@ export async function clearServerCart(token: string): Promise<{ error?: string }
   const res = await apiCall<unknown>("/clear-cart", { method: "POST", body: {}, token });
   if (res.error) return { error: res.error };
   const u = unwrapEdgeData(res.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return {};
 }
 
@@ -29,7 +29,7 @@ export async function addProductToServerCart(
   });
   if (res.error) return { error: res.error };
   const u = unwrapEdgeData(res.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return {};
 }
 
@@ -76,7 +76,7 @@ export async function placeOrder(
   });
   if (res.error) return { error: res.error };
   const u = unwrapEdgeData<{ order: PlacedOrder }>(res.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return { order: u.data.order };
 }
 
@@ -99,7 +99,7 @@ export async function createPaymentIntent(
   });
   if (res.error) return { error: res.error };
   const u = unwrapEdgeData<PaymentIntentPayload>(res.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return { intent: u.data };
 }
 
@@ -114,7 +114,7 @@ export async function confirmMockPayment(
   });
   if (res.error) return { error: res.error };
   const u = unwrapEdgeData<unknown>(res.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return {};
 }
 
@@ -126,6 +126,6 @@ export async function finalizeCodOrder(token: string, orderId: string): Promise<
   });
   if (res.error) return { error: res.error };
   const u = unwrapEdgeData<unknown>(res.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return {};
 }

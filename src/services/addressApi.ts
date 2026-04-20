@@ -1,4 +1,11 @@
-import { apiCall } from "@/lib/api";
+/**
+ * Customer shipping addresses (authenticated flows).
+ *
+ * All server-side writes go to **`ecommerce.addresses`** via Supabase Edge Functions,
+ * which call `ecommerce.add_customer_address`, `ecommerce.update_customer_address`, etc.
+ * (see `supabase/functions/add-address`, `update-address`, …).
+ */
+import { apiCall, unwrapEdgeData } from "@/lib/api";
 
 export interface AddressFormData {
   recipient_name: string;
@@ -133,10 +140,7 @@ export async function addAddress(
     postal_code: body.postal_code,
   });
 
-  const result = await apiCall<{ success?: boolean; data?: { address_id?: string } }>(
-    "/add-address",
-    { method: "POST", body, token }
-  );
+  const result = await apiCall("/add-address", { method: "POST", body, token });
 
   console.log("[CrunchX] addAddress: response →", { status: result.status, error: result.error, data: result.data });
 
@@ -162,10 +166,13 @@ export async function addAddress(
     return { addressId: fallback.id, error: result.error };
   }
 
-  // The Edge Function wraps the payload as { success: true, data: { address_id } }
-  const addressId = result.data?.data?.address_id;
-  if (!addressId) {
+  const parsed = unwrapEdgeData<{ address_id: string }>(result.data);
+  if (parsed.ok === false) {
     console.warn("[CrunchX] addAddress: unexpected response shape", result.data);
+    return { error: parsed.error };
+  }
+  const addressId = parsed.data.address_id;
+  if (!addressId) {
     return { error: "Invalid response from server" };
   }
   return { addressId };
@@ -191,6 +198,8 @@ export async function updateAddress(
 
   const result = await apiCall("/update-address", { method: "POST", body, token });
   if (result.error) return { success: false, error: result.error };
+  const parsed = unwrapEdgeData<{ address_id?: string }>(result.data);
+  if (parsed.ok === false) return { success: false, error: parsed.error };
   return { success: true };
 }
 
@@ -210,6 +219,8 @@ export async function deleteAddress(
     token,
   });
   if (result.error) return { success: false, error: result.error };
+  const parsed = unwrapEdgeData(result.data);
+  if (parsed.ok === false) return { success: false, error: parsed.error };
   return { success: true };
 }
 
@@ -233,6 +244,8 @@ export async function setDefaultAddress(
     token,
   });
   if (result.error) return { success: false, error: result.error };
+  const parsed = unwrapEdgeData(result.data);
+  if (parsed.ok === false) return { success: false, error: parsed.error };
   return { success: true };
 }
 
@@ -245,11 +258,9 @@ export async function getMyAddresses(
     return { addresses: loadGuestAddresses() };
   }
 
-  const result = await apiCall<{ success?: boolean; data?: { addresses?: ApiAddress[] } }>(
-    "/get-my-addresses",
-    { method: "POST", body: {}, token }
-  );
+  const result = await apiCall("/get-my-addresses", { method: "POST", body: {}, token });
   if (result.error) return { error: result.error };
-  const data = result.data as { data?: { addresses?: ApiAddress[] } };
-  return { addresses: data?.data?.addresses ?? [] };
+  const parsed = unwrapEdgeData<{ addresses?: ApiAddress[] }>(result.data);
+  if (parsed.ok === false) return { error: parsed.error };
+  return { addresses: parsed.data.addresses ?? [] };
 }

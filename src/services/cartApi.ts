@@ -76,7 +76,7 @@ export async function addToCartApi(
   });
   if (result.error) return { error: result.error };
   const u = unwrapEdgeData<Record<string, unknown>>(result.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return { success: true };
 }
 
@@ -86,7 +86,7 @@ export async function getCartApi(
   const result = await apiCall<unknown>("/get-cart", { method: "POST", body: {}, token });
   if (result.error) return { error: result.error };
   const u = unwrapEdgeData<{ items?: ServerCartLine[] }>(result.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return { items: u.data.items ?? [] };
 }
 
@@ -101,7 +101,7 @@ export async function updateCartItemApi(
   });
   if (result.error) return { error: result.error };
   const u = unwrapEdgeData<unknown>(result.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return {};
 }
 
@@ -116,6 +116,6 @@ export async function removeCartItemApi(
   });
   if (result.error) return { error: result.error };
   const u = unwrapEdgeData<unknown>(result.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return {};
 }
