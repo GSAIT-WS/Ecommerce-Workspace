@@ -45,7 +45,7 @@ export async function listMyOrders(
   });
   if (res.error) return { error: res.error };
   const u = unwrapEdgeData<{ items: OrderSummaryRow[]; total: number }>(res.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return { items: u.data.items, total: u.data.total };
 }
 
@@ -60,6 +60,6 @@ export async function getOrderByIdApi(
   });
   if (res.error) return { error: res.error };
   const u = unwrapEdgeData<OrderDetailApi>(res.data);
-  if (!u.ok) return { error: u.error };
+  if (u.ok === false) return { error: u.error };
   return { order: u.data };
 }

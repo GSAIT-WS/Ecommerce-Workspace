@@ -9,16 +9,11 @@ const CombosGiftsBanner = () => (
     <motion.div
       whileHover={{ y: -3 }}
       transition={{ type: "spring", stiffness: 380, damping: 24 }}
-      className="relative overflow-hidden rounded-2xl p-[2px] shadow-card ring-1 ring-border/30"
+      className="relative overflow-hidden rounded-2xl shadow-card"
     >
-      <div className="absolute inset-0 opacity-95" aria-hidden>
-        <div
-          className="absolute inset-[-120%] animate-combo-border-spin bg-[conic-gradient(from_90deg_at_50%_50%,hsl(var(--primary))_0deg,hsl(var(--secondary))_120deg,hsl(var(--accent))_240deg,hsl(var(--primary))_360deg)]"
-        />
-      </div>
       <MotionLink
         to="/build-combo"
-        className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-[0.9rem] border border-border/50 bg-card/95 p-6 shadow-sm backdrop-blur-sm transition-shadow hover:shadow-lg hover:shadow-primary/10 md:gap-6 md:p-8"
+        className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-2xl border-2 border-primary/28 bg-card/95 p-6 shadow-sm backdrop-blur-sm transition-[box-shadow,border-color] hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 dark:border-primary/50 dark:hover:border-primary/65 md:gap-6 md:p-8"
         whileTap={{ scale: 0.995 }}
       >
         <div
@@ -47,7 +42,7 @@ const CombosGiftsBanner = () => (
         <div className="relative flex min-w-0 flex-1 items-center gap-4 md:gap-5">
           <div className="relative shrink-0">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/40 to-secondary/30 blur-lg opacity-60 group-hover:opacity-90 transition-opacity" />
-            <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/25 via-primary/15 to-secondary/20 text-primary shadow-inner ring-2 ring-primary/20 transition-transform duration-300 group-hover:scale-110 group-hover:ring-primary/35">
+            <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/16 bg-gradient-to-br from-primary/25 via-primary/15 to-secondary/20 text-primary shadow-inner transition-transform duration-300 group-hover:scale-110 group-hover:border-primary/26 dark:border-primary/34 dark:group-hover:border-primary/46">
               <Gift className="h-7 w-7 drop-shadow-sm" strokeWidth={1.65} />
             </div>
           </div>

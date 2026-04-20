@@ -27,7 +27,7 @@ const categories = [
     icon: Heart,
     slug: "healthy-foods",
     mesh: "from-accent/22 via-accent/9 to-muted",
-    iconClass: "text-accent-foreground",
+    iconClass: "text-accent",
     blob: "bg-accent/14",
   },
   {
@@ -83,10 +83,10 @@ const CategoriesSection = () => (
                   aria-hidden
                 />
                 <div
-                  className={`relative flex h-[4.25rem] w-[4.25rem] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${cat.mesh} shadow-sm ring-1 ring-border/60 transition-[box-shadow] duration-300 group-hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.2),0_8px_24px_-8px_hsl(var(--foreground)/0.12)] dark:ring-border/80 dark:group-hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.25),0_8px_28px_-8px_hsl(0_0%_0%/0.35)]`}
+                  className={`relative flex h-[4.25rem] w-[4.25rem] items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br ${cat.mesh} shadow-sm ring-1 ring-border/60 transition-shadow duration-300 group-hover:shadow-md group-hover:ring-border/90 dark:ring-1 dark:ring-primary/35 dark:shadow-[0_1px_0_0_hsl(var(--primary)/0.12)] dark:group-hover:ring-primary/50 dark:group-hover:shadow-md`}
                 >
                   <div
-                    className="absolute inset-[2px] rounded-[0.9rem] bg-card/55 backdrop-blur-[2px] transition-opacity duration-300 dark:bg-card/40 group-hover:opacity-70"
+                    className="absolute inset-0 rounded-2xl bg-card/40 backdrop-blur-[1px] transition-opacity duration-300 dark:bg-card/25 group-hover:opacity-90"
                     aria-hidden
                   />
                   {/* Edge vignette on hover: borders go dull, center stays clear for the icon */}

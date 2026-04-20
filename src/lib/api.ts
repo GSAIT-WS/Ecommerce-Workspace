@@ -28,6 +28,15 @@ export function unwrapEdgeData<T>(body: unknown): { ok: true; data: T } | { ok: 
   return { ok: false, error: "Invalid response" };
 }
 
+/** Pull a human-readable message from Edge Function / gateway JSON bodies */
+function extractHttpErrorMessage(json: unknown, fallback: string): string {
+  if (!json || typeof json !== "object") return fallback;
+  const o = json as Record<string, unknown>;
+  if (typeof o.error === "string" && o.error.trim()) return o.error;
+  if (typeof o.message === "string" && o.message.trim()) return o.message;
+  return fallback;
+}
+
 /** Map raw browser/network errors to user-friendly messages */
 function friendlyError(raw: string): string {
   if (
@@ -91,10 +100,17 @@ export async function apiCall<T = unknown>(
     const json = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      const errMsg =
-        (json as { error?: string })?.error || res.statusText || "Request failed";
+      const errMsg = extractHttpErrorMessage(json, res.statusText || "Request failed");
       console.warn(`[CrunchX API] ${method} ${path} → ${res.status}:`, errMsg);
       return { error: friendlyError(errMsg), status: res.status };
+    }
+
+    // Some proxies misbehave; treat logical failures in JSON as errors even when status is 2xx
+    if (json && typeof json === "object") {
+      const o = json as Record<string, unknown>;
+      if (o.success === false && typeof o.error === "string" && o.error.trim()) {
+        return { error: friendlyError(o.error), status: res.status };
+      }
     }
 
     return { data: json as T, status: res.status };

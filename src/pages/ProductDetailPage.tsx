@@ -36,6 +36,7 @@ import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImagePlaceholder";
 import { validateBulkInquiryForm } from "@/lib/bulkInquiryValidation";
 import { submitBulkInquiry } from "@/services/bulkInquiryApi";
+import { CrunchXDoodleBackground } from "@/components/doodles";
 
 // ── Bulk Order helpers ──────────────────────────────────────────────────────
 const BULK_TIERS = [
@@ -370,9 +371,13 @@ const ProductDetailPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen overflow-x-hidden bg-background">
+      <div className="pointer-events-none absolute inset-0 z-0 min-h-full">
+        <CrunchXDoodleBackground variant="product" className="h-full min-h-screen w-full" />
+      </div>
+      <div className="relative z-[1]">
       <Navbar />
-      
+
       <main className="container mx-auto px-4 py-6 md:py-10">
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 font-body text-sm text-muted-foreground">
@@ -1100,6 +1105,7 @@ const ProductDetailPage = () => {
       </main>
 
       <Footer />
+      </div>
 
       {/* ── Bulk Inquiry Modal ─────────────────────────────────────────────── */}
       <Dialog open={inquiryOpen} onOpenChange={handleInquiryClose}>

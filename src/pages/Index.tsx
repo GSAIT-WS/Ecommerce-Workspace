@@ -10,6 +10,11 @@ import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import NoAddressBanner from "@/components/address/NoAddressBanner";
 import CombosGiftsBanner from "@/components/home/CombosGiftsBanner";
+import {
+  CrunchXDoodleBackground,
+  CrunchXCornerDoodles,
+  CrunchXSectionDivider,
+} from "@/components/doodles";
 
 const rise = {
   hidden: { opacity: 0, y: 28 },
@@ -37,7 +42,12 @@ const staggerItem = {
 };
 
 const Index = () => (
-  <div className="min-h-screen bg-background">
+  <div className="relative min-h-screen overflow-x-hidden bg-background">
+    <div className="pointer-events-none absolute inset-0 z-0 min-h-full">
+      <CrunchXDoodleBackground variant="home" className="h-full min-h-[110vh] w-full" />
+    </div>
+    <CrunchXCornerDoodles className="fixed inset-0 z-0 hidden lg:block" />
+    <div className="relative z-[1]">
     <Navbar />
     <PageTransition>
       <HeroSection />
@@ -65,6 +75,9 @@ const Index = () => (
           <FeaturedProducts />
         </motion.div>
         <motion.div variants={staggerItem}>
+          <CrunchXSectionDivider />
+        </motion.div>
+        <motion.div variants={staggerItem}>
           <TrustSection />
         </motion.div>
         <motion.div variants={staggerItem}>
@@ -76,6 +89,7 @@ const Index = () => (
       </motion.div>
     </PageTransition>
     <Footer />
+    </div>
   </div>
 );
 
