@@ -43,6 +43,7 @@ import BuildComboPage from "./pages/BuildComboPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import PostLoginAddressPrompt from "./components/address/PostLoginAddressPrompt";
+import ProductRealtimeSync from "./components/ProductRealtimeSync";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />
+            <ProductRealtimeSync />
             {/* Global one-time address prompt shown after login when user has no addresses */}
             <PostLoginAddressPrompt />
             <Routes>

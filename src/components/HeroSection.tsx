@@ -124,7 +124,6 @@ const HeroSection = memo(() => {
                 alt={s.title}
                 className="h-full w-full object-cover"
                 loading={i === 0 ? "eager" : "lazy"}
-                fetchPriority={i === 0 ? "high" : "auto"}
                 decoding="async"
                 initial={false}
                 animate={
