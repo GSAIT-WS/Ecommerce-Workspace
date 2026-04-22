@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   User,
@@ -71,10 +71,42 @@ const ProfilePage = () => {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { user, session, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [profileName, setProfileName] = useState("");
+  const updatedFullName =
+    ((location.state as { updatedFullName?: string } | null)?.updatedFullName ?? "").trim();
 
-  const displayName = user?.user_metadata?.full_name as string | undefined
-    ?? user?.email?.split("@")[0]
-    ?? "User";
+  useEffect(() => {
+    if (updatedFullName) {
+      setProfileName(updatedFullName);
+    }
+  }, [updatedFullName]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const loadProfileName = async () => {
+      const { data, error } = await supabase.rpc("get_my_profile");
+      if (error) {
+        console.error("[Profile] get_my_profile failed:", error.message);
+        return;
+      }
+      const row = Array.isArray(data) ? data[0] : null;
+      const name = typeof row?.full_name === "string" ? row.full_name.trim() : "";
+      if (name) {
+        setProfileName(name);
+      }
+    };
+
+    void loadProfileName();
+  }, [user]);
+
+  const displayName =
+    updatedFullName ||
+    profileName ||
+    (user?.user_metadata?.full_name as string | undefined) ||
+    user?.email?.split("@")[0] ||
+    "User";
   const displayEmail = user?.email ?? "";
   const displayPhone = (user?.user_metadata?.phone as string | undefined) ?? "";
   const displayAvatar = (user?.user_metadata?.avatar_url as string | undefined) ?? "";
