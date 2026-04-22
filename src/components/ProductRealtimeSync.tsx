@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { productKeys } from "@/hooks/useProducts";
-
 const ProductRealtimeSync = () => {
   const queryClient = useQueryClient();
 
