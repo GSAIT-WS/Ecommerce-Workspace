@@ -1,9 +1,9 @@
 /**
- * Products API — Edge Functions call Postgres RPCs that read `ecommerce.products`
- * (with `ecommerce.categories` for `category_slug`). Apply migration `075_*` and
- * deploy `list-products` / `get-product-by-id` so the storefront receives DB rows.
+ * Products API — reads `ecommerce.products` via public PostgREST views when available,
+ * otherwise via `list-products` / `get-product-by-id` Edge Functions (direct Postgres).
  */
 
+import { apiCall, hasApiConfig } from "./api";
 import { PRODUCT_IMAGE_PLACEHOLDER } from "./productImagePlaceholder";
 import { supabase } from "./supabaseClient";
 
@@ -300,32 +300,108 @@ async function fetchProductByIdFromPublicView(productId: string): Promise<Produc
   return mapApiProductToProduct(data as ApiProduct);
 }
 
-export async function fetchProducts(
+function buildListProductsQuery(params: ListProductsParams): string {
+  const qs = new URLSearchParams();
+  if (params.category_id) qs.set("category_id", params.category_id);
+  if (params.category_slug) qs.set("category_slug", params.category_slug);
+  if (params.search) qs.set("search", params.search);
+  if (params.min_price != null) qs.set("min_price", String(params.min_price));
+  if (params.max_price != null) qs.set("max_price", String(params.max_price));
+  if (params.limit != null) qs.set("limit", String(params.limit));
+  if (params.offset != null) qs.set("offset", String(params.offset));
+  const query = qs.toString();
+  return query ? `?${query}` : "";
+}
+
+async function fetchProductsFromEdgeFunction(
   params: ListProductsParams = {}
 ): Promise<{ items: Product[]; total: number }> {
+  if (!hasApiConfig()) {
+    throw new Error("Supabase is not configured");
+  }
+
+  const { data, error } = await apiCall<ListProductsResponse>(
+    `/list-products${buildListProductsQuery(params)}`,
+    { method: "GET" }
+  );
+
+  if (error) {
+    throw new Error(error);
+  }
+  if (!data?.success || !data.data) {
+    throw new Error(data?.error || "Failed to fetch products");
+  }
+
+  const items = data.data.items.map((row) => mapApiProductToProduct(row));
+  return { items, total: data.data.total };
+}
+
+async function fetchProductByIdFromEdgeFunction(productId: string): Promise<Product | null> {
+  if (!hasApiConfig()) {
+    throw new Error("Supabase is not configured");
+  }
+
+  const { data, error } = await apiCall<GetProductResponse>(
+    `/get-product-by-id?product_id=${encodeURIComponent(productId)}`,
+    { method: "GET" }
+  );
+
+  if (error) {
+    throw new Error(error);
+  }
+  if (!data?.success) {
+    if (data?.error?.toLowerCase().includes("not found")) return null;
+    throw new Error(data?.error || "Failed to fetch product");
+  }
+  if (!data.data) return null;
+  return mapApiProductToProduct(data.data);
+}
+
+async function tryFetchProducts(
+  fetcher: (params: ListProductsParams) => Promise<{ items: Product[]; total: number }>,
+  params: ListProductsParams
+): Promise<{ items: Product[]; total: number } | null> {
   try {
-    return await fetchProductsFromDatabase(params);
+    return await fetcher(params);
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Failed to fetch products";
+    const message = e instanceof Error ? e.message : "";
     if (isInvalidEcommerceSchemaError(message) || isMissingPublicViewError(message)) {
-      try {
-        return await fetchProductsFromPublicView(params);
-      } catch (viewErr) {
-        const viewMessage = viewErr instanceof Error ? viewErr.message : "Failed to fetch products";
-        if (isMissingPublicViewError(viewMessage)) {
-          logProductsConfigErrorOnce(
-            "[productsApi] Products are unavailable: ecommerce schema is not exposed in PostgREST and public.ecommerce_products view is missing. Please apply ecommerce public views migration."
-          );
-          return { items: [], total: 0 };
-        }
-        throw viewErr;
-      }
+      return null;
     }
     throw e;
   }
 }
 
+export async function fetchProducts(
+  params: ListProductsParams = {}
+): Promise<{ items: Product[]; total: number }> {
+  const fromView = await tryFetchProducts(fetchProductsFromPublicView, params);
+  if (fromView) return fromView;
+
+  const fromDb = await tryFetchProducts(fetchProductsFromDatabase, params);
+  if (fromDb) return fromDb;
+
+  try {
+    return await fetchProductsFromEdgeFunction(params);
+  } catch (edgeErr) {
+    const message = edgeErr instanceof Error ? edgeErr.message : "Failed to fetch products";
+    logProductsConfigErrorOnce(
+      `[productsApi] Could not load products from Supabase: ${message}. Deploy list-products or apply migration 0028_storefront_public_product_api.sql.`
+    );
+    throw edgeErr;
+  }
+}
+
 export async function fetchProductById(productId: string): Promise<Product | null> {
+  try {
+    return await fetchProductByIdFromPublicView(productId);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "";
+    if (!isInvalidEcommerceSchemaError(message) && !isMissingPublicViewError(message)) {
+      throw e;
+    }
+  }
+
   try {
     const { data: dbRow, error: dbError } = await supabase
       .schema("ecommerce")
@@ -341,36 +417,57 @@ export async function fetchProductById(productId: string): Promise<Product | nul
     const categorySlugById = await fetchCategorySlugMap([(dbRow as DbProductRow).category_id]);
     return mapApiProductToProduct(normalizeDbRow(dbRow as DbProductRow, categorySlugById));
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Failed to fetch product";
-    if (isInvalidEcommerceSchemaError(message) || isMissingPublicViewError(message)) {
-      try {
-        return await fetchProductByIdFromPublicView(productId);
-      } catch (viewErr) {
-        const viewMessage = viewErr instanceof Error ? viewErr.message : "Failed to fetch product";
-        if (isMissingPublicViewError(viewMessage)) {
-          logProductsConfigErrorOnce(
-            "[productsApi] Product details are unavailable: ecommerce schema is not exposed in PostgREST and public.ecommerce_products view is missing."
-          );
-          return null;
-        }
-        throw viewErr;
-      }
+    const message = e instanceof Error ? e.message : "";
+    if (!isInvalidEcommerceSchemaError(message) && !isMissingPublicViewError(message)) {
+      throw e;
     }
-    throw e;
   }
+
+  return fetchProductByIdFromEdgeFunction(productId);
+}
+
+async function fetchCategoriesFromPublicView(): Promise<
+  Array<{ id: string; name: string; slug: string; image_url: string | null }>
+> {
+  const { data, error } = await supabase
+    .from("ecommerce_categories")
+    .select("id, name, slug, image_url")
+    .order("sort_order", { ascending: true });
+
+  if (error) throw new Error(error.message || "Failed to fetch categories");
+  return (data ?? []).map((row) => ({
+    id: row.id as string,
+    name: row.name as string,
+    slug: row.slug as string,
+    image_url: (row.image_url as string | null) ?? null,
+  }));
+}
+
+async function fetchCategoriesFromEdgeFunction(): Promise<
+  Array<{ id: string; name: string; slug: string; image_url: string | null }>
+> {
+  if (!hasApiConfig()) {
+    throw new Error("Supabase is not configured");
+  }
+
+  const { data, error } = await apiCall<ListCategoriesResponse>("/list-categories", { method: "GET" });
+  if (error) throw new Error(error);
+  if (!data?.success) {
+    throw new Error(data?.error || "Failed to fetch categories");
+  }
+  return data.data?.items ?? [];
 }
 
 export async function fetchCategories(): Promise<
   Array<{ id: string; name: string; slug: string; image_url: string | null }>
 > {
-  const path = "/list-categories";
-  const { data, error } = await apiCall<ListCategoriesResponse>(path, { method: "GET" });
-
-  if (error || !data?.success) {
-    throw new Error((data as { error?: string })?.error || error || "Failed to fetch categories");
+  try {
+    return await fetchCategoriesFromPublicView();
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "";
+    if (!isMissingPublicViewError(message)) {
+      throw e;
+    }
   }
-
-  const inner = (data as { data?: { items: Array<{ id: string; name: string; slug: string; image_url: string | null }> } })
-    .data;
-  return inner?.items ?? [];
+  return fetchCategoriesFromEdgeFunction();
 }

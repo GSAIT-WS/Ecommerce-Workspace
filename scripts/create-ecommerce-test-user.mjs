@@ -4,7 +4,11 @@
  * • With SUPABASE_SERVICE_ROLE_KEY: admin createUser, or reset password if email exists.
  * • With only VITE_SUPABASE_ANON_KEY: signUp (fails if user exists — add service role to reset).
  *
- * Usage: npm run create-test-user
+ * Usage:
+ *   npm run create-test-user
+ *   E2E_TEST_EMAIL=you@example.com E2E_TEST_PASSWORD='secret' npm run create-test-user
+ *   node scripts/create-ecommerce-test-user.mjs --email you@example.com --password secret
+ *   node scripts/create-ecommerce-test-user.mjs --delete --email old@example.com
  */
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -13,10 +17,28 @@ import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, "..");
-const nested = join(root, "crunchx-healthy-home");
+const packageRoot = join(__dirname, "..");
+const maybeNested = join(packageRoot, "crunchx-healthy-home");
 
-const TEST_EMAIL = "ecommerce-test@crunchx.in";
+function parseCliArgs(argv) {
+  const out = { delete: false };
+  for (let i = 2; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === "--delete") {
+      out.delete = true;
+      continue;
+    }
+    if (a === "--email" && argv[i + 1]) {
+      out.email = argv[++i];
+      continue;
+    }
+    if (a === "--password" && argv[i + 1]) {
+      out.password = argv[++i];
+      continue;
+    }
+  }
+  return out;
+}
 
 function parseEnvText(text) {
   const out = {};
@@ -38,9 +60,11 @@ function parseEnvText(text) {
   return out;
 }
 
-/** Merge root .env then crunchx-healthy-home/.env (later wins). */
+/** Merge repo .env files (later files override). */
 function loadEnv() {
-  const paths = [join(root, ".env"), join(nested, ".env")];
+  const paths = existsSync(maybeNested)
+    ? [join(packageRoot, ".env"), join(maybeNested, ".env")]
+    : [join(packageRoot, "..", ".env"), join(packageRoot, ".env")];
   let merged = {};
   for (const p of paths) {
     if (existsSync(p)) {
@@ -48,6 +72,25 @@ function loadEnv() {
     }
   }
   return merged;
+}
+
+async function findUserIdByEmail(adminClient, targetEmail) {
+  const normalized = targetEmail.trim().toLowerCase();
+  let page = 1;
+  const perPage = 200;
+  for (;;) {
+    const { data, error } = await adminClient.auth.admin.listUsers({
+      page,
+      perPage,
+    });
+    if (error) throw error;
+    const hit = data.users.find(
+      (u) => (u.email || "").toLowerCase() === normalized
+    );
+    if (hit) return hit.id;
+    if (!data.users.length || data.users.length < perPage) return null;
+    page += 1;
+  }
 }
 
 function randomPassword() {
@@ -71,7 +114,56 @@ if (!url || (!serviceKey && !anonKey)) {
   process.exit(1);
 }
 
-const password = randomPassword();
+const cli = parseCliArgs(process.argv);
+const DEFAULT_TEST_EMAIL = "ecommerce-test@crunchx.in";
+const TEST_EMAIL = (
+  cli.email ||
+  process.env.E2E_TEST_EMAIL ||
+  env.E2E_TEST_EMAIL ||
+  DEFAULT_TEST_EMAIL
+)
+  .trim()
+  .toLowerCase();
+
+const password = (() => {
+  const fromCli = cli.password?.trim();
+  if (fromCli) return fromCli;
+  const fromEnv =
+    process.env.E2E_TEST_PASSWORD?.trim() || env.E2E_TEST_PASSWORD?.trim();
+  if (fromEnv) return fromEnv;
+  return randomPassword();
+})();
+
+if (cli.delete) {
+  const delEmail = (cli.email || "").trim().toLowerCase();
+  if (!delEmail) {
+    console.error("--delete requires --email <auth-email-to-remove>");
+    process.exit(1);
+  }
+  if (!serviceKey) {
+    console.error(
+      "Deleting a user requires SUPABASE_SERVICE_ROLE_KEY in .env (Dashboard → Settings → API)."
+    );
+    process.exit(1);
+  }
+  const supabaseAdmin = createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  try {
+    const id = await findUserIdByEmail(supabaseAdmin, delEmail);
+    if (!id) {
+      console.error("No auth user found with email:", delEmail);
+      process.exit(1);
+    }
+    const { error: delErr } = await supabaseAdmin.auth.admin.deleteUser(id);
+    if (delErr) throw delErr;
+    console.log("\nDeleted auth user:", delEmail, "\n");
+  } catch (e) {
+    console.error("deleteUser failed:", e?.message || e);
+    process.exit(1);
+  }
+  process.exit(0);
+}
 
 if (serviceKey) {
   const supabase = createClient(url, serviceKey, {

@@ -216,13 +216,29 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
       email: testEmail.trim().toLowerCase(),
       password: testPassword,
     });
-    setTestSubmitting(false);
     if (error) {
+      setTestSubmitting(false);
       toast.error(error.message ?? "Login failed");
-    } else {
-      toast.success("Signed in (test)");
-      navigate(from, { replace: true });
+      return;
     }
+
+    // Enforce ecommerce guard immediately for internal password login as well.
+    await supabase.rpc("activate_customer_profile");
+    const { data: isCustomer, error: guardError } = await supabase.rpc(
+      "is_ecommerce_customer"
+    );
+    setTestSubmitting(false);
+
+    if (guardError || isCustomer !== true) {
+      await supabase.auth.signOut();
+      toast.error(
+        "Access denied. This account is inactive or not registered as a CrunchX customer."
+      );
+      return;
+    }
+
+    toast.success("Signed in (test)");
+    navigate(from, { replace: true });
   };
 
   const stepTitle: Record<Step, string> = {
