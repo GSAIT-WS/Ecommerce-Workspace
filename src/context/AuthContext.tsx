@@ -25,10 +25,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const guardSession = async () => {
+      // Only activate an existing customer profile after verified auth session.
+      await supabase.rpc("activate_customer_profile");
+
+      const { data: isCustomer, error: guardError } = await supabase.rpc(
+        "is_ecommerce_customer"
+      );
+
+      if (guardError) {
+        console.error("[auth] is_ecommerce_customer check failed:", guardError.message);
+        return;
+      }
+
+      if (isCustomer === false) {
+        await supabase.auth.signOut();
+        toast.error(
+          "Access denied. This account is inactive or not registered as a CrunchX customer."
+        );
+      }
+    };
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session) {
+        void guardSession();
+      }
     });
 
     const {
@@ -39,32 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
 
       if (event === "SIGNED_IN" && session) {
-        void (async () => {
-          // Step 1 — ensure a customer_profiles row exists for new customers.
-          // IMS staff are silently skipped by the function itself.
-          await supabase.rpc("ensure_customer_profile");
-
-          // Step 2 — verify this is a legitimate ecommerce customer.
-          // Returns false for IMS staff and any account with no customer_profiles row.
-          const { data: isCustomer, error: guardError } = await supabase.rpc(
-            "is_ecommerce_customer"
-          );
-
-          if (guardError) {
-            // Network / DB error — do not lock out the user, but log it.
-            console.error("[auth] is_ecommerce_customer check failed:", guardError.message);
-            return;
-          }
-
-          if (isCustomer === false) {
-            // Not an ecommerce customer (IMS staff or no profile).
-            // Sign out immediately to prevent unauthorised access.
-            await supabase.auth.signOut();
-            toast.error(
-              "Access denied. This account is not registered as a CrunchX customer. Please use the IMS portal."
-            );
-          }
-        })();
+        void guardSession();
       }
     });
 

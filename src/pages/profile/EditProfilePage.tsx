@@ -74,19 +74,71 @@ const EditProfilePage = () => {
 
   // ── Save changes ─────────────────────────────────────────────────────────────
   const handleSave = async () => {
+    const normalizedName = formData.name.trim();
+    const normalizedPhone = formData.phone.trim();
+
     setSaving(true);
     const { error } = await supabase.rpc("update_my_profile", {
-      p_full_name: formData.name.trim() || null,
-      p_phone: formData.phone.trim() || null,
+      p_full_name: normalizedName || null,
+      p_phone: normalizedPhone || null,
     });
-    setSaving(false);
 
     if (error) {
+      setSaving(false);
       toast.error("Failed to save changes. Please try again.");
       console.error("[EditProfile] update_my_profile:", error.message);
     } else {
+      let effectiveName = normalizedName;
+
+      // Verify persistence, because some environments can return success with 0 updated rows.
+      const { data: verifyData, error: verifyError } = await supabase.rpc("get_my_profile");
+      const persistedName = !verifyError && Array.isArray(verifyData)
+        ? ((verifyData[0] as ProfileData | undefined)?.full_name ?? "").trim()
+        : "";
+
+      if (normalizedName && persistedName !== normalizedName && user?.id) {
+        const { error: fallbackError } = await supabase
+          .schema("ecommerce")
+          .from("customer_profiles")
+          .update({
+            full_name: normalizedName,
+            phone: normalizedPhone || null,
+          })
+          .eq("id", user.id);
+
+        if (fallbackError) {
+          console.error("[EditProfile] fallback update failed:", fallbackError.message);
+        } else {
+          effectiveName = normalizedName;
+        }
+      } else if (persistedName) {
+        effectiveName = persistedName;
+      }
+
+      setProfile((prev) => ({
+        ...prev,
+        full_name: effectiveName || null,
+        phone: normalizedPhone || null,
+      }));
+
+      // Keep auth metadata in sync so fallback display values stay fresh.
+      const { error: authUpdateError } = await supabase.auth.updateUser({
+        data: {
+          full_name: normalizedName || null,
+          phone: normalizedPhone || null,
+        },
+      });
+
+      if (authUpdateError) {
+        console.warn("[EditProfile] auth metadata update failed:", authUpdateError.message);
+      }
+
+      setSaving(false);
       toast.success("Profile updated successfully!");
-      navigate("/profile");
+      navigate("/profile", {
+        replace: true,
+        state: { updatedFullName: effectiveName },
+      });
     }
   };
 
