@@ -37,6 +37,13 @@
 
     --radius: 0.8125rem; /* ~13px — within 10–14px system */
 
+    /* Refinement tokens — same palette, used for hairline borders & text strength */
+    --border-strong: 30 26% 82%;
+    --border-soft: 32 32% 91%;
+    --text-strong: 25 34% 16%;
+    --hairline: 33 40% 88%;
+    --sheen: 40 60% 96%;
+
     /* Section surfaces (subtle alternation without layout change) */
     --surface-subtle: 33 42% 93%; /* Warm Beige #F5E6D3 tint */
     --surface-muted: 0 0% 96%; /* Light Grey #F5F5F5 */
@@ -85,6 +92,11 @@
     --border: 28 16% 30%;
     --input: 28 16% 28%;
     --ring: 34 88% 56%;
+    --border-strong: 28 16% 38%;
+    --border-soft: 28 14% 25%;
+    --text-strong: 40 40% 97%;
+    --hairline: 28 14% 27%;
+    --sheen: 40 32% 92%;
     --sidebar-background: 28 17% 14%;
     --sidebar-foreground: 40 32% 95%;
     --sidebar-primary: 34 88% 56%;
@@ -115,6 +127,9 @@
     font-size: 16px;
     line-height: 1.65;
     letter-spacing: -0.01em;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
     background-color: hsl(var(--background));
     background-image:
       radial-gradient(ellipse 120% 80% at 100% -15%, hsl(var(--primary) / 0.09), transparent 52%),
@@ -130,32 +145,175 @@
       radial-gradient(ellipse 70% 50% at 50% 100%, hsl(var(--secondary) / 0.08), transparent 48%);
   }
 
+  /* Branded text selection */
+  ::selection {
+    background-color: hsl(var(--primary) / 0.22);
+    color: hsl(var(--foreground));
+  }
+
+  /* Themed, unobtrusive scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.42) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary) / 0.32);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary) / 0.55);
+  }
+
+  /* Fluid display scale — headings breathe on large screens, stay compact on mobile */
   h1 {
     font-family: var(--font-display);
-    font-size: 2.125rem;
+    font-size: clamp(1.95rem, 1.45rem + 2.1vw, 2.4rem);
     font-weight: 800;
-    line-height: 1.18;
-    letter-spacing: -0.025em;
+    line-height: 1.16;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
   }
 
   h2 {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: clamp(1.4rem, 1.16rem + 1.05vw, 1.72rem);
     font-weight: 700;
-    line-height: 1.28;
-    letter-spacing: -0.02em;
+    line-height: 1.26;
+    letter-spacing: -0.024em;
+    text-wrap: balance;
   }
 
   h3 {
     font-family: var(--font-display);
-    font-size: 1.25rem;
+    font-size: clamp(1.14rem, 1.04rem + 0.42vw, 1.3rem);
     font-weight: 600;
-    line-height: 1.38;
-    letter-spacing: -0.015em;
+    line-height: 1.36;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
   }
 
   h4, h5, h6 {
     font-family: var(--font-display);
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  /* Balanced paragraph wrapping keeps marketing copy from ragging */
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer components {
+  /** Section label above a heading — small gold rule + uppercase kicker */
+  .eyebrow {
+    @apply inline-flex items-center gap-2.5 font-body text-[11px] font-bold uppercase tracking-[0.22em] text-primary/90;
+  }
+
+  .eyebrow::before {
+    content: "";
+    @apply block h-px w-7 rounded-full bg-gradient-to-r from-primary/70 to-primary/10;
+  }
+
+  .eyebrow-centered::after {
+    content: "";
+    @apply block h-px w-7 rounded-full bg-gradient-to-l from-primary/70 to-primary/10;
+  }
+
+  /** Standard section heading block (kicker + title + supporting line) */
+  .section-title {
+    @apply font-display font-extrabold tracking-[-0.03em] text-foreground;
+    font-size: clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+    line-height: 1.14;
+  }
+
+  .section-subtitle {
+    @apply mx-auto max-w-xl font-body text-[15px] leading-relaxed text-muted-foreground md:text-base;
+  }
+
+  /** Premium card surface: hairline border + warm inner top highlight */
+  .surface-card {
+    @apply relative overflow-hidden rounded-2xl border border-border/70 bg-card;
+    box-shadow:
+      inset 0 1px 0 0 hsl(var(--sheen) / 0.55),
+      0 1px 2px hsl(var(--foreground) / 0.04);
+  }
+
+  .dark .surface-card {
+    box-shadow:
+      inset 0 1px 0 0 hsl(var(--sheen) / 0.05),
+      0 1px 2px hsl(0 0% 0% / 0.3);
+  }
+
+  /** Interactive card lift: border warms + shadow deepens on hover */
+  .card-interactive {
+    @apply transition-[transform,box-shadow,border-color] duration-300 ease-smooth;
+  }
+
+  .card-interactive:hover {
+    @apply -translate-y-1 border-primary/30;
+    box-shadow:
+      inset 0 1px 0 0 hsl(var(--sheen) / 0.7),
+      0 18px 40px -16px hsl(var(--primary) / 0.26),
+      0 4px 10px -6px hsl(var(--foreground) / 0.12);
+  }
+
+  .dark .card-interactive:hover {
+    box-shadow:
+      inset 0 1px 0 0 hsl(var(--sheen) / 0.07),
+      0 18px 44px -16px hsl(var(--primary) / 0.3),
+      0 4px 12px -6px hsl(0 0% 0% / 0.5);
+  }
+
+  /** Frosted panel for chips / bars over imagery */
+  .glass-panel {
+    @apply border border-white/25 bg-white/10 backdrop-blur-md;
+    box-shadow: inset 0 1px 0 0 hsl(0 0% 100% / 0.18);
+  }
+
+  .dark .glass-panel {
+    @apply border-white/10 bg-white/[0.06];
+  }
+
+  /** Animated underline for nav / footer text links */
+  .link-underline {
+    @apply relative inline-block transition-colors duration-300 ease-in-out;
+  }
+
+  .link-underline::after {
+    content: "";
+    @apply pointer-events-none absolute -bottom-0.5 left-0 h-[1.5px] w-full origin-left scale-x-0 rounded-full bg-gradient-to-r from-primary to-accent transition-transform duration-300 ease-smooth;
+  }
+
+  .link-underline:hover::after,
+  .link-underline[data-active="true"]::after {
+    @apply scale-x-100;
+  }
+
+  /** Gold glow ring for primary emphasis (badges, price chips) */
+  .glow-gold {
+    box-shadow:
+      inset 0 1px 0 0 hsl(var(--sheen) / 0.6),
+      0 6px 18px -6px hsl(var(--primary) / 0.45);
+  }
+
+  .dark .glow-gold {
+    box-shadow:
+      inset 0 1px 0 0 hsl(var(--sheen) / 0.08),
+      0 6px 20px -6px hsl(var(--primary) / 0.5);
   }
 }
 
@@ -163,6 +321,26 @@
   .text-gradient {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+
+  /** Gold→amber gradient for headline emphasis on imagery */
+  .text-gradient-warm {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(
+      100deg,
+      hsl(var(--accent)) 0%,
+      hsl(42 96% 72%) 42%,
+      hsl(var(--accent)) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  .group:hover .text-gradient-warm {
+    background-position: 100% 0;
+  }
+
+  .text-gradient-warm {
+    transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   /** Full-width image banners (hero, offers): dark scrim + subtle gold/amber warmth for readability */
@@ -253,5 +431,64 @@
     );
     background-size: 200% 100%;
     animation: shimmer 2.5s linear infinite;
+  }
+
+  /** Soft gold text glow on price / numeric emphasis */
+  .text-glow-gold {
+    text-shadow: 0 1px 12px hsl(var(--primary) / 0.28);
+  }
+
+  /** Hairline top edge used to separate stacked sections without heavy borders */
+  .hairline-top {
+    box-shadow: inset 0 1px 0 0 hsl(var(--hairline) / 0.9);
+  }
+
+  .dark .hairline-top {
+    box-shadow: inset 0 1px 0 0 hsl(var(--hairline) / 0.85);
+  }
+
+  /** Number/label chip — small uppercase meta */
+  .meta-chip {
+    @apply inline-flex items-center gap-1 rounded-full bg-muted/70 px-2 py-0.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground;
+  }
+
+  /** Consistent icon tile for feature cards */
+  .icon-tile {
+    @apply relative flex h-12 w-12 items-center justify-center rounded-2xl transition-transform duration-300 ease-smooth;
+  }
+
+  /** Consistent page/section heading block */
+  .section-heading {
+    @apply mx-auto max-w-2xl text-center;
+  }
+
+  .section-heading .section-title {
+    @apply mb-3;
+  }
+
+  .section-heading .section-subtitle {
+    @apply text-[15px] md:text-base;
+  }
+}
+
+/** Hero carousel autoplay progress bar */
+@keyframes shrink-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/** Respect user motion preferences across every decorative animation */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

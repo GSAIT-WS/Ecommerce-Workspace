@@ -39,35 +39,78 @@ const CustomerReviews = () => {
   }, []);
 
   return (
-    <section className="overflow-hidden border-t border-border/40 bg-background py-10 md:py-14">
+    <section className="overflow-hidden border-t border-border/40 bg-background py-14 md:py-20">
       <div className="container mx-auto px-4 md:px-8">
-        <h2 className="mb-6 text-center font-display text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
-          Loved by CrunchX Customers
-        </h2>
+        <div className="section-heading mb-9 md:mb-11">
+          <span className="eyebrow eyebrow-centered mb-3">Real reviews</span>
+          <h2 className="section-title">
+            Loved by <span className="text-gradient">CrunchX Customers</span>
+          </h2>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <div className="flex gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="h-4 w-4 fill-primary text-primary" />
+              ))}
+            </div>
+            <span className="font-body text-sm text-muted-foreground">
+              <span className="font-semibold text-foreground">4.9</span> from 2,400+ reviews
+            </span>
+          </div>
+        </div>
       </div>
       <div className="relative">
-        <div ref={scrollRef} className="flex gap-4 will-change-transform" style={{ width: "max-content" }}>
+        {/* Edge fades so cards dissolve into the page instead of being cut off */}
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent md:w-28"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent md:w-28"
+          aria-hidden
+        />
+        <div
+          ref={scrollRef}
+          className="flex gap-4 px-4 will-change-transform md:gap-5"
+          style={{ width: "max-content" }}
+        >
           {doubled.map((t, i) => (
-            <div
+            <figure
               key={i}
               onClick={() => setSelected(selected === i ? null : i)}
-              className={`w-72 shrink-0 cursor-pointer rounded-2xl border p-5 shadow-card transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:scale-[1.02] hover:border-primary/60 hover:shadow-[0_0_24px_hsl(var(--primary)/0.45),0_0_8px_hsl(var(--primary)/0.3)] active:border-primary/80 active:shadow-[0_0_32px_hsl(var(--primary)/0.6),0_0_12px_hsl(var(--primary)/0.4)] ${
+              className={`card-interactive relative w-72 shrink-0 cursor-pointer rounded-2xl border p-6 shadow-card md:w-80 ${
                 selected === i
-                  ? "border-primary/80 bg-card shadow-[0_0_32px_hsl(var(--primary)/0.6),0_0_12px_hsl(var(--primary)/0.4)]"
-                  : "border-border/50 bg-card"
+                  ? "-translate-y-1 border-primary/50 bg-gradient-to-b from-card to-primary/[0.05] shadow-card-hover"
+                  : "border-border/70 bg-card"
               }`}
             >
-              <div className="mb-3 flex gap-0.5">
+              {/* Oversized quote glyph for visual weight */}
+              <span
+                className="pointer-events-none absolute right-5 top-3 select-none font-display text-6xl font-black leading-none text-primary/12"
+                aria-hidden
+              >
+                &rdquo;
+              </span>
+              <div className="relative mb-3.5 flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, s) => (
                   <Star
                     key={s}
-                    className={`h-4 w-4 ${s < t.rating ? "fill-primary text-primary" : "text-muted-foreground/35"}`}
+                    className={`h-4 w-4 ${s < t.rating ? "fill-primary text-primary" : "fill-muted text-muted-foreground/30"}`}
                   />
                 ))}
               </div>
-              <p className="mb-4 text-sm leading-[1.7] text-foreground/85">"{t.text}"</p>
-              <p className="text-xs font-semibold tracking-wide text-foreground/95">{t.name}</p>
-            </div>
+              <blockquote className="relative mb-5 font-body text-sm leading-[1.75] text-foreground/85">
+                &ldquo;{t.text}&rdquo;
+              </blockquote>
+              <figcaption className="relative flex items-center gap-2.5 border-t border-border/60 pt-4">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary/25 to-secondary/25 font-display text-xs font-bold text-primary">
+                  {t.name.charAt(0)}
+                </span>
+                <span className="font-body text-xs font-bold uppercase tracking-wide text-foreground/90">
+                  {t.name}
+                </span>
+                <span className="meta-chip ml-auto">Verified</span>
+              </figcaption>
+            </figure>
           ))}
         </div>
       </div>

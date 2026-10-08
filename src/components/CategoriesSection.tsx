@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Dumbbell, Wheat, Heart, Package } from "lucide-react";
+import { ArrowUpRight, Dumbbell, Wheat, Heart, Package } from "lucide-react";
 
 const MotionLink = motion.create(Link);
 
@@ -41,17 +41,21 @@ const categories = [
 ];
 
 const CategoriesSection = () => (
-  <section className="bg-surface-muted/40 py-12 md:py-16">
-    <div className="container mx-auto px-4 md:px-8">
-      <div className="mb-8 text-center">
-        <h2 className="mb-2 font-display text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
-          Shop by Category
+  <section className="relative overflow-hidden bg-surface-muted/40 py-14 md:py-20">
+    {/* Warm corner wash so the band reads as a distinct surface, not flat grey */}
+    <div
+      className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,hsl(var(--primary)/0.09),transparent_62%)]"
+      aria-hidden
+    />
+    <div className="container relative mx-auto px-4 md:px-8">
+      <div className="section-heading mb-9 md:mb-11">
+        <span className="eyebrow eyebrow-centered mb-3">Browse</span>
+        <h2 className="section-title">
+          Shop by <span className="text-gradient">Category</span>
         </h2>
-        <p className="font-body text-[15px] leading-relaxed text-muted-foreground">
-          Find exactly what fuels your lifestyle
-        </p>
+        <p className="section-subtitle">Find exactly what fuels your lifestyle</p>
       </div>
-      <div className="grid grid-cols-2 gap-3.5 md:grid-cols-4 md:gap-5">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
         {categories.map((cat, i) => (
           <MotionLink
             key={cat.name}
@@ -66,8 +70,13 @@ const CategoriesSection = () => (
               transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
             }}
             whileTap={{ scale: 0.98 }}
-            className="group relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-primary/[0.04] p-6 shadow-card ring-1 ring-black/[0.04] transition-[box-shadow,border-color,transform] duration-300 ease-in-out hover:border-primary/30 hover:shadow-card-hover dark:from-card dark:via-card dark:to-secondary/[0.06] dark:ring-white/[0.06] md:gap-4 md:p-8"
+            className="card-interactive group relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-primary/[0.04] p-6 shadow-card ring-1 ring-black/[0.04] hover:shadow-card-elevated-hover dark:from-card dark:via-card dark:to-secondary/[0.06] dark:ring-white/[0.06] md:gap-4 md:p-8"
           >
+            {/* Bottom gold hairline that draws in on hover */}
+            <span
+              className="pointer-events-none absolute inset-x-6 bottom-0 h-[2px] origin-left scale-x-0 rounded-full bg-gradient-to-r from-primary via-accent to-secondary transition-transform duration-500 ease-smooth group-hover:scale-x-100"
+              aria-hidden
+            />
             <div
               className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full ${cat.blob} blur-2xl transition-all duration-500 group-hover:scale-110 group-hover:opacity-90`}
               aria-hidden
@@ -100,9 +109,15 @@ const CategoriesSection = () => (
                   />
                 </div>
               </motion.div>
-              <span className="relative text-center font-body text-sm font-semibold text-foreground md:text-base">
-                {cat.name}
-              </span>
+              <div className="relative text-center">
+                <span className="font-body text-sm font-semibold text-foreground transition-colors duration-300 group-hover:text-primary md:text-base">
+                  {cat.name}
+                </span>
+                <span className="mt-1.5 flex items-center justify-center gap-1 font-body text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground opacity-0 transition-all duration-300 ease-smooth group-hover:translate-y-0 group-hover:opacity-100">
+                  Explore
+                  <ArrowUpRight className="h-3 w-3" />
+                </span>
+              </div>
             </div>
           </MotionLink>
         ))}

@@ -13,7 +13,7 @@ const CombosGiftsBanner = () => (
     >
       <MotionLink
         to="/build-combo"
-        className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-2xl border-2 border-primary/28 bg-card/95 p-6 shadow-sm backdrop-blur-sm transition-[box-shadow,border-color] hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 dark:border-primary/50 dark:hover:border-primary/65 md:gap-6 md:p-8"
+        className="group relative flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-primary/25 bg-card/95 p-6 shadow-card ring-1 ring-inset ring-white/20 backdrop-blur-sm transition-[box-shadow,border-color,transform] duration-300 ease-smooth hover:-translate-y-0.5 hover:border-primary/45 hover:shadow-card-elevated-hover dark:border-primary/45 dark:hover:border-primary/60 md:gap-6 md:p-8"
         whileTap={{ scale: 0.995 }}
       >
         <div
@@ -42,13 +42,13 @@ const CombosGiftsBanner = () => (
         <div className="relative flex min-w-0 flex-1 items-center gap-4 md:gap-5">
           <div className="relative shrink-0">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/40 to-secondary/30 blur-lg opacity-60 group-hover:opacity-90 transition-opacity" />
-            <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/16 bg-gradient-to-br from-primary/25 via-primary/15 to-secondary/20 text-primary shadow-inner transition-transform duration-300 group-hover:scale-110 group-hover:border-primary/26 dark:border-primary/34 dark:group-hover:border-primary/46">
+            <div className="glow-gold relative flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/16 bg-gradient-to-br from-primary/25 via-primary/15 to-secondary/20 text-primary transition-transform duration-300 ease-smooth group-hover:scale-110 group-hover:border-primary/26 dark:border-primary/34 dark:group-hover:border-primary/46">
               <Gift className="h-7 w-7 drop-shadow-sm" strokeWidth={1.65} />
             </div>
           </div>
           <div className="min-w-0">
             <div className="mb-1 flex flex-wrap items-center gap-2">
-              <h3 className="font-display text-lg font-bold text-foreground md:text-xl">
+              <h3 className="font-display text-lg font-bold tracking-[-0.025em] text-foreground md:text-xl">
                 Combos &amp; Gifts
               </h3>
               <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-semibold text-primary ring-1 ring-primary/20">
@@ -63,12 +63,12 @@ const CombosGiftsBanner = () => (
         </div>
 
         <div className="relative flex shrink-0 items-center gap-2">
-          <motion.div
-            animate={{ x: [0, 4, 0] }}
-            transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-          >
-            <ArrowRight className="h-5 w-5 text-primary transition-transform duration-300 group-hover:translate-x-1" />
-          </motion.div>
+          <span className="hidden rounded-full border border-primary/25 bg-primary/10 px-4 py-2 font-body text-xs font-bold uppercase tracking-[0.12em] text-primary transition-all duration-300 ease-smooth group-hover:border-primary/45 group-hover:bg-primary/15 sm:inline-flex">
+            Build Now
+          </span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-md shadow-primary/25 ring-1 ring-inset ring-white/25 transition-transform duration-300 ease-smooth group-hover:translate-x-0.5">
+            <ArrowRight className="h-4 w-4" />
+          </span>
         </div>
       </MotionLink>
     </motion.div>

@@ -318,7 +318,7 @@ const CheckoutPage = () => {
 
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-28 rounded-2xl border border-border bg-card p-6">
+            <div className="surface-card sticky top-32 p-6 shadow-card-elevated">
               <h2 className="mb-6 font-display text-xl font-bold text-foreground">
                 Order Summary
               </h2>

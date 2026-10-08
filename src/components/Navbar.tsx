@@ -35,15 +35,21 @@ const Navbar = () => {
     <>
       <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 shadow-sm backdrop-blur-md transition-all duration-300 ease-in-out">
+      <header className="group/nav sticky top-0 z-50 border-b border-border/60 bg-background/90 shadow-[0_1px_0_0_hsl(var(--primary)/0.06),0_8px_24px_-18px_hsl(var(--foreground)/0.35)] backdrop-blur-xl transition-all duration-300 ease-smooth supports-[backdrop-filter]:bg-background/75">
         <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-8">
 
           {/* Left: Logo + Delivery chip (desktop) */}
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="font-display text-2xl font-extrabold tracking-tight text-primary"
+              className="group flex items-center gap-2.5 font-display text-2xl font-extrabold tracking-[-0.035em] text-primary"
             >
+              <span
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-sm font-black text-primary-foreground shadow-md shadow-primary/30 ring-1 ring-inset ring-white/30 transition-transform duration-300 ease-smooth group-hover:scale-105 group-hover:-rotate-3"
+                aria-hidden
+              >
+                CX
+              </span>
               CRUNCH<span className="text-secondary">X</span>
             </Link>
 
@@ -61,10 +67,11 @@ const Navbar = () => {
               <Link
                 key={link.label}
                 to={link.href}
-                className={`font-body text-sm font-medium transition-all duration-300 ease-in-out hover:text-primary ${
+                data-active={location.pathname === link.href}
+                className={`link-underline font-body text-sm font-semibold tracking-[-0.01em] ${
                   location.pathname === link.href
                     ? "text-primary"
-                    : "text-foreground/70"
+                    : "text-foreground/70 hover:text-primary"
                 }`}
               >
                 {link.label}
@@ -93,7 +100,10 @@ const Navbar = () => {
               <Link to="/cart">
                 <ShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  <span
+                    key={cartCount}
+                    className="absolute -right-0.5 -top-0.5 flex h-[1.15rem] min-w-[1.15rem] animate-badge-pop items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary px-1 text-[10px] font-bold leading-none text-primary-foreground shadow-sm shadow-primary/40 ring-2 ring-background"
+                  >
                     {cartCount > 99 ? "99+" : cartCount}
                   </span>
                 )}
@@ -149,9 +159,25 @@ const Navbar = () => {
           </div>
         </div>
 
+        {/* Announcement strip — thin gold bar reinforcing the brand promise */}
+      <div className="hidden overflow-hidden border-b border-primary/15 bg-gradient-to-r from-primary/12 via-accent/10 to-secondary/12 md:block">
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="flex h-9 items-center justify-center gap-6 font-body text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/75">
+            <span className="inline-flex items-center gap-2">
+              <span className="h-1 w-1 rounded-full bg-primary" aria-hidden />
+              Free shipping over ₹499
+            </span>
+            <span className="hidden h-3 w-px bg-border lg:block" aria-hidden />
+            <span className="hidden lg:inline">Farm sourced in Lambasingi, Andhra Pradesh</span>
+            <span className="hidden h-3 w-px bg-border lg:block" aria-hidden />
+            <span className="hidden lg:inline">100% Natural · No Preservatives</span>
+          </div>
+        </div>
+      </div>
+
         {/* ── Mobile Drawer ── */}
         {mobileOpen && (
-          <nav className="border-t border-border bg-background px-4 py-4 md:hidden">
+          <nav className="animate-fade-in border-t border-border/70 bg-background/95 px-4 py-4 backdrop-blur-xl md:hidden">
 
             {/* Delivery chip in mobile menu */}
             {user && (
@@ -171,10 +197,10 @@ const Navbar = () => {
                 key={link.label}
                 to={link.href}
                 onClick={() => setMobileOpen(false)}
-                className={`block py-2 font-body text-sm font-medium transition-all duration-300 ease-in-out hover:text-primary ${
+                className={`block rounded-lg px-3 py-2.5 font-body text-sm font-semibold transition-all duration-300 ease-smooth hover:bg-muted/70 hover:text-primary ${
                   location.pathname === link.href
-                    ? "text-primary"
-                    : "text-foreground/70"
+                    ? "bg-primary/10 text-primary"
+                    : "text-foreground/75"
                 }`}
               >
                 {link.label}

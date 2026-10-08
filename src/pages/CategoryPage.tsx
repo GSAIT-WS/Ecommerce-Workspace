@@ -70,12 +70,25 @@ const CategoryPage = () => {
       <Navbar />
 
       {/* Page Header */}
-      <section className="bg-gradient-to-b from-muted/50 to-background px-4 pb-6 pt-24 md:pb-8 md:pt-28">
-        <div className="mx-auto max-w-7xl text-center">
+      <section className="relative overflow-hidden bg-gradient-to-b from-surface-subtle/60 to-background px-4 pb-10 pt-24 md:pb-12 md:pt-28">
+        {/* Warm halo behind the heading */}
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_100%_at_50%_0%,hsl(var(--primary)/0.14),transparent_62%)]"
+          aria-hidden
+        />
+        <div className="relative mx-auto max-w-7xl text-center">
+          <motion.span
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+            className="eyebrow eyebrow-centered mb-3"
+          >
+            Shop
+          </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-display text-3xl font-bold text-foreground md:text-4xl"
+            className="section-title"
           >
             {category.title}
           </motion.h1>
@@ -91,7 +104,7 @@ const CategoryPage = () => {
       </section>
 
       {/* Sticky Filter & Sort Bar */}
-      <div className="sticky top-16 z-30 border-b border-border bg-background/95 backdrop-blur-sm">
+      <div className="sticky top-[105px] z-30 border-b border-border/70 bg-background/90 shadow-[0_8px_20px_-16px_hsl(var(--foreground)/0.4)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
           {/* Left: Filter Button & Results Count */}
           <div className="flex items-center gap-4">
@@ -104,7 +117,7 @@ const CategoryPage = () => {
               <SlidersHorizontal className="h-4 w-4" />
               <span className="hidden sm:inline">Filters</span>
             </Button>
-            <span className="font-body text-sm text-muted-foreground">
+            <span className="meta-chip">
               {sortedProducts.length} products
             </span>
           </div>
@@ -126,26 +139,28 @@ const CategoryPage = () => {
             </Select>
 
             {/* View Toggle */}
-            <div className="flex rounded-full border border-border bg-muted p-1">
+            <div className="flex rounded-full border border-border/80 bg-muted/60 p-1">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`rounded-full p-1.5 transition-colors ${
+                className={`rounded-full p-1.5 transition-all duration-300 ease-smooth ${
                   viewMode === "grid"
-                    ? "bg-card text-foreground shadow-sm"
+                    ? "bg-card text-primary shadow-sm ring-1 ring-primary/20"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
                 aria-label="Grid view"
+                aria-pressed={viewMode === "grid"}
               >
                 <LayoutGrid className="h-4 w-4" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`rounded-full p-1.5 transition-colors ${
+                className={`rounded-full p-1.5 transition-all duration-300 ease-smooth ${
                   viewMode === "list"
-                    ? "bg-card text-foreground shadow-sm"
+                    ? "bg-card text-primary shadow-sm ring-1 ring-primary/20"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
                 aria-label="List view"
+                aria-pressed={viewMode === "list"}
               >
                 <List className="h-4 w-4" />
               </button>
@@ -218,14 +233,14 @@ const CategoryPage = () => {
           )}
 
           {/* Load More Button */}
-          <div className="mt-8 flex justify-center">
+          <div className="mt-10 flex justify-center">
             <Button
               variant="outline"
               size="lg"
-              className="gap-2 rounded-full font-body"
+              className="group gap-2 rounded-full px-8 font-body shadow-sm hover:shadow-glow-sm"
             >
               Load More Products
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-4 w-4 transition-transform duration-300 ease-smooth group-hover:translate-y-0.5" />
             </Button>
           </div>
         </div>

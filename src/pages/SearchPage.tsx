@@ -119,25 +119,32 @@ const SearchPage = () => {
       <Navbar />
 
       {/* Search Header */}
-      <section className="border-b border-border bg-card py-6">
-        <div className="container mx-auto px-4 md:px-8">
+      <section className="relative overflow-hidden border-b border-border bg-surface-subtle/50 py-10 md:py-12">
+        {/* Warm top wash so the search header feels intentional */}
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_90%_at_50%_0%,hsl(var(--primary)/0.13),transparent_65%)]"
+          aria-hidden
+        />
+        <div className="container relative mx-auto px-4 md:px-8">
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mb-4">
-            <div className="relative mx-auto max-w-2xl">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <form onSubmit={handleSearch} className="mb-6">
+            <div className="group relative mx-auto max-w-2xl">
+              <div className="pointer-events-none absolute -inset-1 rounded-full bg-gradient-to-r from-primary/25 via-accent/20 to-secondary/25 opacity-0 blur-[2px] transition-opacity duration-500 group-focus-within:opacity-100" />
+              <Search className="absolute left-5 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors duration-300 group-focus-within:text-primary" />
               <Input
                 value={localQuery}
                 onChange={(e) => setLocalQuery(e.target.value)}
                 placeholder="Search for multigrain snacks, protein bars…"
-                className="h-12 rounded-full border-2 border-primary/30 bg-background pl-12 pr-12 font-body text-base focus-visible:border-primary"
+                className="relative z-10 h-12 rounded-full border-2 border-border bg-card pl-12 pr-12 font-body text-base shadow-card transition-[border-color,box-shadow] duration-300 hover:border-primary/40 focus-visible:border-primary/60 focus-visible:ring-4 focus-visible:ring-primary/15"
               />
               {localQuery && (
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label="Clear search"
+                  className="absolute right-4 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground transition-all duration-300 ease-smooth hover:bg-muted hover:text-foreground"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4" />
                 </button>
               )}
             </div>
@@ -182,7 +189,7 @@ const SearchPage = () => {
       </section>
 
       {/* Filters Bar */}
-      <section className="sticky top-[73px] z-40 border-b border-border bg-background/95 py-3 backdrop-blur-sm">
+      <section className="sticky top-[105px] z-40 border-b border-border/70 bg-background/90 py-3 shadow-[0_8px_20px_-16px_hsl(var(--foreground)/0.4)] backdrop-blur-xl">
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between gap-4">
             {/* Filter Tags */}
@@ -221,7 +228,7 @@ const SearchPage = () => {
 
           {/* Expanded Filters Panel */}
           {showFilters && (
-            <div className="mt-4 rounded-xl border border-border bg-card p-4">
+            <div className="surface-card animate-fade-in-up mt-4 p-5">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {/* Sort By */}
                 <div>

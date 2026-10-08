@@ -76,6 +76,18 @@ export default {
         "card-hover":
           "0 14px 36px -10px hsl(var(--primary) / 0.18), 0 0 0 1px hsl(var(--primary) / 0.14)",
         lift: "0 6px 20px -8px hsl(var(--foreground) / 0.12), 0 2px 8px -4px hsl(var(--foreground) / 0.06)",
+        /** Deeper elevation for hero cards & featured tiles */
+        "card-elevated":
+          "0 22px 48px -20px hsl(var(--foreground) / 0.16), 0 0 0 1px hsl(var(--border) / 0.5)",
+        "card-elevated-hover":
+          "0 30px 64px -24px hsl(var(--primary) / 0.28), 0 0 0 1px hsl(var(--primary) / 0.18)",
+        /** Warm gold halo — used sparingly on badges & price chips */
+        glow: "0 8px 24px -8px hsl(var(--primary) / 0.45)",
+        "glow-sm": "0 4px 12px -4px hsl(var(--primary) / 0.35)",
+        /** Crisp top inner highlight that makes light surfaces feel glossy */
+        "inner-top":
+          "inset 0 1px 0 0 hsl(var(--sheen) / 0.6), 0 1px 2px hsl(var(--foreground) / 0.04)",
+        "focus-ring": "0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary) / 0.35)",
       },
       transitionDuration: {
         DEFAULT: "300ms",
@@ -135,6 +147,47 @@ export default {
               "inset 0 2px 5px rgba(255,255,255,0.48), inset 0 -3px 5px rgba(0,0,0,0.12), 0 0 0 10px hsl(36 78% 46% / 0.06)",
           },
         },
+        /** Soft scale-in for badges/chips appearing on hover or state change */
+        "pop-in": {
+          from: { opacity: "0", transform: "scale(0.86)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        /** Sheen sweep across a surface on hover */
+        "sheen-sweep": {
+          "0%": { transform: "translateX(-120%)" },
+          "100%": { transform: "translateX(220%)" },
+        },
+        /** Slow rotating conic halo (accent rings, badges) */
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        /** Underline grows from the centre for headings */
+        "underline-grow": {
+          from: { transform: "scaleX(0)" },
+          to: { transform: "scaleX(1)" },
+        },
+        /** Cart badge pop when an item is added */
+        "badge-pop": {
+          "0%": { transform: "scale(0.6)", opacity: "0" },
+          "60%": { transform: "scale(1.18)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        /** Soft vertical drift for decorative blobs */
+        "drift": {
+          "0%, 100%": { transform: "translate3d(0, 0, 0)" },
+          "50%": { transform: "translate3d(0, -14px, 0)" },
+        },
+        /** Horizontal marquee for testimonial / logo strips */
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
+        /** Fade + rise used by scroll-reveal wrappers */
+        "reveal-up": {
+          from: { opacity: "0", transform: "translateY(24px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -148,6 +201,14 @@ export default {
         "pulse-soft": "pulse-soft 4s ease-in-out infinite",
         shimmer: "shimmer 2.5s linear infinite",
         "offer-badge-pulse": "offer-badge-pulse 5.5s ease-in-out infinite",
+        "pop-in": "pop-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+        "sheen-sweep": "sheen-sweep 1.1s ease-in-out forwards",
+        "spin-slow": "spin-slow 14s linear infinite",
+        "underline-grow": "underline-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "badge-pop": "badge-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        drift: "drift 7s ease-in-out infinite",
+        marquee: "marquee 42s linear infinite",
+        "reveal-up": "reveal-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards",
       },
     },
   },
