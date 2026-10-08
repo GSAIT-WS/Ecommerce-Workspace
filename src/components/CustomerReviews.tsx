@@ -1,5 +1,5 @@
 import { Star } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const testimonials = [
   { name: "Priya Sharma", rating: 5, text: "CrunchX bars are my go-to post-workout snack. Clean ingredients and amazing taste!" },
@@ -19,6 +19,7 @@ const CustomerReviews = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
   const offsetRef = useRef(0);
+  const [selected, setSelected] = useState<number | null>(null);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -38,7 +39,7 @@ const CustomerReviews = () => {
   }, []);
 
   return (
-    <section className="overflow-hidden border-t border-border/40 bg-gradient-to-b from-background via-[hsl(28_48%_97%)] to-surface-muted/80 py-10 md:py-14">
+    <section className="overflow-hidden border-t border-border/40 bg-background py-10 md:py-14">
       <div className="container mx-auto px-4 md:px-8">
         <h2 className="mb-6 text-center font-display text-2xl font-extrabold tracking-tight text-foreground md:text-3xl">
           Loved by CrunchX Customers
@@ -49,7 +50,12 @@ const CustomerReviews = () => {
           {doubled.map((t, i) => (
             <div
               key={i}
-              className="w-72 shrink-0 rounded-2xl border border-border/50 bg-gradient-to-br from-[hsl(28_55%_99%)] via-card to-[hsl(33_38%_94%)] p-5 shadow-card transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:scale-[1.02] hover:border-primary/20 hover:shadow-card-hover"
+              onClick={() => setSelected(selected === i ? null : i)}
+              className={`w-72 shrink-0 cursor-pointer rounded-2xl border p-5 shadow-card transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:scale-[1.02] hover:border-primary/60 hover:shadow-[0_0_24px_hsl(var(--primary)/0.45),0_0_8px_hsl(var(--primary)/0.3)] active:border-primary/80 active:shadow-[0_0_32px_hsl(var(--primary)/0.6),0_0_12px_hsl(var(--primary)/0.4)] ${
+                selected === i
+                  ? "border-primary/80 bg-card shadow-[0_0_32px_hsl(var(--primary)/0.6),0_0_12px_hsl(var(--primary)/0.4)]"
+                  : "border-border/50 bg-card"
+              }`}
             >
               <div className="mb-3 flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, s) => (

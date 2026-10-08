@@ -10,10 +10,10 @@ import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
   { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
   { label: "Shop", href: "/search" },
   { label: "Categories", href: "/categories" },
   { label: "My Orders", href: "/orders" },
-  { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
 
