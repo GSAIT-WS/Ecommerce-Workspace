@@ -54,16 +54,21 @@ const ProductListCard = ({
   return (
     <Link 
       to={`/product/${id}`}
-      className="group flex gap-4 overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg md:gap-6"
+      className="card-interactive group flex gap-4 overflow-hidden rounded-2xl border border-border/80 bg-card p-4 shadow-card md:gap-6 md:p-5"
     >
       {/* Product Image */}
-      <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl bg-muted md:h-36 md:w-36">
+      <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl bg-muted ring-1 ring-inset ring-border/50 md:h-36 md:w-36">
         <img
           src={image}
           alt={name}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-500 ease-smooth group-hover:scale-[1.07]"
         />
-        <Badge className="absolute left-2 top-2 rounded-full bg-secondary font-body text-xs font-semibold text-secondary-foreground">
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/20 to-transparent"
+          aria-hidden
+        />
+        <Badge className="absolute left-2 top-2 rounded-full bg-secondary/95 font-semibold text-secondary-foreground shadow-sm">
           {tag}
         </Badge>
       </div>
@@ -71,7 +76,7 @@ const ProductListCard = ({
       {/* Product Details */}
       <div className="flex flex-1 flex-col justify-between">
         <div>
-          <h3 className="mb-1 font-display text-base font-semibold text-foreground md:text-lg">
+          <h3 className="mb-1.5 font-display text-base font-bold tracking-[-0.02em] text-foreground transition-colors duration-300 group-hover:text-primary md:text-lg">
             {name}
           </h3>
           
@@ -112,14 +117,16 @@ const ProductListCard = ({
         {/* Price & Action */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-baseline gap-2">
-            <span className="font-body text-xl font-bold text-foreground">₹{price}</span>
+            <span className="font-display text-xl font-extrabold tracking-tight text-foreground text-glow-gold">
+              ₹{price}
+            </span>
             {originalPrice && (
               <span className="font-body text-sm text-muted-foreground line-through">
                 ₹{originalPrice}
               </span>
             )}
             {originalPrice && (
-              <span className="font-body text-xs font-semibold text-secondary">
+              <span className="meta-chip bg-primary/12 text-primary">
                 {Math.round(((originalPrice - price) / originalPrice) * 100)}% OFF
               </span>
             )}

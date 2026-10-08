@@ -1,5 +1,6 @@
 import { memo, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import heroSlide1 from "@/assets/hero-slide-1.jpg";
@@ -61,6 +62,13 @@ const slides = [
     secondaryCta: "Explore Categories",
     secondaryLink: "/categories",
   },
+];
+
+/** Short proof points under the hero CTAs — brand-consistent, no new data source */
+const heroStats = [
+  { value: "100%", label: "Natural" },
+  { value: "7+", label: "Ancient Grains" },
+  { value: "20g+", label: "Protein" },
 ];
 
 const textBlockVariants = {
@@ -143,12 +151,12 @@ const HeroSection = memo(() => {
       </div>
 
       <motion.div
-        className="pointer-events-none container relative mx-auto flex min-h-[500px] items-center px-4 py-16 md:min-h-[580px] md:px-8 md:py-20"
+        className="pointer-events-none container relative mx-auto flex min-h-[520px] items-center px-4 py-20 md:min-h-[600px] md:px-8 md:py-24"
         initial={{ opacity: 0, y: 22 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="pointer-events-auto max-w-xl">
+        <div className="pointer-events-auto max-w-2xl">
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
@@ -158,52 +166,92 @@ const HeroSection = memo(() => {
               exit="exit"
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             >
-              <span className="mb-3 inline-block rounded-full bg-white/18 px-4 py-1.5 font-body text-xs font-semibold uppercase tracking-wider text-accent backdrop-blur-sm ring-1 ring-white/25">
+              <span className="glass-panel mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-body text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+                </span>
                 {slide.badge}
               </span>
-              <h1 className="mb-3 font-display text-4xl font-extrabold leading-[1.12] tracking-tight text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)] md:text-5xl lg:text-6xl">
+              <h1 className="mb-4 font-display text-4xl font-extrabold leading-[1.08] tracking-[-0.035em] text-white drop-shadow-[0_2px_28px_rgba(0,0,0,0.45)] md:text-5xl lg:text-6xl">
                 {slide.title}{" "}
-                <span className="text-accent drop-shadow-sm">{slide.highlight}</span>
+                <span className="text-gradient-warm drop-shadow-sm">{slide.highlight}</span>
               </h1>
-              <p className="mb-7 max-w-md font-body text-base leading-relaxed text-white/90 md:text-lg md:leading-relaxed">
+              <p className="mb-8 max-w-md font-body text-base leading-relaxed text-white/90 [text-shadow:0_1px_12px_rgba(0,0,0,0.4)] md:text-lg">
                 {slide.description}
               </p>
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <Button
-                  size="lg"
-                  className="rounded-full px-8 font-semibold shadow-lg shadow-black/20"
+                  size="xl"
+                  className="group rounded-full bg-gradient-to-b from-accent via-primary to-primary px-8 font-semibold text-white shadow-[0_12px_32px_-10px_hsl(var(--primary)/0.75)] ring-1 ring-inset ring-white/35 hover:from-accent hover:to-primary/90 hover:shadow-[0_18px_44px_-10px_hsl(var(--primary)/0.85)]"
                   asChild
                 >
-                  <Link to={slide.ctaLink}>{slide.cta}</Link>
+                  <Link to={slide.ctaLink}>
+                    {slide.cta}
+                    <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-smooth group-hover:translate-x-0.5" />
+                  </Link>
                 </Button>
                 <Button
-                  size="lg"
+                  size="xl"
                   variant="outline"
-                  className="rounded-full border-2 border-white/50 bg-transparent px-8 font-semibold text-white shadow-none ring-0 backdrop-blur-md transition-all duration-300 ease-in-out hover:!scale-[1.02] hover:!border-white/70 hover:!bg-white hover:!text-foreground hover:!shadow-xl"
+                  className="group rounded-full border-2 border-white/50 bg-white/5 px-8 font-semibold text-white shadow-none ring-1 ring-inset ring-white/20 backdrop-blur-md hover:!scale-[1.02] hover:!border-white/70 hover:!bg-white hover:!text-foreground hover:!shadow-xl"
                   asChild
                 >
-                  <Link to={slide.secondaryLink}>{slide.secondaryCta}</Link>
+                  <Link to={slide.secondaryLink}>
+                    {slide.secondaryCta}
+                    <Compass className="h-4 w-4 transition-transform duration-300 ease-smooth group-hover:rotate-12" />
+                  </Link>
                 </Button>
+              </div>
+
+              {/* Trust strip — reinforces the brand without changing layout */}
+              <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-2.5">
+                {heroStats.map((s) => (
+                  <div key={s.label} className="flex items-baseline gap-1.5">
+                    <span className="font-display text-lg font-extrabold text-white [text-shadow:0_2px_10px_rgba(0,0,0,0.5)]">
+                      {s.value}
+                    </span>
+                    <span className="font-body text-[11px] font-semibold uppercase tracking-[0.14em] text-white/65">
+                      {s.label}
+                    </span>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
       </motion.div>
 
-      <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+      <div className="glass-panel absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-full px-2.5 py-2">
         {slides.map((_, i) => (
           <button
             key={i}
             type="button"
             onClick={() => handleDot(i)}
-            className={`h-2 rounded-full transition-all duration-500 ease-out ${
-              i === current ? "w-8 bg-white shadow-sm shadow-white/30" : "w-2 bg-white/35 hover:bg-white/55"
+            className={`h-1.5 rounded-full transition-all duration-500 ease-smooth ${
+              i === current
+                ? "w-9 bg-gradient-to-r from-accent to-primary shadow-sm shadow-accent/40"
+                : "w-1.5 bg-white/45 hover:scale-y-150 hover:bg-white/70"
             }`}
             aria-label={`Go to slide ${i + 1}`}
             aria-current={i === current}
           />
         ))}
       </div>
+
+      {/* Slide progress bar — fills across the autoplay interval */}
+      {autoplayOn && (
+        <div
+          key={`progress-${current}`}
+          className="absolute bottom-0 left-0 z-20 h-[3px] bg-gradient-to-r from-accent via-primary to-secondary shadow-[0_0_12px_hsl(var(--primary)/0.5)]"
+          style={{
+            width: "100%",
+            transformOrigin: "left",
+            animation: `shrink-x ${AUTOPLAY_MS}ms linear forwards`,
+          }}
+          aria-hidden
+        />
+      )}
     </section>
   );
 });

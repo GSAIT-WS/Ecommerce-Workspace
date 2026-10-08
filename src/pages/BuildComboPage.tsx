@@ -141,7 +141,7 @@ const BuildComboPage = () => {
 
             {/* Combo Box */}
             <div className="lg:col-span-1">
-              <div className="sticky top-20 rounded-xl border border-border bg-card p-4 shadow-sm">
+              <div className="surface-card sticky top-32 p-4 shadow-card-elevated">
                 <div className="mb-3 flex items-center gap-2">
                   <Package className="h-5 w-5 text-primary" />
                   <h3 className="font-display text-lg font-bold text-foreground">Your Combo</h3>
