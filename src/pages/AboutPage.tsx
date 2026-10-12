@@ -21,8 +21,7 @@ const AboutPage = () => {
           {/* Hero */}
           <section className="text-center">
             <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
-              About <span className="text-primary">CRUNCH</span>
-              <span className="text-secondary">X</span>
+              About <span className="text-primary">PURVITA</span>
             </h1>
             <p className="mt-4 font-body text-lg text-muted-foreground">
               Fueling India with wholesome, crunchy goodness — one bar at a time.
@@ -36,10 +35,10 @@ const AboutPage = () => {
             </h2>
             <div className="space-y-4 font-body text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                CrunchX was born out of a simple frustration — finding healthy snacks in India that actually taste great. In 2023, our founders, a group of fitness enthusiasts from Bangalore, set out to create protein bars and multigrain snacks using locally-sourced millets, nuts, and superfoods.
+                PURVITA was born out of a simple frustration — finding healthy snacks in India that actually taste great. In 2023, our founders, a group of fitness enthusiasts from Bangalore, set out to create protein bars and multigrain snacks using locally-sourced millets, nuts, and superfoods.
               </p>
               <p>
-                What started as a weekend kitchen experiment quickly grew into a movement. Today, CrunchX serves thousands of health-conscious snackers across India — from gym-goers and office warriors to school kids and busy parents.
+                What started as a weekend kitchen experiment quickly grew into a movement. Today, PURVITA serves thousands of health-conscious snackers across India — from gym-goers and office warriors to school kids and busy parents.
               </p>
               <p>
                 Every product is crafted with care — no refined sugar, no artificial preservatives, just clean ingredients backed by traditional Indian wisdom and modern nutrition science.
@@ -94,7 +93,7 @@ const AboutPage = () => {
               🎉 Over 1,00,000 bars sold across India!
             </p>
             <p className="mt-2 font-body text-sm text-muted-foreground">
-              Thank you for being part of the CrunchX family.
+              Thank you for being part of the PURVITA family.
             </p>
           </section>
         </div>

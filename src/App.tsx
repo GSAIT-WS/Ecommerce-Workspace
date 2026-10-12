@@ -1,9 +1,11 @@
+import { MotionConfig } from "framer-motion";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
+import PageTransition from "./components/PageTransition";
 import { CartProvider } from "./context/CartContext";
 import { AuthProvider } from "./context/AuthContext";
 import { AddressProvider } from "./context/AddressContext";
@@ -50,6 +52,9 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+        {/* reducedMotion="user" makes every framer-motion animation in the app
+            respect the OS "reduce motion" setting, not just the CSS ones. */}
+        <MotionConfig reducedMotion="user">
         <AuthProvider>
           <AddressProvider>
           <CartProvider>
@@ -60,6 +65,7 @@ const App = () => (
             <ProductRealtimeSync />
             {/* Global one-time address prompt shown after login when user has no addresses */}
             <PostLoginAddressPrompt />
+            <PageTransition>
             <Routes>
               {/* Public routes — accessible to everyone, authenticated or not */}
               <Route path="/" element={<Index />} />
@@ -106,10 +112,12 @@ const App = () => (
               {/* Catch-all */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </PageTransition>
           </BrowserRouter>
           </CartProvider>
           </AddressProvider>
         </AuthProvider>
+        </MotionConfig>
     </TooltipProvider>
   </QueryClientProvider>
 );

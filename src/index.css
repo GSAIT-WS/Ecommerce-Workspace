@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    /* CRUNCHX — premium organic palette (#C89B3C gold, #D4A017 amber, olives & warm neutrals) */
+    /* PURVITA — premium organic palette (#C89B3C gold, #D4A017 amber, olives & warm neutrals) */
     --background: 28 56% 96%; /* Soft Cream #FFF3E9 */
     --foreground: 25 32% 20%; /* Rich Brown #5A3E2B — readable on cream */
 
@@ -119,6 +119,13 @@
 @layer base {
   * {
     @apply border-border;
+  }
+
+  /** Smooth programmatic/anchor scrolling — never affects wheel or trackpad */
+  html {
+    scroll-behavior: smooth;
+    /* Clears the sticky navbar + announcement strip for anchor targets */
+    scroll-padding-top: 6.5rem;
   }
 
   body {
@@ -278,6 +285,13 @@
       0 4px 12px -6px hsl(0 0% 0% / 0.5);
   }
 
+  /* Marquee (customer reviews) — compositor-only transform, pauses on hover/focus.
+     Duration is the Tailwind `animate-marquee` token; this only adds play-state. */
+  .marquee-track:hover,
+  .marquee-track:focus-within {
+    animation-play-state: paused;
+  }
+
   /** Frosted panel for chips / bars over imagery */
   .glass-panel {
     @apply border border-white/25 bg-white/10 backdrop-blur-md;
@@ -295,7 +309,11 @@
 
   .link-underline::after {
     content: "";
-    @apply pointer-events-none absolute -bottom-0.5 left-0 h-[1.5px] w-full origin-left scale-x-0 rounded-full bg-gradient-to-r from-primary to-accent transition-transform duration-300 ease-smooth;
+    /* Grows from the centre so the rule appears to settle under the word
+       instead of sweeping in from the left. Duration is written longhand —
+       `duration-[340ms]` is ambiguous inside @apply (transition vs animation). */
+    @apply pointer-events-none absolute -bottom-0.5 left-0 h-[1.5px] w-full origin-center scale-x-0 rounded-full bg-gradient-to-r from-primary to-accent;
+    transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .link-underline:hover::after,
@@ -471,6 +489,17 @@
   }
 }
 
+/**
+ * The fixed radial-gradient wash repaints the whole viewport every scroll
+ * frame, which is a real jank source on low-end mobile. Static below 768px —
+ * visually near-identical, meaningfully smoother.
+ */
+@media (max-width: 767px) {
+  body {
+    background-attachment: scroll;
+  }
+}
+
 /** Hero carousel autoplay progress bar */
 @keyframes shrink-x {
   from {
@@ -490,5 +519,23 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Kill the marquee outright — a 0.01ms duration would snap it to the
+     loop end-point and leave the strip parked mid-offset. */
+  .marquee-track {
+    animation: none !important;
+  }
+}
+
+/**
+ * The scroll rubber band in `hooks/useScrollRubberBand` writes its transform
+ * inline from a rAF loop, so CSS can't disable it — the hook itself checks this
+ * query and never attaches. These two rules are the belt-and-braces backstop for
+ * the short window before hydration, and for any stray inline transform.
+ */
+@media (prefers-reduced-motion: reduce) {
+  #scroll-rubber-band {
+    transform: none !important;
   }
 }

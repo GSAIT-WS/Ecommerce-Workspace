@@ -70,7 +70,7 @@ export function AddressProvider({ children }: { children: ReactNode }) {
       }
     } else {
       // ── Guest: load from localStorage ─────────────────────────────────────
-      console.log("[CrunchX] AddressContext: loading guest addresses from localStorage");
+      console.log("[PURVITA] AddressContext: loading guest addresses from localStorage");
       const guestAddrs = loadGuestAddresses();
       setAddresses(guestAddrs);
       autoSelect(guestAddrs);

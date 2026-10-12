@@ -68,7 +68,7 @@ export async function apiCall<T = unknown>(
   // Guard: don't attempt a fetch if the Supabase URL is not configured
   if (!FUNCTIONS_BASE) {
     console.warn(
-      `[CrunchX API] VITE_SUPABASE_URL is not set — skipping request to ${path}`
+      `[PURVITA API] VITE_SUPABASE_URL is not set — skipping request to ${path}`
     );
     return {
       error: "Service is not configured. Please contact support.",
@@ -80,7 +80,7 @@ export async function apiCall<T = unknown>(
 
   // Debug log — shows URL and whether a bearer token is attached
   console.log(
-    `[CrunchX API] ${method} ${url} | authenticated: ${token ? "yes" : "no"}`
+    `[PURVITA API] ${method} ${url} | authenticated: ${token ? "yes" : "no"}`
   );
 
   const headers: Record<string, string> = {
@@ -101,7 +101,7 @@ export async function apiCall<T = unknown>(
 
     if (!res.ok) {
       const errMsg = extractHttpErrorMessage(json, res.statusText || "Request failed");
-      console.warn(`[CrunchX API] ${method} ${path} → ${res.status}:`, errMsg);
+      console.warn(`[PURVITA API] ${method} ${path} → ${res.status}:`, errMsg);
       return { error: friendlyError(errMsg), status: res.status };
     }
 
@@ -116,7 +116,7 @@ export async function apiCall<T = unknown>(
     return { data: json as T, status: res.status };
   } catch (e) {
     const raw = e instanceof Error ? e.message : "Unknown network error";
-    console.error(`[CrunchX API] Network error for ${method} ${path}:`, raw);
+    console.error(`[PURVITA API] Network error for ${method} ${path}:`, raw);
     return { error: friendlyError(raw), status: 0 };
   }
 }

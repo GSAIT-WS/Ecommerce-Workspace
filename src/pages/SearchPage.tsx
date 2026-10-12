@@ -45,7 +45,7 @@ const SearchPage = () => {
   const { data: productsData, isLoading, error } = useProducts({
     category_slug: categoryParam || undefined,
     search: query || undefined,
-    limit: 200,
+    limit: 100,
   });
   const apiProducts = productsData?.items ?? [];
 

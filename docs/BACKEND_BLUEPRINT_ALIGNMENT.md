@@ -1,6 +1,6 @@
-# CrunchX Backend — Blueprint Alignment
+# PURVITA Backend — Blueprint Alignment
 
-This document aligns the **CrunchX Architecture Blueprint** (Lovable, March 2026) with the current implementation and notes corrections or adaptations.
+This document aligns the **PURVITA Architecture Blueprint** (Lovable, March 2026) with the current implementation and notes corrections or adaptations.
 
 ## Implementation Stack vs Blueprint
 

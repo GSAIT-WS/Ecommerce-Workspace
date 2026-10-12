@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { Search, ShoppingCart, User, Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SearchOverlay from "@/components/SearchOverlay";
@@ -7,6 +8,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import DeliveryLocationChip from "@/components/address/DeliveryLocationChip";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { EASE } from "@/lib/motion";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -20,11 +22,31 @@ const navLinks = [
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { items: cartItems } = useCart();
   const { user, logout } = useAuth();
   const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+
+  /** Header gains a little depth once the page has moved — toggles a boolean
+      rather than a scroll value, so it never re-renders mid-scroll. */
+  useEffect(() => {
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 8);
+        frame = 0;
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -35,7 +57,13 @@ const Navbar = () => {
     <>
       <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      <header className="group/nav sticky top-0 z-50 border-b border-border/60 bg-background/90 shadow-[0_1px_0_0_hsl(var(--primary)/0.06),0_8px_24px_-18px_hsl(var(--foreground)/0.35)] backdrop-blur-xl transition-all duration-300 ease-smooth supports-[backdrop-filter]:bg-background/75">
+      <header
+        className={`group/nav sticky top-0 z-50 border-b backdrop-blur-xl transition-[box-shadow,background-color,border-color] duration-300 ease-smooth ${
+          scrolled
+            ? "border-border bg-background/80 shadow-[0_1px_0_0_hsl(var(--primary)/0.08),0_12px_28px_-20px_hsl(var(--foreground)/0.5)] supports-[backdrop-filter]:bg-background/70"
+            : "border-border/60 bg-background/90 shadow-[0_1px_0_0_hsl(var(--primary)/0.06),0_8px_24px_-18px_hsl(var(--foreground)/0.35)] supports-[backdrop-filter]:bg-background/75"
+        }`}
+      >
         <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-8">
 
           {/* Left: Logo + Delivery chip (desktop) */}
@@ -48,9 +76,9 @@ const Navbar = () => {
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-sm font-black text-primary-foreground shadow-md shadow-primary/30 ring-1 ring-inset ring-white/30 transition-transform duration-300 ease-smooth group-hover:scale-105 group-hover:-rotate-3"
                 aria-hidden
               >
-                CX
+              PV
               </span>
-              CRUNCH<span className="text-secondary">X</span>
+              PURVITA
             </Link>
 
             {/* Delivery location chip — only on desktop */}
@@ -176,8 +204,21 @@ const Navbar = () => {
       </div>
 
         {/* ── Mobile Drawer ── */}
-        {mobileOpen && (
-          <nav className="animate-fade-in border-t border-border/70 bg-background/95 px-4 py-4 backdrop-blur-xl md:hidden">
+        {/* Height + opacity so it eases open and closes again, instead of
+            popping into place with a bare fade. */}
+        <AnimatePresence initial={false}>
+          {mobileOpen && (
+          <motion.nav
+            key="mobile-drawer"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.26, ease: EASE.smooth }}
+            style={{ overflow: "hidden" }}
+            /* `will-change` only while open — a permanent hint on a full-width
+               sticky header costs memory for nothing. */
+            className="border-t border-border/70 bg-background/95 px-4 py-4 backdrop-blur-xl md:hidden"
+          >
 
             {/* Delivery chip in mobile menu */}
             {user && (
@@ -237,8 +278,9 @@ const Navbar = () => {
                 </Link>
               )}
             </div>
-          </nav>
-        )}
+          </motion.nav>
+          )}
+        </AnimatePresence>
       </header>
     </>
   );

@@ -1,7 +1,7 @@
 /**
  * IMS (Inventory Management System) HTTP client.
  *
- * CrunchX communicates with the external IMS via HTTP API for:
+ * PURVITA communicates with the external IMS via HTTP API for:
  * - Inventory reservation (on order placement)
  * - Inventory release (on order cancellation or payment failure)
  *
@@ -53,7 +53,7 @@ function buildHeaders(): Record<string, string> {
 
 /**
  * Reserve inventory in IMS for an order.
- * Call this BEFORE creating the order in CrunchX.
+ * Call this BEFORE creating the order in PURVITA.
  * If this fails, do NOT create the order.
  */
 export async function reserveInventory(

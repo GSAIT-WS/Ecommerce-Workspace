@@ -91,6 +91,9 @@ export default {
       },
       transitionDuration: {
         DEFAULT: "300ms",
+        /** Shared rhythm for Radix overlays (dialog, sheet, popover, select).
+            Also used as the animation duration by tailwindcss-animate. */
+        overlay: "220ms",
       },
       transitionTimingFunction: {
         smooth: "cubic-bezier(0.22, 1, 0.36, 1)",
@@ -207,6 +210,8 @@ export default {
         "underline-grow": "underline-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "badge-pop": "badge-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1)",
         drift: "drift 7s ease-in-out infinite",
+        /** Seamless loop for the customer-reviews strip.
+            42s ≈ 70px/s on the current 8-card width — slow enough to read. */
         marquee: "marquee 42s linear infinite",
         "reveal-up": "reveal-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards",
       },

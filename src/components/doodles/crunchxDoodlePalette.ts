@@ -1,5 +1,5 @@
 /**
- * CrunchX packaging-inspired stroke colors (line-art only).
+ * PURVITA packaging-inspired stroke colors (line-art only).
  * Final visibility comes from the layer opacity (~6–7%), not these alone.
  */
 export const crunchxDoodlePalette = {

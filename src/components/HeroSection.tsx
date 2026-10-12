@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { EASE } from "@/lib/motion";
 import heroSlide1 from "@/assets/hero-slide-1.jpg";
 import heroSlide2 from "@/assets/hero-slide-2.jpg";
 import heroSlide3 from "@/assets/hero-slide-3.jpg";
@@ -14,7 +15,7 @@ const AUTOPLAY_MS = 9000;
 /** Slide track: horizontal pan (same ease & direction); slower “slow motion” */
 const SLIDE_TRANSITION = {
   duration: 2.45,
-  ease: [0.16, 1, 0.3, 1] as const,
+  ease: EASE.smooth,
 };
 
 const slides = [
@@ -140,7 +141,7 @@ const HeroSection = memo(() => {
                         scale: 1.04,
                         transition: { duration: AUTOPLAY_MS / 1000, ease: "linear" },
                       }
-                    : { scale: 1, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+                    : { scale: 1, transition: { duration: 0.7, ease: EASE.smooth } }
                 }
               />
             </div>
@@ -154,7 +155,7 @@ const HeroSection = memo(() => {
         className="pointer-events-none container relative mx-auto flex min-h-[520px] items-center px-4 py-20 md:min-h-[600px] md:px-8 md:py-24"
         initial={{ opacity: 0, y: 22 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.65, ease: EASE.smooth }}
       >
         <div className="pointer-events-auto max-w-2xl">
           <AnimatePresence mode="wait">
@@ -164,7 +165,7 @@ const HeroSection = memo(() => {
               initial="initial"
               animate="animate"
               exit="exit"
-              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.55, ease: EASE.smooth }}
             >
               <span className="glass-panel mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 font-body text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
                 <span className="relative flex h-1.5 w-1.5">

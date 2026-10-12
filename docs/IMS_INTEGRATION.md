@@ -1,6 +1,6 @@
-# CrunchX ↔ IMS Integration
+# PURVITA ↔ IMS Integration
 
-This document describes the integration between the **CrunchX** e-commerce backend and the external **IMS (Inventory Management System)**.
+This document describes the integration between the **PURVITA** e-commerce backend and the external **IMS (Inventory Management System)**.
 
 ---
 
@@ -8,10 +8,10 @@ This document describes the integration between the **CrunchX** e-commerce backe
 
 | System | Responsibility |
 |--------|----------------|
-| **CrunchX** | Users, cart, addresses, orders, payments, checkout |
+| **PURVITA** | Users, cart, addresses, orders, payments, checkout |
 | **IMS** | SKU stock levels, inventory reservation, inventory release on cancellations |
 
-CrunchX communicates with IMS via **HTTP API calls**. There are no direct database connections between the two systems.
+PURVITA communicates with IMS via **HTTP API calls**. There are no direct database connections between the two systems.
 
 ---
 
@@ -38,7 +38,7 @@ When the `place-order` Edge Function is called:
    }
    ```
 
-3. **If IMS succeeds** — Create order in CrunchX DB via `place_order` RPC, status `pending_payment`
+3. **If IMS succeeds** — Create order in PURVITA DB via `place_order` RPC, status `pending_payment`
 4. **If IMS fails** — Reject order, return error: *"Inventory reservation failed. Please try again."*
 
 ### 3. Payment Success
@@ -59,7 +59,7 @@ When the payment webhook receives a failure event:
 
 When a user cancels an order (or admin cancels):
 
-- Update order status to `cancelled` in CrunchX
+- Update order status to `cancelled` in PURVITA
 - Call IMS release API:
 
   ```json
@@ -73,7 +73,7 @@ When a user cancels an order (or admin cancels):
 
 ---
 
-## Database Schema (CrunchX)
+## Database Schema (PURVITA)
 
 ### `ecommerce.orders`
 

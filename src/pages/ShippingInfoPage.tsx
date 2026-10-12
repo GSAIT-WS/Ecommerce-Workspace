@@ -86,7 +86,7 @@ const ShippingInfoPage = () => {
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">Delivery Issues</h3>
                 <p>
-                  If your delivery is delayed, contact our support team at support@crunchx.in with your order ID.
+                  If your delivery is delayed, contact our support team at support@purvita.in with your order ID.
                 </p>
               </div>
             </div>

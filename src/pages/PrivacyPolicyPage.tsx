@@ -33,7 +33,7 @@ const PrivacyPolicyPage = () => {
             </h2>
             <div className="space-y-4 font-body text-sm leading-relaxed text-muted-foreground md:text-base">
               <p>
-                At CrunchX, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information.
+                At PURVITA, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information.
               </p>
 
               <div>
@@ -67,7 +67,7 @@ const PrivacyPolicyPage = () => {
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">Your Rights</h3>
                 <p>
-                  You have the right to access, update, or delete your personal information. Contact us at privacy@crunchx.in for requests.
+                  You have the right to access, update, or delete your personal information. Contact us at privacy@purvita.in for requests.
                 </p>
               </div>
 

@@ -32,7 +32,7 @@ const TermsOfServicePage = () => {
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">1. Acceptance of Terms</h3>
                 <p>
-                  By accessing and using CrunchX, you agree to be bound by these Terms of Service. If you do not agree, you may not use our services.
+                  By accessing and using PURVITA, you agree to be bound by these Terms of Service. If you do not agree, you may not use our services.
                 </p>
               </div>
 
@@ -53,21 +53,21 @@ const TermsOfServicePage = () => {
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">4. Intellectual Property</h3>
                 <p>
-                  All content on this platform, including text, graphics, logos, and images, is the property of CrunchX and protected by law.
+                  All content on this platform, including text, graphics, logos, and images, is the property of PURVITA and protected by law.
                 </p>
               </div>
 
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">5. Limitation of Liability</h3>
                 <p>
-                  CrunchX is not liable for any indirect, incidental, or consequential damages arising from the use of our products or services.
+                  PURVITA is not liable for any indirect, incidental, or consequential damages arising from the use of our products or services.
                 </p>
               </div>
 
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">6. Contact</h3>
                 <p>
-                  For questions about these terms, please contact us at legal@crunchx.in
+                  For questions about these terms, please contact us at legal@purvita.in
                 </p>
               </div>
             </div>

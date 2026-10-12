@@ -1,5 +1,6 @@
 import ProductCard from "./ProductCard";
 import { useProducts } from "@/hooks/useProducts";
+import Reveal from "@/components/motion/Reveal";
 
 const FeaturedProducts = () => {
   const { data, isLoading, error } = useProducts({ limit: 6 });
@@ -13,13 +14,15 @@ const FeaturedProducts = () => {
         aria-hidden
       />
       <div className="container relative mx-auto px-4 md:px-8">
-        <div className="section-heading mb-9 md:mb-12">
-          <span className="eyebrow eyebrow-centered mb-3">Loved by thousands</span>
-          <h2 className="section-title">Best <span className="text-gradient">Sellers</span></h2>
-          <p className="section-subtitle">
-            Our most loved products, straight from the farm
-          </p>
-        </div>
+        <Reveal distance={14} amount={0.2}>
+          <div className="section-heading mb-9 md:mb-12">
+            <span className="eyebrow eyebrow-centered mb-3">Loved by thousands</span>
+            <h2 className="section-title">Best <span className="text-gradient">Sellers</span></h2>
+            <p className="section-subtitle">
+              Our most loved products, straight from the farm
+            </p>
+          </div>
+        </Reveal>
         {isLoading ? (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -29,11 +32,15 @@ const FeaturedProducts = () => {
         ) : error ? (
           <p className="text-center font-body text-muted-foreground">Unable to load products. Please try again later.</p>
         ) : products.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </div>
+          /* Whole grid is one reveal unit — a per-card wrapper <div> would become
+             the grid item and break the cards' equal-height stretching. */
+          <Reveal distance={14} amount={0.1}>
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+              {products.map((product) => (
+                <ProductCard key={product.id} {...product} />
+              ))}
+            </div>
+          </Reveal>
         ) : (
           <p className="text-center font-body text-muted-foreground">No products yet. Check back soon!</p>
         )}

@@ -40,7 +40,7 @@ const TermsPage = () => {
             <section>
               <h2 className="mb-2 font-semibold">1. Acceptance of Terms</h2>
               <p className="text-sm text-muted-foreground">
-                By accessing and using CRUNCHX, you agree to be bound by these
+                By accessing and using PURVITA, you agree to be bound by these
                 Terms and Conditions. If you do not agree with any part of these
                 terms, you may not use our services.
               </p>
@@ -89,7 +89,7 @@ const TermsPage = () => {
               <h2 className="mb-2 font-semibold">6. Intellectual Property</h2>
               <p className="text-sm text-muted-foreground">
                 All content on this platform, including text, graphics, logos,
-                and images, is the property of CRUNCHX and protected by
+                and images, is the property of PURVITA and protected by
                 intellectual property laws.
               </p>
             </section>
@@ -97,7 +97,7 @@ const TermsPage = () => {
             <section>
               <h2 className="mb-2 font-semibold">7. Limitation of Liability</h2>
               <p className="text-sm text-muted-foreground">
-                CRUNCHX shall not be liable for any indirect, incidental, or
+                PURVITA shall not be liable for any indirect, incidental, or
                 consequential damages arising from the use of our products or
                 services.
               </p>
@@ -107,7 +107,7 @@ const TermsPage = () => {
               <h2 className="mb-2 font-semibold">8. Contact</h2>
               <p className="text-sm text-muted-foreground">
                 For questions about these Terms, please contact us at
-                legal@crunchx.in
+                legal@purvita.in
               </p>
             </section>
           </div>

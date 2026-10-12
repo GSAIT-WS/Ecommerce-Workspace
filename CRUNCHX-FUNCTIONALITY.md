@@ -1,4 +1,4 @@
-# CRUNCHX – Healthy Snacking E-Commerce Webapp
+# PURVITA – Healthy Snacking E-Commerce Webapp
 
 ## Functionality Overview
 
@@ -139,4 +139,4 @@
 
 ## Summary
 
-CRUNCHX is a full-featured e-commerce webapp for healthy snacks with product catalog, cart, checkout, payments, order management, address management, and user profiles, powered by Supabase and Stripe.
+PURVITA is a full-featured e-commerce webapp for healthy snacks with product catalog, cart, checkout, payments, order management, address management, and user profiles, powered by Supabase and Stripe.

@@ -70,7 +70,7 @@ const BuildComboPage = () => {
       <main className="container mx-auto px-4 py-6 md:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-5xl">
           <h1 className="mb-2 text-center font-display text-2xl font-bold text-foreground md:text-3xl">
-            Build Your Own CrunchX Combo
+            Build Your Own PURVITA Combo
           </h1>
           <p className="mb-8 text-center text-sm text-muted-foreground">
             Pick your favorites and unlock combo discounts

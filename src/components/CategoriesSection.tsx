@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Dumbbell, Wheat, Heart, Package } from "lucide-react";
+import Reveal from "@/components/motion/Reveal";
+import { EASE, viewportOnce } from "@/lib/motion";
 
 const MotionLink = motion.create(Link);
 
@@ -48,26 +50,28 @@ const CategoriesSection = () => (
       aria-hidden
     />
     <div className="container relative mx-auto px-4 md:px-8">
-      <div className="section-heading mb-9 md:mb-11">
-        <span className="eyebrow eyebrow-centered mb-3">Browse</span>
-        <h2 className="section-title">
-          Shop by <span className="text-gradient">Category</span>
-        </h2>
-        <p className="section-subtitle">Find exactly what fuels your lifestyle</p>
-      </div>
+      <Reveal distance={14} amount={0.2}>
+        <div className="section-heading mb-9 md:mb-11">
+          <span className="eyebrow eyebrow-centered mb-3">Browse</span>
+          <h2 className="section-title">
+            Shop by <span className="text-gradient">Category</span>
+          </h2>
+          <p className="section-subtitle">Find exactly what fuels your lifestyle</p>
+        </div>
+      </Reveal>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
         {categories.map((cat, i) => (
           <MotionLink
             key={cat.name}
             to={`/search?category=${cat.slug}`}
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ delay: i * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            viewport={viewportOnce(0.3)}
+            transition={{ delay: i * 0.06, duration: 0.55, ease: EASE.smooth }}
             whileHover={{
               scale: 1.02,
               y: -4,
-              transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
+              transition: { duration: 0.3, ease: EASE.smooth },
             }}
             whileTap={{ scale: 0.98 }}
             className="card-interactive group relative flex flex-col items-center gap-3 overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-primary/[0.04] p-6 shadow-card ring-1 ring-black/[0.04] hover:shadow-card-elevated-hover dark:from-card dark:via-card dark:to-secondary/[0.06] dark:ring-white/[0.06] md:gap-4 md:p-8"

@@ -54,13 +54,13 @@ const AboutPage = () => {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-xl font-bold">About CRUNCHX</h1>
+            <h1 className="text-xl font-bold">About PURVITA</h1>
           </div>
 
           {/* Hero */}
           <div className="mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-transparent p-8 text-center">
             <h2 className="text-3xl font-bold text-foreground">
-              CRUNCH<span className="text-secondary">X</span>
+              PURVITA
             </h2>
             <p className="mt-2 text-lg text-muted-foreground">
               Healthy Snacking, Redefined
@@ -71,7 +71,7 @@ const AboutPage = () => {
           <div className="mb-8 rounded-xl bg-card p-6 shadow-sm">
             <h3 className="mb-3 text-lg font-semibold">Our Story</h3>
             <p className="text-muted-foreground">
-              CRUNCHX was born from a simple idea: healthy snacking shouldn't
+              PURVITA was born from a simple idea: healthy snacking shouldn't
               mean compromising on taste. Founded in 2024 by a team of health
               enthusiasts and food scientists, we set out to create snacks that
               are both nutritious and delicious.
@@ -124,7 +124,7 @@ const AboutPage = () => {
           <div className="rounded-xl bg-card p-6 shadow-sm">
             <h3 className="mb-3 font-semibold">Get in Touch</h3>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>📧 hello@crunchx.in</p>
+              <p>📧 hello@purvita.in</p>
               <p>📞 1800-XXX-XXXX (Toll Free)</p>
               <p>📍 Bengaluru, Karnataka, India</p>
             </div>
