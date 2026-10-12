@@ -44,6 +44,8 @@ import ReturnsRefundsPage from "./pages/ReturnsRefundsPage";
 import BuildComboPage from "./pages/BuildComboPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 import PostLoginAddressPrompt from "./components/address/PostLoginAddressPrompt";
 import ProductRealtimeSync from "./components/ProductRealtimeSync";
 
@@ -86,6 +88,8 @@ const App = () => (
               {/* Auth routes — redirect to / when already logged in */}
               <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
               <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
+              <Route path="/admin-login" element={<AdminLoginPage />} />
+              <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
 
               {/* Protected routes — redirect to /login when not logged in */}
               <Route element={<ProtectedRoute />}>

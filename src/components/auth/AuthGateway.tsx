@@ -710,6 +710,19 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
             </Link>
           </motion.p>
 
+          {isLogin && (
+            <motion.div
+              className="mt-5"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.45 }}
+            >
+              <Button variant="outline" size="lg" className="w-full rounded-xl" asChild>
+                <Link to="/admin-login">Admin Login</Link>
+              </Button>
+            </motion.div>
+          )}
+
           {/* Return to homepage */}
           <motion.div
             className="mt-4 flex justify-center"
