@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, X, Plus, ChevronRight } from "lucide-react";
+import { MapPin, Plus, ChevronRight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -65,14 +65,6 @@ const PostLoginAddressPrompt = () => {
             >
               {/* Decorative header */}
               <div className="relative bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/20 px-6 pb-6 pt-8 text-center">
-                <button
-                  onClick={dismiss}
-                  className="absolute right-4 top-4 rounded-full p-1 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
-                  aria-label="Close"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-
                 <motion.div
                   initial={{ scale: 0.7, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
