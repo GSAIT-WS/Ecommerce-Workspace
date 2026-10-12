@@ -76,11 +76,11 @@ const HelpCenterPage = () => {
               className="h-auto flex-col gap-2 py-4"
               asChild
             >
-              <a href="mailto:hello@crunchx.in">
+              <a href="mailto:hello@purvita.in">
                 <Mail className="h-6 w-6 text-primary" />
                 <span>Email</span>
                 <span className="text-xs text-muted-foreground">
-                  hello@crunchx.in
+                  hello@purvita.in
                 </span>
               </a>
             </Button>

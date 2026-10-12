@@ -1,4 +1,7 @@
 import { Wheat, Dumbbell, Leaf, ShieldCheck } from "lucide-react";
+import Reveal from "@/components/motion/Reveal";
+import { staggerContainer, revealTile, viewportOnce } from "@/lib/motion";
+import { motion } from "framer-motion";
 
 const benefits = [
   {
@@ -40,17 +43,29 @@ const TrustSection = () => (
       aria-hidden
     />
     <div className="container relative mx-auto px-4 md:px-8">
-      <div className="section-heading mb-9 md:mb-12">
-        <span className="eyebrow eyebrow-centered mb-3">Why choose us</span>
-        <h2 className="section-title">
-          Why <span className="text-gradient">CRUNCHX?</span>
-        </h2>
-        <p className="section-subtitle">Quality you can trust, nutrition you can taste</p>
-      </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:gap-5">
+      <Reveal distance={14} amount={0.2}>
+        <div className="section-heading mb-9 md:mb-12">
+          <span className="eyebrow eyebrow-centered mb-3">Why choose us</span>
+          <h2 className="section-title">
+            Why <span className="text-gradient">PURVITA?</span>
+          </h2>
+          <p className="section-subtitle">Quality you can trust, nutrition you can taste</p>
+        </div>
+      </Reveal>
+
+      {/* Tiles are the grid items themselves — motion.div in place, no wrapper,
+          so equal-height stretching across a row is unchanged. */}
+      <motion.div
+        variants={staggerContainer(0.07)}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce(0.15)}
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:gap-5"
+      >
         {benefits.map((b) => (
-          <div
+          <motion.div
             key={b.title}
+            variants={revealTile}
             className="card-interactive group relative flex flex-col items-center overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-b from-card to-primary/[0.03] p-7 text-center shadow-card dark:to-secondary/[0.04]"
           >
             {/* Radial gold bloom revealed on hover */}
@@ -70,49 +85,51 @@ const TrustSection = () => (
               {b.title}
             </h3>
             <p className="font-body text-sm leading-relaxed text-muted-foreground">{b.desc}</p>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Social proof bar — rounded, glassy strip tying the four pillars together */}
-      <div className="surface-card mt-8 flex flex-col items-center justify-between gap-4 px-6 py-5 md:flex-row md:px-10">
-        <p className="font-body text-[15px] text-muted-foreground">
-          Trusted by families and athletes across India
-        </p>
-        <div className="flex items-center gap-6">
-          <div className="text-center">
-            <p className="font-display text-2xl font-extrabold tracking-tight text-primary text-glow-gold">
-              {TrustStat.value}
-            </p>
-            <p className="font-body text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              {TrustStat.label}
-            </p>
-          </div>
-          <span className="h-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" aria-hidden />
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-2" aria-hidden>
-              {["P", "R", "A"].map((initial) => (
-                <span
-                  key={initial}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-gradient-to-br from-primary/25 to-secondary/25 font-display text-[11px] font-bold text-primary"
-                >
-                  {initial}
-                </span>
-              ))}
+      <Reveal distance={12} amount={0.2} delay={0.06}>
+        <div className="surface-card mt-8 flex flex-col items-center justify-between gap-4 px-6 py-5 md:flex-row md:px-10">
+          <p className="font-body text-[15px] text-muted-foreground">
+            Trusted by families and athletes across India
+          </p>
+          <div className="flex items-center gap-6">
+            <div className="text-center">
+              <p className="font-display text-2xl font-extrabold tracking-tight text-primary text-glow-gold">
+                {TrustStat.value}
+              </p>
+              <p className="font-body text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {TrustStat.label}
+              </p>
             </div>
-            <div className="text-left">
-              <div className="flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-primary text-primary">
-                    <path d="M10 1.6l2.5 5.2 5.7.8-4.1 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4.1-4 5.7-.8L10 1.6z" />
-                  </svg>
+            <span className="h-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" aria-hidden />
+            <div className="flex items-center gap-2">
+              <div className="flex -space-x-2" aria-hidden>
+                {["P", "R", "A"].map((initial) => (
+                  <span
+                    key={initial}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-card bg-gradient-to-br from-primary/25 to-secondary/25 font-display text-[11px] font-bold text-primary"
+                  >
+                    {initial}
+                  </span>
                 ))}
               </div>
-              <p className="font-body text-[11px] text-muted-foreground">4.9 average rating</p>
+              <div className="text-left">
+                <div className="flex gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <svg key={i} viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-primary text-primary">
+                      <path d="M10 1.6l2.5 5.2 5.7.8-4.1 4 1 5.6-5.1-2.7-5.1 2.7 1-5.6-4.1-4 5.7-.8L10 1.6z" />
+                    </svg>
+                  ))}
+                </div>
+                <p className="font-body text-[11px] text-muted-foreground">4.9 average rating</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Reveal>
     </div>
   </section>
 );

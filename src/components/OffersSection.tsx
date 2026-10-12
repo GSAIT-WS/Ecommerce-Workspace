@@ -7,6 +7,8 @@ import offerSlide2 from "@/assets/offer-slide-2.jpg";
 import offerSlide3 from "@/assets/offer-slide-3.jpg";
 import offerSlide4 from "@/assets/offer-slide-4.jpg";
 import { FREE_SHIPPING_THRESHOLD } from "@/lib/shipping";
+import Reveal from "@/components/motion/Reveal";
+import { EASE, revealTile, staggerContainer, viewportOnce } from "@/lib/motion";
 
 // Offer slides — link to /search so CTAs always navigate correctly.
 // Replace with real offers from backend when available.
@@ -69,8 +71,8 @@ const slideMotion = {
 };
 
 /** Same horizontal slide direction & easing; slower “slow motion” on the image strip */
-const slideImageTransition = { duration: 1.45, ease: [0.22, 1, 0.36, 1] as const };
-const slideCopyTransition = { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const };
+const slideImageTransition = { duration: 1.45, ease: EASE.smooth };
+const slideCopyTransition = { duration: 0.55, ease: EASE.smooth };
 
 const OFFER_AUTOPLAY_MS = 7500;
 
@@ -109,17 +111,27 @@ const OffersSection = memo(() => {
   return (
     <section className="border-t border-border/50 bg-gradient-to-b from-[hsl(33_40%_93%)] to-[hsl(28_50%_96%)] py-12 shadow-[inset_0_1px_0_0_hsl(var(--border)/0.35)] dark:border-border/30 dark:from-muted/25 dark:to-background md:py-16">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="section-heading mb-9 md:mb-12">
-          <span className="eyebrow eyebrow-centered mb-3">Limited time</span>
-          <h2 className="section-title">
-            Offers &amp; <span className="text-gradient">Combos</span>
-          </h2>
-          <p className="section-subtitle">
-            Grab value packs and save more on your favourites
-          </p>
-        </div>
-        <div className="grid gap-5 md:grid-cols-2">
-          <div
+        <Reveal distance={14} amount={0.2}>
+          <div className="section-heading mb-9 md:mb-12">
+            <span className="eyebrow eyebrow-centered mb-3">Limited time</span>
+            <h2 className="section-title">
+              Offers &amp; <span className="text-gradient">Combos</span>
+            </h2>
+            <p className="section-subtitle">
+              Grab value packs and save more on your favourites
+            </p>
+          </div>
+        </Reveal>
+
+        <motion.div
+          variants={staggerContainer(0.08)}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce(0.12)}
+          className="grid gap-5 md:grid-cols-2"
+        >
+          <motion.div
+            variants={revealTile}
             className="group relative overflow-hidden rounded-2xl shadow-card ring-1 ring-border/40 transition-shadow duration-500 ease-smooth hover:shadow-card-elevated-hover md:col-span-2"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => {
@@ -204,11 +216,12 @@ const OffersSection = memo(() => {
                 />
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {miniOffers.map((offer, i) => (
-            <div
+            <motion.div
               key={i}
+              variants={revealTile}
               className={`card-interactive group relative flex items-center gap-5 overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br ${offer.cardTint} p-6 shadow-card md:p-7`}
             >
               {/* Sheen sweep across the tile on hover */}
@@ -230,9 +243,9 @@ const OffersSection = memo(() => {
                 </p>
               </div>
               <ArrowRight className="ml-auto h-5 w-5 shrink-0 text-muted-foreground opacity-0 transition-all duration-300 ease-smooth group-hover:translate-x-0.5 group-hover:text-primary group-hover:opacity-100" />
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

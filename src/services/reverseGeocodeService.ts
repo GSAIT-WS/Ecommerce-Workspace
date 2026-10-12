@@ -15,7 +15,7 @@ export interface GeocodedAddress {
 }
 
 const NOMINATIM_BASE = "https://nominatim.openstreetmap.org/reverse";
-const USER_AGENT = "CrunchX-Ecommerce/1.0 (Delivery Address Selection)";
+const USER_AGENT = "PURVITA-Ecommerce/1.0 (Delivery Address Selection)";
 
 let lastRequestTime = 0;
 const MIN_INTERVAL_MS = 1100; // Slightly over 1 req/sec for Nominatim policy

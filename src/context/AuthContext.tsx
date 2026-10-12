@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (isCustomer === false) {
           await supabase.auth.signOut();
           toast.error(
-            "Access denied. This account is inactive or not registered as a CrunchX customer."
+            "Access denied. This account is inactive or not registered as a PURVITA customer."
           );
         }
       } catch (err) {

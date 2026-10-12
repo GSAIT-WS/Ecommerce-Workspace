@@ -115,7 +115,7 @@ if (!url || (!serviceKey && !anonKey)) {
 }
 
 const cli = parseCliArgs(process.argv);
-const DEFAULT_TEST_EMAIL = "ecommerce-test@crunchx.in";
+const DEFAULT_TEST_EMAIL = "ecommerce-test@purvita.in";
 const TEST_EMAIL = (
   cli.email ||
   process.env.E2E_TEST_EMAIL ||

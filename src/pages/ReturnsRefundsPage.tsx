@@ -95,7 +95,7 @@ const ReturnsRefundsPage = () => {
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">Need Help?</h3>
                 <p>
-                  Contact our support team at support@crunchx.in for any return or refund queries.
+                  Contact our support team at support@purvita.in for any return or refund queries.
                 </p>
               </div>
             </div>

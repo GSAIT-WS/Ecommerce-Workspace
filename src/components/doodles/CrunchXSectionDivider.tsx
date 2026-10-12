@@ -1,4 +1,6 @@
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { EASE, viewportOnce } from "@/lib/motion";
 import { crunchxDoodlePalette as P } from "./crunchxDoodlePalette";
 import { CrunchXDoodleSprite, type DoodleSpriteName } from "./CrunchXDoodleSprites";
 import type { CrunchxDoodleColor } from "./crunchxDoodlePalette";
@@ -36,26 +38,33 @@ export function CrunchXSectionDivider({ className }: Props) {
       className={cn(
         "pointer-events-none select-none",
         "my-6 md:my-10",
-        "opacity-[0.1] dark:opacity-[0.072]",
         "px-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]",
         className,
       )}
     >
-      <svg
-        className="mx-auto h-12 w-full max-w-5xl md:h-14"
+      {/* The doodle band widens slightly and fades up as it scrolls in, so the
+          seam between two sections opens up rather than just existing. */}
+      <motion.svg
+        className="mx-auto h-12 w-full max-w-5xl origin-center md:h-14"
         viewBox="0 0 1480 56"
         preserveAspectRatio="xMidYMid meet"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        initial={{ opacity: 0, scaleX: 0.9 }}
+        whileInView={{ opacity: 1, scaleX: 1 }}
+        viewport={viewportOnce(0.3)}
+        transition={{ duration: 0.9, ease: EASE.smooth }}
       >
-        {DIVIDER_ROW.map((it, i) => (
-          <g key={`${it.name}-${i}`} transform={`translate(${it.x} 28) rotate(${it.r}) scale(${it.s})`}>
-            <g transform="translate(-16 -16)">
-              <CrunchXDoodleSprite name={it.name} color={it.c} w={1.25} />
+        <g className="opacity-[0.1] dark:opacity-[0.072]">
+          {DIVIDER_ROW.map((it, i) => (
+            <g key={`${it.name}-${i}`} transform={`translate(${it.x} 28) rotate(${it.r}) scale(${it.s})`}>
+              <g transform="translate(-16 -16)">
+                <CrunchXDoodleSprite name={it.name} color={it.c} w={1.25} />
+              </g>
             </g>
-          </g>
-        ))}
-      </svg>
+          ))}
+        </g>
+      </motion.svg>
     </div>
   );
 }

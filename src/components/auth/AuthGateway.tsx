@@ -137,7 +137,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
   };
 
   const finishSuccess = () => {
-    toast.success(isLogin ? "Welcome back!" : "Welcome to CrunchX!");
+    toast.success(isLogin ? "Welcome back!" : "Welcome to PURVITA!");
     navigate(from, { replace: true });
   };
 
@@ -232,7 +232,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
     if (guardError || isCustomer !== true) {
       await supabase.auth.signOut();
       toast.error(
-        "Access denied. This account is inactive or not registered as a CrunchX customer."
+        "Access denied. This account is inactive or not registered as a PURVITA customer."
       );
       return;
     }
@@ -250,7 +250,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
   };
 
   const stepSubtitle: Record<Step, string> = {
-    choose: isLogin ? "Sign in to your CrunchX account" : "Start your healthy snacking journey",
+    choose: isLogin ? "Sign in to your PURVITA account" : "Start your healthy snacking journey",
     email: isLogin ? "We'll send a sign-in code to your email" : "We'll send a code to verify your email",
     emailOtp: `We sent a 6-digit code to ${email || "your email"}`,
     phone: isLogin ? "We'll send a sign-in code via SMS" : "We'll send a code to verify your number",
@@ -305,7 +305,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
           {/* Logo */}
           <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
             <Link to="/" className="inline-block font-display text-3xl font-extrabold tracking-tight text-white drop-shadow">
-              CRUNCH<span className="text-amber-300">X</span>
+              PURVITA
             </Link>
           </motion.div>
 
@@ -367,7 +367,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
           {/* Mobile-only logo */}
           <div className="lg:hidden mb-8 text-center">
             <Link to="/" className="font-display text-3xl font-extrabold tracking-tight text-primary">
-              CRUNCH<span className="text-secondary">X</span>
+              PURVITA
             </Link>
           </div>
 
@@ -700,7 +700,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            {isLogin ? "New to CrunchX? " : "Already have an account? "}
+            {isLogin ? "New to PURVITA? " : "Already have an account? "}
             <Link
               to={alternateHref}
               state={location.state}

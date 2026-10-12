@@ -447,7 +447,7 @@ const ProfilePage = () => {
           <ProfileSection title="About & Legal">
             <ProfileMenuItem
               icon={Info}
-              label="About CRUNCHX"
+              label="About PURVITA"
               subtitle="Our story & mission"
               href="/profile/about"
             />

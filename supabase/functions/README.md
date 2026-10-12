@@ -1,4 +1,4 @@
-# CrunchX E-Commerce — Edge Functions & Service Layer
+# PURVITA E-Commerce — Edge Functions & Service Layer
 
 ## 1. System Vision
 
@@ -81,7 +81,7 @@ All address Edge Functions use **`createSupabaseServiceRoleClient().schema("ecom
 
 ## 2.5 IMS Integration
 
-CrunchX coordinates inventory with an external **IMS (Inventory Management System)** via HTTP:
+PURVITA coordinates inventory with an external **IMS (Inventory Management System)** via HTTP:
 
 - **place-order** — Calls IMS reserve API *before* creating the order. If IMS fails, no order is created.
 - **cancel-order** — Calls IMS release API after cancelling.

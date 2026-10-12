@@ -64,9 +64,9 @@ export function saveGuestAddress(address: ApiAddress): void {
       ...existing.filter((a) => a.id !== address.id),
     ].slice(0, 5);
     localStorage.setItem(GUEST_ADDRESSES_KEY, JSON.stringify(updated));
-    console.log("[CrunchX] Guest address saved to localStorage:", address.id);
+    console.log("[PURVITA] Guest address saved to localStorage:", address.id);
   } catch {
-    console.warn("[CrunchX] Could not save guest address to localStorage");
+    console.warn("[PURVITA] Could not save guest address to localStorage");
   }
 }
 
@@ -134,7 +134,7 @@ export async function addAddress(
     longitude: data.longitude ?? null,
   };
 
-  console.log("[CrunchX] addAddress: sending POST /add-address", {
+  console.log("[PURVITA] addAddress: sending POST /add-address", {
     recipient_name: body.recipient_name,
     city: body.city,
     postal_code: body.postal_code,
@@ -142,11 +142,11 @@ export async function addAddress(
 
   const result = await apiCall("/add-address", { method: "POST", body, token });
 
-  console.log("[CrunchX] addAddress: response →", { status: result.status, error: result.error, data: result.data });
+  console.log("[PURVITA] addAddress: response →", { status: result.status, error: result.error, data: result.data });
 
   if (result.error) {
     // API failed — fall back to localStorage so the UI keeps working
-    console.warn("[CrunchX] addAddress: API error, saving to localStorage as fallback:", result.error);
+    console.warn("[PURVITA] addAddress: API error, saving to localStorage as fallback:", result.error);
     const fallback: ApiAddress = {
       id: `local-${Date.now()}`,
       recipient_name: body.recipient_name as string,
@@ -168,7 +168,7 @@ export async function addAddress(
 
   const parsed = unwrapEdgeData<{ address_id: string }>(result.data);
   if (parsed.ok === false) {
-    console.warn("[CrunchX] addAddress: unexpected response shape", result.data);
+    console.warn("[PURVITA] addAddress: unexpected response shape", result.data);
     return { error: parsed.error };
   }
   const addressId = parsed.data.address_id;
@@ -254,7 +254,7 @@ export async function getMyAddresses(
 ): Promise<{ addresses?: ApiAddress[]; error?: string }> {
   // No auth token — return locally stored guest addresses without any API call
   if (!token) {
-    console.log("[CrunchX] getMyAddresses: no token — returning guest addresses from localStorage");
+    console.log("[PURVITA] getMyAddresses: no token — returning guest addresses from localStorage");
     return { addresses: loadGuestAddresses() };
   }
 

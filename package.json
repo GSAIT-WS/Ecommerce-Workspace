@@ -1,8 +1,8 @@
 {
-  "name": "crunchx",
+  "name": "purvita",
   "private": true,
   "type": "module",
-  "description": "CRUNCHX web app (Vite + React). Falls back to root when crunchx-healthy-home/ has no package.json.",
+  "description": "PURVITA e-commerce web app (Vite + React).",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

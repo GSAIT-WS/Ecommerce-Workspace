@@ -165,7 +165,7 @@ const AddressFormModal = ({
 
     const token = directToken ?? getAuthToken?.() ?? null;
 
-    console.log(`[CrunchX] AddressFormModal: submit | mode=${isEditMode ? "edit" : "add"} | authenticated=${token ? "yes" : "no"}`);
+    console.log(`[PURVITA] AddressFormModal: submit | mode=${isEditMode ? "edit" : "add"} | authenticated=${token ? "yes" : "no"}`);
 
     // ── Edit mode ────────────────────────────────────────────────────────────
     if (isEditMode && editAddress) {
