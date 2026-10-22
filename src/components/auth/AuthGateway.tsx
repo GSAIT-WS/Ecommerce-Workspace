@@ -718,7 +718,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
               transition={{ delay: 0.45 }}
             >
               <Button variant="outline" size="lg" className="w-full rounded-xl" asChild>
-                <Link to="/admin-login">Admin Login</Link>
+                <Link to="/admin-login">LOGIN AS ADMIN</Link>
               </Button>
             </motion.div>
           )}
