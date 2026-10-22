@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { useAddress } from "@/context/AddressContext";
+import { useLocation } from "react-router-dom";
 import AddressFormModal from "./AddressFormModal";
 
 const PROMPT_KEY = "crunchx_address_prompt_shown";
@@ -21,19 +22,22 @@ const PROMPT_KEY = "crunchx_address_prompt_shown";
 const PostLoginAddressPrompt = () => {
   const { user, session } = useAuth();
   const { addresses, loaded, refreshAddresses } = useAddress();
+  const location = useLocation();
+  const isAdminRoute = location.pathname === "/admin-login" || location.pathname.startsWith("/admin-dashboard");
 
   const [showPrompt, setShowPrompt] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
   // Decide whether to show prompt
   useEffect(() => {
+    if (isAdminRoute) return;
     if (!user || !loaded) return;
     if (addresses.length > 0) return;
     if (sessionStorage.getItem(PROMPT_KEY)) return;
 
     const timer = setTimeout(() => setShowPrompt(true), 800);
     return () => clearTimeout(timer);
-  }, [user, loaded, addresses.length]);
+  }, [user, loaded, addresses.length, isAdminRoute]);
 
   const dismiss = () => {
     sessionStorage.setItem(PROMPT_KEY, "1");
@@ -52,6 +56,8 @@ const PostLoginAddressPrompt = () => {
     setShowForm(false);
     await refreshAddresses();
   };
+
+  if (isAdminRoute) return null;
 
   return (
     <>

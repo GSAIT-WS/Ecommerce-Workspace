@@ -89,7 +89,7 @@ const App = () => (
               <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
               <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />
               <Route path="/admin-login" element={<AdminLoginPage />} />
-              <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin-dashboard/*" element={<AdminDashboardPage />} />
 
               {/* Protected routes — redirect to /login when not logged in */}
               <Route element={<ProtectedRoute />}>
