@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
   Activity, AlertTriangle, ArrowRight, ArrowUpRight, Bell, Boxes, Check, ChevronDown,
   CircleDollarSign, CreditCard, LayoutDashboard, Leaf, LogOut, Menu, Package, Pencil,
@@ -18,8 +18,19 @@ import {
 import { usePageTitle } from "@/hooks/usePageTitle";
 import {
   adminCustomers, adminNotifications, adminOrders, adminPayments, adminProducts,
-  salesByRange, type AdminNotification, type AdminOrder, type AdminProduct, type OrderStatus,
+  salesByRange, type AdminNotification, type AdminOrder, type AdminProduct,
 } from "@/data/adminMockData";
+import {
+  demoAdminOrderDataSource,
+  formatAdminOrderStatus,
+  formatAdminPaymentStatus,
+  loadAdminOrderPage,
+  normalizeAdminOrderPageParams,
+  type AdminOrderDataSource,
+  type AdminOrderDetail,
+  type AdminOrderSummary,
+  type AdminOrderStatus,
+} from "@/services/adminOrderData";
 
 const ADMIN_AUTH_KEY = "purvita_admin_authenticated";
 const currency = (amount: number) => `₹${amount.toLocaleString("en-IN")}`;
@@ -34,7 +45,9 @@ const navItems = [
   { title: "Notifications", path: "/admin-dashboard/notifications", icon: Bell },
   { title: "Settings", path: "/admin-dashboard/settings", icon: Settings },
 ];
-const orderStatuses: OrderStatus[] = ["Processing", "Packed", "Shipped", "Delivered"];
+const orderStatuses: AdminOrderStatus[] = [
+  "pending", "confirmed", "packed", "shipped", "delivered", "cancelled",
+];
 
 function StatusPill({ value }: { value: string }) {
   const theme = value === "Paid" || value === "Delivered" || value === "In stock"
@@ -160,25 +173,85 @@ function Overview({ orders, products, onNavigate }: {
   );
 }
 
-function OrdersPage({ orders, setOrders }: { orders: AdminOrder[]; setOrders: (orders: AdminOrder[]) => void }) {
+function OrdersPage({ dataSource }: { dataSource: AdminOrderDataSource }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All statuses");
-  const [selected, setSelected] = useState<AdminOrder | null>(null);
-  const visible = orders.filter((order) => (status === "All statuses" || order.status === status) && `${order.id} ${order.customer} ${order.email}`.toLowerCase().includes(search.toLowerCase()));
-  const updateStatus = (next: OrderStatus) => {
-    if (!selected) return;
+  const [pageIndex, setPageIndex] = useState(0);
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const [page, setPage] = useState<Awaited<ReturnType<AdminOrderDataSource["listOrders"]>> | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<AdminOrderSummary | null>(null);
+  const [details, setDetails] = useState<AdminOrderDetail | null>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
+  const pageSize = normalizeAdminOrderPageParams().limit;
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+    void loadAdminOrderPage(dataSource, { limit: pageSize, offset: pageIndex * pageSize }).then((result) => {
+      if (cancelled) return;
+      setLoading(false);
+      if (result.ok === false) {
+        setError(result.error);
+        setPage(null);
+        return;
+      }
+      setPage(result.page);
+    });
+    return () => { cancelled = true; };
+  }, [dataSource, pageIndex, pageSize, reloadVersion]);
+
+  const openDetails = async (order: AdminOrderSummary) => {
+    setSelected(order);
+    setDetails(null);
+    setDetailsError(null);
+    setDetailsLoading(true);
+    try {
+      const result = await dataSource.getOrderDetails(order.id);
+      if (!result) {
+        setDetailsError("Order details were not found.");
+        return;
+      }
+      setDetails(result);
+    } catch (cause) {
+      setDetailsError(cause instanceof Error ? cause.message : "Unable to load order details.");
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  const visible = (page?.items ?? []).filter((order) =>
+    (status === "All statuses" || order.status === status) &&
+    `${order.order_number} ${order.customer.full_name} ${order.customer.email ?? ""}`
+      .toLowerCase()
+      .includes(search.toLowerCase()),
+  );
+
+  const updateStatus = (next: AdminOrderStatus) => {
+    if (!selected || !page) return;
     const updated = { ...selected, status: next };
-    setOrders(orders.map((order) => order.id === selected.id ? updated : order));
+    setPage({ ...page, items: page.items.map((order) => order.id === selected.id ? updated : order) });
     setSelected(updated);
+    setDetails((current) => current ? { ...current, status: next } : current);
+  };
+
+  const closeDetails = () => {
+    setSelected(null);
+    setDetails(null);
+    setDetailsError(null);
   };
   return (
     <>
-      <PageHeading eyebrow="Fulfillment · demo data" title="Orders & Tracking" description="Review sample orders and update their prototype status." />
+      <PageHeading eyebrow="Fulfillment · demo data" title="Orders & Tracking" description="Preview orders through the admin order data interface. Records are demo data, not live customer orders." />
       <Panel>
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><SearchBox value={search} onChange={setSearch} placeholder="Search order or customer" /><FilterSelect label="Filter orders by status" value={status} onChange={setStatus} options={["All statuses", ...orderStatuses]} /></div>
-        {visible.length ? <TableFrame><TableHead><th className="px-3 py-3">Order ID / Date</th><th className="px-3 py-3">Customer</th><th className="px-3 py-3">Items</th><th className="px-3 py-3">Total</th><th className="px-3 py-3">Payment</th><th className="px-3 py-3">Order status</th><th className="px-3 py-3">Details</th></TableHead><tbody>{visible.map((order) => <tr key={order.id} className="border-b border-border/70 last:border-0"><Cell><p className="font-semibold">{order.id}</p><p className="text-xs text-muted-foreground">{order.date}</p></Cell><Cell><p>{order.customer}</p><p className="text-xs text-muted-foreground">{order.email}</p></Cell><Cell className="max-w-48 truncate">{order.items}</Cell><Cell className="font-semibold">{currency(order.total)}</Cell><Cell><StatusPill value={order.paymentStatus} /></Cell><Cell><StatusPill value={order.status} /></Cell><Cell><Button variant="outline" size="sm" className="rounded-lg" onClick={() => setSelected(order)}>View</Button></Cell></tr>)}</tbody></TableFrame> : <EmptyState title="No sample orders match your search." />}
+        {loading ? <EmptyState title="Loading demo orders…" /> : error ? <div role="alert" className="py-8 text-center text-sm text-destructive"><p>{error}</p><Button variant="outline" className="mt-3 rounded-xl" onClick={() => setReloadVersion((value) => value + 1)}>Retry</Button></div> : visible.length ? <TableFrame><TableHead><th className="px-3 py-3">Order ID / Date</th><th className="px-3 py-3">Customer</th><th className="px-3 py-3">Items</th><th className="px-3 py-3">Total</th><th className="px-3 py-3">Payment</th><th className="px-3 py-3">Order status</th><th className="px-3 py-3">Details</th></TableHead><tbody>{visible.map((order) => <tr key={order.id} className="border-b border-border/70 last:border-0"><Cell><p className="font-semibold">{order.order_number}</p><p className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</p></Cell><Cell><p>{order.customer.full_name}</p><p className="text-xs text-muted-foreground">{order.customer.email ?? "Email not available"}</p></Cell><Cell className="max-w-48 truncate">{order.items_summary || "No item details"}</Cell><Cell className="font-semibold">{currency(order.total_amount)}</Cell><Cell><StatusPill value={formatAdminPaymentStatus(order.payment_status)} /></Cell><Cell><StatusPill value={formatAdminOrderStatus(order.status)} /></Cell><Cell><Button variant="outline" size="sm" className="rounded-lg" onClick={() => void openDetails(order)}>View</Button></Cell></tr>)}</tbody></TableFrame> : <EmptyState title={page?.total ? "No orders on this page match your search." : "No orders are available."} />}
+        {!loading && !error && page && page.total > 0 && <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground"><span>Showing {page.offset + 1}–{page.offset + page.items.length} of {page.total}</span><div className="flex gap-2"><Button variant="outline" size="sm" className="rounded-lg" disabled={pageIndex === 0} onClick={() => setPageIndex((index) => Math.max(0, index - 1))}>Previous</Button><Button variant="outline" size="sm" className="rounded-lg" disabled={page.offset + page.items.length >= page.total} onClick={() => setPageIndex((index) => index + 1)}>Next</Button></div></div>}
       </Panel>
-      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}><DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl"><DialogHeader><DialogTitle>Order {selected?.id}</DialogTitle><DialogDescription>Sample order detail · updates are local to this session.</DialogDescription></DialogHeader>{selected && <div className="space-y-4 text-sm"><div className="grid grid-cols-2 gap-3 rounded-xl bg-muted/50 p-4"><div><p className="text-xs text-muted-foreground">Customer</p><p className="font-semibold">{selected.customer}</p><p>{selected.email}</p></div><div><p className="text-xs text-muted-foreground">Order total</p><p className="font-semibold">{currency(selected.total)}</p><p>{selected.date}</p></div></div><div><p className="text-xs text-muted-foreground">Items</p><p className="mt-1 font-medium">{selected.items}</p></div><div><Label htmlFor="order-status">Update order status (demo)</Label><select id="order-status" value={selected.status} onChange={(event) => updateStatus(event.target.value as OrderStatus)} className="mt-1 h-10 w-full rounded-xl border border-input bg-background px-3">{orderStatuses.map((item) => <option key={item}>{item}</option>)}</select></div><div className="rounded-xl border border-dashed border-border p-4"><p className="mb-1 font-semibold">Tracking information · placeholder</p><p className="text-muted-foreground">{selected.tracking}</p></div><p>Payment: <StatusPill value={selected.paymentStatus} /></p></div>}<DialogFooter><Button variant="outline" className="rounded-xl" onClick={() => setSelected(null)}>Close</Button></DialogFooter></DialogContent></Dialog>
+      <Dialog open={!!selected} onOpenChange={(open) => !open && closeDetails()}><DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl"><DialogHeader><DialogTitle>Order {selected?.order_number}</DialogTitle><DialogDescription>Demo order detail · status changes are local to this preview.</DialogDescription></DialogHeader>{selected && <div className="space-y-4 text-sm"><div className="grid grid-cols-2 gap-3 rounded-xl bg-muted/50 p-4"><div><p className="text-xs text-muted-foreground">Customer</p><p className="font-semibold">{selected.customer.full_name}</p><p>{selected.customer.email ?? "Email not available"}</p></div><div><p className="text-xs text-muted-foreground">Order total</p><p className="font-semibold">{currency(selected.total_amount)}</p><p>{new Date(selected.created_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</p></div></div>{detailsLoading ? <p className="text-muted-foreground">Loading order details…</p> : detailsError ? <p role="alert" className="text-destructive">{detailsError}</p> : <div><p className="text-xs text-muted-foreground">Items</p>{details?.items.length ? <ul className="mt-1 space-y-1">{details.items.map((item) => <li key={item.id} className="font-medium">{item.name_snapshot} × {item.quantity} · {currency(item.line_total)}</li>)}</ul> : <p className="mt-1 font-medium">{selected.items_summary || "No item details available."}</p>}</div>}<div><Label htmlFor="order-status">Update order status (demo)</Label><select id="order-status" value={selected.status} onChange={(event) => updateStatus(event.target.value as AdminOrderStatus)} className="mt-1 h-10 w-full rounded-xl border border-input bg-background px-3">{orderStatuses.map((item) => <option key={item} value={item}>{formatAdminOrderStatus(item)}</option>)}</select></div><div className="rounded-xl border border-dashed border-border p-4"><p className="mb-1 font-semibold">Tracking information · demo placeholder</p><p className="text-muted-foreground">Tracking information is not included in this order data preview.</p></div><p>Payment: <StatusPill value={formatAdminPaymentStatus(selected.payment_status)} /></p></div>}<DialogFooter><Button variant="outline" className="rounded-xl" onClick={closeDetails}>Close</Button></DialogFooter></DialogContent></Dialog>
     </>
   );
 }
@@ -284,7 +357,7 @@ const AdminDashboardPage = () => {
   const activeItem = navItems.find((item) => item.path === currentPath) ?? navItems[0];
   const page = useMemo(() => {
     switch (currentPath) {
-      case "/admin-dashboard/orders": return <OrdersPage orders={orders} setOrders={setOrders} />;
+      case "/admin-dashboard/orders": return <OrdersPage dataSource={demoAdminOrderDataSource} />;
       case "/admin-dashboard/products": return <ProductsPage products={products} setProducts={setProducts} />;
       case "/admin-dashboard/inventory": return <InventoryPage products={products} setProducts={setProducts} />;
       case "/admin-dashboard/analytics": return <AnalyticsPage />;
