@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, ShoppingCart, User, Menu, X, LogOut, Sprout } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SearchOverlay from "@/components/SearchOverlay";
 import ThemeToggle from "@/components/ThemeToggle";
 import DeliveryLocationChip from "@/components/address/DeliveryLocationChip";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import { EASE } from "@/lib/motion";
+import logo from "@/assets/logo-trimmed.png";
+import logoCream from "@/assets/logo-cream.png";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -27,7 +30,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { items: cartItems } = useCart();
   const { user, logout } = useAuth();
+  const { resolvedTheme } = useTheme();
   const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
+  const brandLogo = resolvedTheme === "dark" ? logoCream : logo;
 
   /** Header gains a little depth once the page has moved — toggles a boolean
       rather than a scroll value, so it never re-renders mid-scroll. */
@@ -64,28 +69,21 @@ const Navbar = () => {
             : "bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/88"
         }`}
       >
-        <div className="container mx-auto flex items-center justify-between gap-3 px-3 py-2.5 sm:px-4 md:px-8">
+        <div className="container mx-auto flex items-center justify-between gap-3 px-3 py-1.5 sm:px-4 md:px-8">
           {/* Left: brand + delivery chip (wide screens) */}
           <div className="flex min-w-0 items-center gap-3">
             <Link
               to="/"
               aria-label="PURVITA home"
-              className="group flex min-w-0 items-center gap-2"
+              className="group flex min-w-0 shrink-0 items-center"
             >
-              <span
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-secondary/30 bg-secondary/10 text-secondary transition-transform duration-300 ease-smooth group-hover:-rotate-6 group-hover:scale-105 sm:h-10 sm:w-10"
-                aria-hidden
-              >
-                <Sprout className="h-[1.15rem] w-[1.15rem] sm:h-5 sm:w-5" strokeWidth={1.8} />
-              </span>
-              <span className="flex min-w-0 flex-col">
-                <span className="font-brand text-[1.3rem] font-semibold leading-none tracking-[0.07em] text-primary sm:text-[1.55rem]">
-                  PURVITA
-                </span>
-                <span className="mt-1 whitespace-nowrap font-brand text-[7px] font-medium uppercase leading-none tracking-[0.16em] text-brand-green-deep dark:text-secondary sm:text-[9px] sm:tracking-[0.18em]">
-                  Goodness from the Roots
-                </span>
-              </span>
+              <img
+                src={brandLogo}
+                alt=""
+                width={480}
+                height={387}
+                className="h-12 w-auto transition-transform duration-300 ease-smooth group-hover:scale-[1.03]"
+              />
             </Link>
 
             {user && (

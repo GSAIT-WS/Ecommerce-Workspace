@@ -1,5 +1,6 @@
-import { Instagram, Facebook, Twitter, Youtube, Sprout } from "lucide-react";
+import { Instagram, Facebook, Twitter, Youtube } from "lucide-react";
 import Reveal from "@/components/motion/Reveal";
+import logoCream from "@/assets/logo-cream.png";
 
 const socialLinks = [
   { icon: Instagram, href: "https://instagram.com/purvita", label: "PURVITA on Instagram" },
@@ -22,21 +23,18 @@ const Footer = () => (
     <div className="container relative mx-auto px-4 py-14 md:px-8 md:py-16">
       <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.45fr_0.8fr_1fr_1fr] lg:gap-8">
         <div>
-          <a href="/" className="group inline-flex items-center gap-2.5" aria-label="PURVITA home">
-            <span
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-brand-cream/15 bg-brand-cream/10 text-brand-green transition-transform duration-300 ease-smooth group-hover:-rotate-6"
-              aria-hidden
-            >
-              <Sprout className="h-5 w-5" strokeWidth={1.8} />
-            </span>
-            <span className="flex flex-col">
-              <span className="font-brand text-[1.65rem] font-semibold leading-none tracking-[0.07em] text-brand-cream">
-                PURVITA
-              </span>
-              <span className="mt-1 font-brand text-[9px] font-medium uppercase leading-none tracking-[0.18em] text-brand-green">
-                Goodness from the Roots
-              </span>
-            </span>
+          <a
+            href="/"
+            className="group inline-flex transition-transform duration-300 ease-smooth hover:-translate-y-0.5"
+            aria-label="PURVITA home"
+          >
+            <img
+              src={logoCream}
+              alt=""
+              width={480}
+              height={387}
+              className="h-20 w-auto sm:h-24"
+            />
           </a>
           <p className="mt-5 max-w-xs font-body text-sm leading-relaxed text-brand-cream/65">
             Rooted in India&apos;s food heritage, PURVITA brings traditional chikki flavours to

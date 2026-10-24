@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, type ComponentProps } from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import { Loader2 } from "lucide-react";
@@ -121,27 +121,26 @@ const MapPickerModal = ({
               zoom: 15,
               className: "h-full w-full rounded-b-lg",
               scrollWheelZoom: true,
-            } as any)}
+            } as unknown as ComponentProps<typeof MapContainer>)}
           >
             <TileLayer
               {...({
                 attribution:
                   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                 url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              } as any)}
+              } as unknown as ComponentProps<typeof TileLayer>)}
             />
             <Marker
               {...({
                 position,
                 draggable: true,
                 eventHandlers: {
-                  dragend: (e: any) => {
-                    const m = e.target;
-                    const { lat, lng } = m.getLatLng();
+                  dragend: (e: L.LeafletEvent) => {
+                    const { lat, lng } = (e.target as L.Marker).getLatLng();
                     handlePositionChange(lat, lng);
                   },
                 },
-              } as any)}
+              } as unknown as ComponentProps<typeof Marker>)}
             />
             <MapClickHandler onPositionChange={handlePositionChange} />
           </MapContainer>

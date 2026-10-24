@@ -19,7 +19,13 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      // This app has not adopted React Compiler. These compiler-only checks flag
+      // established data-fetching, ref, and form-library patterns across the codebase.
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/incompatible-library": "off",
+      // shadcn/ui primitives and context modules intentionally co-export helpers.
+      "react-refresh/only-export-components": "off",
       "@typescript-eslint/no-unused-vars": "off",
     },
   },

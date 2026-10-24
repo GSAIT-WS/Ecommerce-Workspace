@@ -7,7 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabaseClient";
 import { normalizePhoneToE164 } from "@/lib/phoneAuth";
+import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
+import logo from "@/assets/logo-trimmed.png";
+import logoCream from "@/assets/logo-cream.png";
 
 export type AuthGatewayMode = "login" | "signup";
 
@@ -110,6 +113,8 @@ function OtpBoxes({ value, onChange, disabled }: { value: string; onChange: (v: 
 export function AuthGateway({ mode }: AuthGatewayProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { resolvedTheme } = useTheme();
+  const brandLogo = resolvedTheme === "dark" ? logoCream : logo;
   const from = (location.state as { from?: string })?.from ?? "/";
 
   const [step, setStep] = useState<Step>("choose");
@@ -304,8 +309,14 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
           <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Link to="/" className="inline-block font-display text-3xl font-extrabold tracking-tight text-white drop-shadow">
-              PURVITA
+            <Link to="/" aria-label="PURVITA home" className="inline-block">
+              <img
+                src={logoCream}
+                alt=""
+                width={480}
+                height={387}
+                className="h-16 w-auto drop-shadow-md sm:h-20"
+              />
             </Link>
           </motion.div>
 
@@ -365,9 +376,15 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
           className="w-full max-w-md"
         >
           {/* Mobile-only logo */}
-          <div className="lg:hidden mb-8 text-center">
-            <Link to="/" className="font-display text-3xl font-extrabold tracking-tight text-primary">
-              PURVITA
+          <div className="mb-8 flex justify-center lg:hidden">
+            <Link to="/" aria-label="PURVITA home" className="inline-flex">
+              <img
+                src={brandLogo}
+                alt=""
+                width={480}
+                height={387}
+                className="h-14 w-auto"
+              />
             </Link>
           </div>
 

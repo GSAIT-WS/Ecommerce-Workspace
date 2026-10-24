@@ -49,7 +49,7 @@ const CategoryPage = () => {
     category_slug: slug || undefined,
     limit: 100,
   });
-  let products = data?.items ?? [];
+  const products = data?.items ?? [];
 
   // Apply sorting
   const sortedProducts = [...products].sort((a, b) => {

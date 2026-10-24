@@ -7,6 +7,6 @@ describe("cn", () => {
   });
 
   it("filters falsy inputs", () => {
-    expect(cn("a", false && "b", "c")).toBe("a c");
+    expect(cn("a", null, undefined, "c")).toBe("a c");
   });
 });
