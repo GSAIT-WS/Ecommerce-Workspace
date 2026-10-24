@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Compass, Pause, Play } from "lucide-react";
@@ -22,6 +22,9 @@ const heroSlides = [
     description:
       "Traditional chikki flavours, reimagined for everyday snacking.",
     ctaLabel: "Shop Our Chikki",
+    accent: "#4C1450",
+    accentForeground: "#FCF8F0",
+    accentHover: "#5D1E63",
     imagePosition: "55% center",
   },
   {
@@ -33,6 +36,9 @@ const heroSlides = [
     titleAccent: "Chikki",
     description: "A familiar grain paired with peanuts in a traditional chikki.",
     ctaLabel: "Shop All Chikki",
+    accent: "#1B4223",
+    accentForeground: "#FCF8F0",
+    accentHover: "#25562F",
     imagePosition: "68% center",
   },
   {
@@ -44,6 +50,9 @@ const heroSlides = [
     titleAccent: "Chikki",
     description: "A crisp chikki with peanuts in every bite.",
     ctaLabel: "Shop All Chikki",
+    accent: "#FFE9A8",
+    accentForeground: "#3B163D",
+    accentHover: "#FFDE82",
     imagePosition: "68% center",
   },
   {
@@ -55,6 +64,9 @@ const heroSlides = [
     titleAccent: "Chikki",
     description: "Sesame and peanuts in a traditional chikki.",
     ctaLabel: "Shop All Chikki",
+    accent: "#612760",
+    accentForeground: "#FCF8F0",
+    accentHover: "#743174",
     imagePosition: "55% center",
   },
 ] as const;
@@ -149,13 +161,6 @@ const HeroSection = () => {
           />
         ))}
 
-        <div className="pointer-events-none absolute inset-0 bg-banner-scrim" aria-hidden />
-        <div className="pointer-events-none absolute inset-0 bg-hero-depth" aria-hidden />
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent md:from-black/15"
-          aria-hidden
-        />
-
         <div className="container relative z-10 mx-auto flex h-full items-end px-4 pb-7 sm:px-6 sm:pb-9 md:px-8 lg:items-center lg:pb-0">
           <div className="flex w-full max-w-[34rem] flex-col items-start">
             <AnimatePresence mode="wait" initial={false}>
@@ -168,6 +173,13 @@ const HeroSection = () => {
                   duration: prefersReducedMotion ? 0 : 0.4,
                   ease: EASE.smooth,
                 }}
+                style={
+                  {
+                    "--hero-accent": slide.accent,
+                    "--hero-accent-foreground": slide.accentForeground,
+                    "--hero-accent-hover": slide.accentHover,
+                  } as CSSProperties
+                }
                 className="w-full"
               >
                 <p className="eyebrow eyebrow-inverse mb-4 text-white/85 sm:mb-5">
@@ -175,7 +187,7 @@ const HeroSection = () => {
                 </p>
                 <h1 className="max-w-[13ch] text-balance font-brand text-[2.55rem] font-semibold leading-[0.98] tracking-[-0.035em] text-white drop-shadow-[0_2px_22px_rgba(0,0,0,0.36)] sm:text-[3.15rem] lg:text-[3.65rem] xl:text-[4rem]">
                   {slide.titleLead}{" "}
-                  <span className="italic text-brand-gold">{slide.titleAccent}</span>
+                  <span className="italic text-[color:var(--hero-accent)]">{slide.titleAccent}</span>
                 </h1>
                 <p className="mt-3 max-w-[29rem] font-body text-[15px] leading-relaxed text-white/85 drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)] sm:mt-4 sm:text-base lg:text-[17px]">
                   {slide.description}
@@ -185,7 +197,7 @@ const HeroSection = () => {
                   <Button
                     variant="cta"
                     size="xl"
-                    className="group h-11 w-full rounded-full px-6 text-sm shadow-lg sm:h-12 sm:w-auto sm:px-7 sm:text-[15px]"
+                    className="group h-11 w-full rounded-full bg-[color:var(--hero-accent)] px-6 text-sm text-[color:var(--hero-accent-foreground)] shadow-lg shadow-black/25 hover:bg-[color:var(--hero-accent-hover)] hover:shadow-black/30 sm:h-12 sm:w-auto sm:px-7 sm:text-[15px]"
                     asChild
                   >
                     <Link to="/search">
