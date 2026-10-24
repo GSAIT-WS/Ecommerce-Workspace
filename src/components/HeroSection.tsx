@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { EASE } from "@/lib/motion";
 import heroImage from "@/assets/hero-slide-2.jpg";
 
-const varieties = ["Jowar Peanut", "Sesame Peanut", "Kurmura Peanut"];
-
 const HeroSection = () => (
   <section className="relative overflow-hidden border-b border-border/60 bg-background">
     <div
@@ -33,7 +31,7 @@ const HeroSection = () => (
           today&apos;s generation.
         </p>
 
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Button
             variant="cta"
             size="xl"
@@ -56,18 +54,6 @@ const HeroSection = () => (
               <Compass className="h-4 w-4 transition-transform duration-300 ease-smooth group-hover:rotate-12" />
             </Link>
           </Button>
-        </div>
-
-        <div className="mt-8 flex flex-wrap items-center gap-2.5">
-          {varieties.map((variety) => (
-            <span
-              key={variety}
-              className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/80 px-3.5 py-1.5 font-body text-xs font-semibold text-primary shadow-sm"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-secondary" aria-hidden />
-              {variety}
-            </span>
-          ))}
         </div>
       </motion.div>
 
@@ -106,10 +92,10 @@ const HeroSection = () => (
             </span>
             <div>
               <p className="font-brand text-base font-semibold leading-tight text-primary">
-                Made from traditional grains
+                Rooted in India
               </p>
               <p className="mt-0.5 font-body text-[11px] text-muted-foreground">
-                Rooted in India&apos;s food heritage
+                Goodness from the Roots
               </p>
             </div>
           </div>

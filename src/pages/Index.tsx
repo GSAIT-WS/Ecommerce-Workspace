@@ -18,7 +18,7 @@ import CombosGiftsBanner from "@/components/home/CombosGiftsBanner";
  * and Footer own their own reveals internally.
  */
 const Index = () => (
-  <div className="relative min-h-screen overflow-x-clip bg-background">
+  <div className="relative min-h-screen bg-background">
     <Navbar />
     <HeroSection />
     <Reveal distance={10} amount={0.1}>
