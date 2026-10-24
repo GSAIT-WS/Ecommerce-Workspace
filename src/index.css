@@ -614,10 +614,25 @@
   }
 
   .admin-shell {
+    width: 100%;
+    min-width: 0;
+    min-height: 100dvh;
+    overflow-x: clip;
     background-image:
       radial-gradient(ellipse 100% 65% at 100% 0%, hsl(var(--primary) / 0.055), transparent 58%),
       radial-gradient(ellipse 85% 55% at 0% 100%, hsl(var(--secondary) / 0.06), transparent 55%);
     background-attachment: fixed;
+  }
+
+  .admin-shell main,
+  .admin-shell main > *,
+  .admin-shell main section {
+    min-width: 0;
+  }
+
+  .admin-shell main .overflow-x-auto {
+    max-width: 100%;
+    overscroll-behavior-x: contain;
   }
 
   .admin-shell :is(h1, h2, h3),
