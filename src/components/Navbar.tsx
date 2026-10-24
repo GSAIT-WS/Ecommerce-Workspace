@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, ShoppingCart, User, Menu, X, LogOut } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, LogOut, Sprout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SearchOverlay from "@/components/SearchOverlay";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -58,45 +58,51 @@ const Navbar = () => {
       <SearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
       <header
-        className={`group/nav sticky top-0 z-50 border-b backdrop-blur-xl transition-[box-shadow,background-color,border-color] duration-300 ease-smooth ${
+        className={`group/nav sticky top-0 z-50 border-b border-border/70 transition-[box-shadow,background-color,border-color] duration-300 ease-smooth ${
           scrolled
-            ? "border-border bg-background/80 shadow-[0_1px_0_0_hsl(var(--primary)/0.08),0_12px_28px_-20px_hsl(var(--foreground)/0.5)] supports-[backdrop-filter]:bg-background/70"
-            : "border-border/60 bg-background/90 shadow-[0_1px_0_0_hsl(var(--primary)/0.06),0_8px_24px_-18px_hsl(var(--foreground)/0.35)] supports-[backdrop-filter]:bg-background/75"
+            ? "bg-background/95 shadow-[0_12px_30px_-24px_hsl(var(--primary)/0.45)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/90"
+            : "bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/88"
         }`}
       >
-        <div className="container mx-auto flex items-center justify-between px-4 py-3 md:px-8">
-
-          {/* Left: Logo + Delivery chip (desktop) */}
-          <div className="flex items-center gap-3">
+        <div className="container mx-auto flex items-center justify-between gap-3 px-3 py-2.5 sm:px-4 md:px-8">
+          {/* Left: brand + delivery chip (wide screens) */}
+          <div className="flex min-w-0 items-center gap-3">
             <Link
               to="/"
-              className="group flex items-center gap-2.5 font-display text-2xl font-extrabold tracking-[-0.035em] text-primary"
+              aria-label="PURVITA home"
+              className="group flex min-w-0 items-center gap-2"
             >
               <span
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-sm font-black text-primary-foreground shadow-md shadow-primary/30 ring-1 ring-inset ring-white/30 transition-transform duration-300 ease-smooth group-hover:scale-105 group-hover:-rotate-3"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-secondary/30 bg-secondary/10 text-secondary transition-transform duration-300 ease-smooth group-hover:-rotate-6 group-hover:scale-105 sm:h-10 sm:w-10"
                 aria-hidden
               >
-              PV
+                <Sprout className="h-[1.15rem] w-[1.15rem] sm:h-5 sm:w-5" strokeWidth={1.8} />
               </span>
-              PURVITA
+              <span className="flex min-w-0 flex-col">
+                <span className="font-brand text-[1.3rem] font-semibold leading-none tracking-[0.07em] text-primary sm:text-[1.55rem]">
+                  PURVITA
+                </span>
+                <span className="mt-1 whitespace-nowrap font-brand text-[7px] font-medium uppercase leading-none tracking-[0.16em] text-brand-green-deep dark:text-secondary sm:text-[9px] sm:tracking-[0.18em]">
+                  Goodness from the Roots
+                </span>
+              </span>
             </Link>
 
-            {/* Delivery location chip — only on desktop */}
             {user && (
-              <div className="hidden md:block">
+              <div className="hidden xl:block">
                 <DeliveryLocationChip />
               </div>
             )}
           </div>
 
-          {/* Centre: Desktop Nav */}
-          <nav className="hidden items-center gap-8 md:flex">
+          {/* Centre: desktop navigation */}
+          <nav aria-label="Primary" className="hidden items-center gap-5 lg:flex xl:gap-7">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
                 to={link.href}
                 data-active={location.pathname === link.href}
-                className={`link-underline font-body text-sm font-semibold tracking-[-0.01em] ${
+                className={`link-underline font-body text-[13px] font-semibold tracking-[0.01em] ${
                   location.pathname === link.href
                     ? "text-primary"
                     : "text-foreground/70 hover:text-primary"
@@ -107,14 +113,15 @@ const Navbar = () => {
             ))}
           </nav>
 
-          {/* Right: Icons */}
-          <div className="flex items-center gap-2">
+          {/* Right: actions */}
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
             <ThemeToggle />
             <Button
               variant="ghost"
               size="icon"
               className="text-foreground/70 transition-all duration-300 ease-in-out hover:text-primary [&_svg]:transition-transform [&_svg]:duration-300 [&_svg]:ease-in-out hover:[&_svg]:scale-110"
               onClick={() => setSearchOpen(true)}
+              aria-label="Search products"
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -125,12 +132,16 @@ const Navbar = () => {
               className="relative text-foreground/70 transition-all duration-300 ease-in-out hover:text-primary [&_svg]:transition-transform [&_svg]:duration-300 [&_svg]:ease-in-out hover:[&_svg]:scale-110"
               asChild
             >
-              <Link to="/cart">
+              <Link
+                to="/cart"
+                aria-label={`Cart${cartCount > 0 ? `, ${cartCount} item${cartCount === 1 ? "" : "s"}` : ", empty"}`}
+              >
                 <ShoppingCart className="h-5 w-5" />
                 {cartCount > 0 && (
                   <span
                     key={cartCount}
-                    className="absolute -right-0.5 -top-0.5 flex h-[1.15rem] min-w-[1.15rem] animate-badge-pop items-center justify-center rounded-full bg-gradient-to-br from-accent to-primary px-1 text-[10px] font-bold leading-none text-primary-foreground shadow-sm shadow-primary/40 ring-2 ring-background"
+                    className="absolute -right-0.5 -top-0.5 flex h-[1.15rem] min-w-[1.15rem] animate-badge-pop items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold leading-none text-accent-foreground shadow-sm ring-2 ring-background"
+                    aria-hidden
                   >
                     {cartCount > 99 ? "99+" : cartCount}
                   </span>
@@ -146,7 +157,7 @@ const Navbar = () => {
                   className="hidden text-foreground/70 transition-all duration-300 ease-in-out hover:text-primary md:flex [&_svg]:transition-transform [&_svg]:duration-300 [&_svg]:ease-in-out hover:[&_svg]:scale-110"
                   asChild
                 >
-                  <Link to="/profile">
+                  <Link to="/profile" aria-label="My profile">
                     <User className="h-5 w-5" />
                   </Link>
                 </Button>
@@ -155,7 +166,7 @@ const Navbar = () => {
                   size="icon"
                   className="hidden text-foreground/70 transition-all duration-300 ease-in-out hover:text-destructive md:flex [&_svg]:transition-transform [&_svg]:duration-300 [&_svg]:ease-in-out hover:[&_svg]:scale-110"
                   onClick={handleLogout}
-                  title="Logout"
+                  aria-label="Log out"
                 >
                   <LogOut className="h-5 w-5" />
                 </Button>
@@ -175,110 +186,105 @@ const Navbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-foreground/70 md:hidden"
+              className="text-foreground/70 lg:hidden"
               onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation"
             >
-              {mobileOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
-        {/* Announcement strip — thin gold bar reinforcing the brand promise */}
-      <div className="hidden overflow-hidden border-b border-primary/15 bg-gradient-to-r from-primary/12 via-accent/10 to-secondary/12 md:block">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="flex h-9 items-center justify-center gap-6 font-body text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/75">
-            <span className="inline-flex items-center gap-2">
-              <span className="h-1 w-1 rounded-full bg-primary" aria-hidden />
-              Free shipping over ₹499
-            </span>
-            <span className="hidden h-3 w-px bg-border lg:block" aria-hidden />
-            <span className="hidden lg:inline">Farm sourced in Lambasingi, Andhra Pradesh</span>
-            <span className="hidden h-3 w-px bg-border lg:block" aria-hidden />
-            <span className="hidden lg:inline">100% Natural · No Preservatives</span>
+        {/* Announcement strip */}
+        <div className="hidden overflow-hidden border-t border-border/50 bg-surface-cream/60 md:block dark:bg-surface-cream/30">
+          <div className="container mx-auto px-4 md:px-8">
+            <div className="flex h-8 items-center justify-center gap-5 font-body text-[10px] font-semibold uppercase tracking-[0.16em] text-primary/80">
+              <span className="inline-flex items-center gap-2">
+                <span className="h-1 w-1 rounded-full bg-secondary" aria-hidden />
+                Free shipping over ₹499
+              </span>
+              <span className="hidden h-3 w-px bg-border lg:block" aria-hidden />
+              <span className="hidden lg:inline">Farm sourced in Lambasingi, Andhra Pradesh</span>
+              <span className="hidden h-3 w-px bg-border lg:block" aria-hidden />
+              <span className="hidden lg:inline">100% Natural · No Preservatives</span>
+            </div>
           </div>
         </div>
-      </div>
 
-        {/* ── Mobile Drawer ── */}
-        {/* Height + opacity so it eases open and closes again, instead of
-            popping into place with a bare fade. */}
+        {/* Mobile drawer */}
         <AnimatePresence initial={false}>
           {mobileOpen && (
-          <motion.nav
-            key="mobile-drawer"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.26, ease: EASE.smooth }}
-            style={{ overflow: "hidden" }}
-            /* `will-change` only while open — a permanent hint on a full-width
-               sticky header costs memory for nothing. */
-            className="border-t border-border/70 bg-background/95 px-4 py-4 backdrop-blur-xl md:hidden"
-          >
-
-            {/* Delivery chip in mobile menu */}
-            {user && (
-              <div className="mb-3 pb-3 border-b border-border">
-                <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Delivery location
-                </p>
-                <DeliveryLocationChip
-                  compact
-                  onInteract={() => setMobileOpen(false)}
-                />
-              </div>
-            )}
-
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={`block rounded-lg px-3 py-2.5 font-body text-sm font-semibold transition-all duration-300 ease-smooth hover:bg-muted/70 hover:text-primary ${
-                  location.pathname === link.href
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground/75"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            <div className="mt-2 border-t border-border pt-2">
-              {user ? (
-                <>
-                  <Link
-                    to="/profile"
-                    onClick={() => setMobileOpen(false)}
-                    className="block py-2 font-body text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
-                  >
-                    My Profile
-                  </Link>
-                  <button
-                    onClick={() => {
-                      setMobileOpen(false);
-                      handleLogout();
-                    }}
-                    className="block py-2 font-body text-sm font-medium text-destructive transition-colors hover:text-destructive/80"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="block py-2 font-body text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
-                >
-                  Sign In
-                </Link>
+            <motion.nav
+              id="mobile-navigation"
+              key="mobile-drawer"
+              aria-label="Mobile"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.26, ease: EASE.smooth }}
+              style={{ overflow: "hidden" }}
+              className="border-t border-border/70 bg-background/95 px-3 py-3 backdrop-blur-xl lg:hidden"
+            >
+              {user && (
+                <div className="mb-3 border-b border-border pb-3">
+                  <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    Delivery location
+                  </p>
+                  <DeliveryLocationChip compact onInteract={() => setMobileOpen(false)} />
+                </div>
               )}
-            </div>
-          </motion.nav>
+
+              <div className="grid gap-1">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={location.pathname === link.href ? "page" : undefined}
+                    className={`rounded-xl px-3 py-2.5 font-body text-sm font-semibold transition-all duration-300 ease-smooth ${
+                      location.pathname === link.href
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground/75 hover:bg-muted/70 hover:text-primary"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="mt-3 border-t border-border pt-3">
+                {user ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-3 py-2 font-body text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
+                    >
+                      My Profile
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setMobileOpen(false);
+                        handleLogout();
+                      }}
+                      className="block px-3 py-2 font-body text-sm font-medium text-destructive transition-colors hover:text-destructive/80"
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="block px-3 py-2 font-body text-sm font-medium text-foreground/70 transition-colors hover:text-primary"
+                  >
+                    Sign In
+                  </Link>
+                )}
+              </div>
+            </motion.nav>
           )}
         </AnimatePresence>
       </header>

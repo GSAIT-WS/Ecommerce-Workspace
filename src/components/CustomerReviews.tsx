@@ -17,16 +17,14 @@ const CustomerReviews = () => {
   const [selected, setSelected] = useState<number | null>(null);
 
   return (
-    <section className="overflow-hidden border-t border-border/40 bg-background py-14 md:py-20">
+    <section className="overflow-hidden border-t border-border/50 bg-surface-cream/20 py-14 dark:bg-background md:py-20">
       <div className="container mx-auto px-4 md:px-8">
         <Reveal distance={14} amount={0.2}>
           <div className="section-heading mb-9 md:mb-11">
             <span className="eyebrow eyebrow-centered mb-3">Real reviews</span>
-            <h2 className="section-title">
-              Loved by <span className="text-gradient">PURVITA Customers</span>
-            </h2>
+            <h2 className="section-title">Loved by PURVITA Customers</h2>
             <div className="mt-4 flex items-center justify-center gap-2">
-              <div className="flex gap-0.5">
+              <div className="flex gap-0.5" aria-hidden>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                 ))}
@@ -75,24 +73,24 @@ const CustomerReviews = () => {
                     <figure
                       key={`${copy}-${i}`}
                       onClick={() => setSelected(selected === index ? null : index)}
-                      className={`card-interactive relative w-72 shrink-0 cursor-pointer rounded-2xl border p-6 shadow-card md:w-80 ${
+                      className={`card-interactive relative w-72 shrink-0 cursor-pointer rounded-[1.5rem] border p-6 shadow-card md:w-80 ${
                         selected === index
-                          ? "-translate-y-1 border-primary/50 bg-gradient-to-b from-card to-primary/[0.05] shadow-card-hover"
+                          ? "-translate-y-1 border-primary/40 bg-gradient-to-b from-card to-surface-purple/50 shadow-card-hover"
                           : "border-border/70 bg-card"
                       }`}
                     >
-                      {/* Oversized quote glyph for visual weight */}
                       <span
-                        className="pointer-events-none absolute right-5 top-3 select-none font-display text-6xl font-black leading-none text-primary/12"
+                        className="pointer-events-none absolute right-5 top-2 select-none font-brand text-6xl font-semibold leading-none text-primary/10"
                         aria-hidden
                       >
                         &rdquo;
                       </span>
-                      <div className="relative mb-3.5 flex gap-0.5">
+                      <div className="relative mb-3.5 flex gap-0.5" aria-label={`Rated ${t.rating} out of 5`}>
                         {Array.from({ length: 5 }).map((_, s) => (
                           <Star
                             key={s}
                             className={`h-4 w-4 ${s < t.rating ? "fill-primary text-primary" : "fill-muted text-muted-foreground/30"}`}
+                            aria-hidden
                           />
                         ))}
                       </div>
@@ -100,7 +98,7 @@ const CustomerReviews = () => {
                         &ldquo;{t.text}&rdquo;
                       </blockquote>
                       <figcaption className="relative flex items-center gap-2.5 border-t border-border/60 pt-4">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary/25 to-secondary/25 font-display text-xs font-bold text-primary">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-secondary/25 font-body text-xs font-bold text-primary">
                           {t.name.charAt(0)}
                         </span>
                         <span className="font-body text-xs font-bold uppercase tracking-wide text-foreground/90">

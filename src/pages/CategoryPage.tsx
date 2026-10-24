@@ -104,10 +104,10 @@ const CategoryPage = () => {
       </section>
 
       {/* Sticky Filter & Sort Bar */}
-      <div className="sticky top-[105px] z-30 border-b border-border/70 bg-background/90 shadow-[0_8px_20px_-16px_hsl(var(--foreground)/0.4)] backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+      <div className="sticky top-[61px] z-30 border-b border-border/70 bg-background/90 shadow-[0_8px_20px_-16px_hsl(var(--foreground)/0.4)] backdrop-blur-xl md:top-[94px]">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3">
           {/* Left: Filter Button & Results Count */}
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-3">
             <Button
               variant="outline"
               size="sm"
@@ -123,10 +123,10 @@ const CategoryPage = () => {
           </div>
 
           {/* Right: Sort & View Toggle */}
-          <div className="flex items-center gap-3">
+          <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
             {/* Sort Dropdown */}
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[140px] rounded-full font-body text-sm md:w-[180px]">
+              <SelectTrigger className="w-[120px] rounded-full font-body text-sm sm:w-[140px] md:w-[180px]">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent className="bg-popover">

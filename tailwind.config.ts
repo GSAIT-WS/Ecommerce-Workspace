@@ -15,12 +15,26 @@ export default {
     extend: {
       fontFamily: {
         display: ['Plus Jakarta Sans', 'sans-serif'],
+        brand: ['Fraunces', 'Georgia', 'serif'],
         body: ['Plus Jakarta Sans', 'sans-serif'],
       },
       colors: {
         surface: {
           subtle: "hsl(var(--surface-subtle))",
           muted: "hsl(var(--surface-muted))",
+          green: "hsl(var(--surface-green))",
+          purple: "hsl(var(--surface-purple))",
+          yellow: "hsl(var(--surface-yellow))",
+          cream: "hsl(var(--surface-cream))",
+        },
+        brand: {
+          DEFAULT: "hsl(var(--brand-purple))",
+          purple: "hsl(var(--brand-purple))",
+          deep: "hsl(var(--brand-purple-deep))",
+          green: "hsl(var(--brand-green))",
+          "green-deep": "hsl(var(--brand-green-deep))",
+          gold: "hsl(var(--brand-gold))",
+          cream: "hsl(var(--brand-cream))",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

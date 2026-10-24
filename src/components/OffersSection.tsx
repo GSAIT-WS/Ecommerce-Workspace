@@ -50,15 +50,15 @@ const offerSlides = [
 const miniOffers = [
   {
     value: "20%",
-    circleClass: "bg-primary/20 text-primary ring-2 ring-primary/25",
-    cardTint: "from-[hsl(28_48%_97%)] via-[hsl(33_40%_96%)] to-primary/[0.07]",
+    circleClass: "bg-brand-purple text-brand-cream",
+    surface: "bg-surface-cream/75 dark:bg-surface-cream",
     title: "First Order Discount",
     subtitle: "Use code CRUNCHFIRST at checkout",
   },
   {
     value: "Free",
-    circleClass: "bg-secondary/18 text-secondary ring-2 ring-secondary/30",
-    cardTint: "from-[hsl(84_22%_95%)] via-[hsl(33_35%_96%)] to-secondary/[0.1]",
+    circleClass: "bg-brand-green text-brand-deep",
+    surface: "bg-surface-green/85 dark:bg-surface-green",
     title: "Free Delivery",
     subtitle: `On all orders of ₹${FREE_SHIPPING_THRESHOLD}+ across India`,
   },
@@ -109,14 +109,12 @@ const OffersSection = memo(() => {
   const slide = offerSlides[current];
 
   return (
-    <section className="border-t border-border/50 bg-gradient-to-b from-[hsl(33_40%_93%)] to-[hsl(28_50%_96%)] py-12 shadow-[inset_0_1px_0_0_hsl(var(--border)/0.35)] dark:border-border/30 dark:from-muted/25 dark:to-background md:py-16">
+    <section className="border-y border-border/50 bg-surface-purple/45 py-14 dark:bg-surface-purple/50 md:py-20">
       <div className="container mx-auto px-4 md:px-8">
         <Reveal distance={14} amount={0.2}>
           <div className="section-heading mb-9 md:mb-12">
             <span className="eyebrow eyebrow-centered mb-3">Limited time</span>
-            <h2 className="section-title">
-              Offers &amp; <span className="text-gradient">Combos</span>
-            </h2>
+            <h2 className="section-title">Offers &amp; Combos</h2>
             <p className="section-subtitle">
               Grab value packs and save more on your favourites
             </p>
@@ -128,18 +126,18 @@ const OffersSection = memo(() => {
           initial="hidden"
           whileInView="show"
           viewport={viewportOnce(0.12)}
-          className="grid gap-5 md:grid-cols-2"
+          className="grid gap-4 md:grid-cols-2 md:gap-5"
         >
           <motion.div
             variants={revealTile}
-            className="group relative overflow-hidden rounded-2xl shadow-card ring-1 ring-border/40 transition-shadow duration-500 ease-smooth hover:shadow-card-elevated-hover md:col-span-2"
+            className="group relative overflow-hidden rounded-[2rem] border border-border/70 shadow-card ring-1 ring-black/[0.03] transition-shadow duration-500 ease-smooth hover:shadow-card-elevated-hover md:col-span-2"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => {
               if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
               setIsPaused(false);
             }}
           >
-            <div className="relative h-72 md:h-96">
+            <div className="relative h-[21rem] md:h-[26rem]">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={current}
@@ -160,7 +158,7 @@ const OffersSection = memo(() => {
               <div className="pointer-events-none absolute inset-0 z-[1] bg-offers-carousel-overlay" aria-hidden />
             </div>
 
-            <div className="pointer-events-none absolute inset-0 z-[2] flex items-center p-8 md:p-12">
+            <div className="pointer-events-none absolute inset-0 z-[2] flex items-end p-5 sm:items-center sm:p-9 md:p-12">
               <div className="pointer-events-auto max-w-xl">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
@@ -170,31 +168,22 @@ const OffersSection = memo(() => {
                     exit={{ opacity: 0, y: -10 }}
                     transition={slideCopyTransition}
                   >
-                    <span className="mb-3 inline-block rounded-full bg-accent px-3.5 py-1 font-body text-[11px] font-bold uppercase tracking-[0.14em] text-accent-foreground animate-offer-badge-pulse">
+                    <span className="mb-3 inline-block rounded-full bg-brand-gold px-3.5 py-1 font-body text-[11px] font-bold uppercase tracking-[0.14em] text-brand-deep animate-offer-badge-pulse">
                       {slide.badge}
                     </span>
-                    <h3 className="mb-2 font-display text-2xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)] md:text-3xl">
+                    <h3 className="mb-2 max-w-md font-brand text-[1.55rem] font-semibold leading-[1.08] tracking-[-0.02em] text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.45)] sm:text-3xl md:text-4xl">
                       {slide.title}
                     </h3>
-                    <p className="mb-5 max-w-sm font-body text-sm leading-relaxed text-white/95 drop-shadow-[0_1px_8px_rgba(0,0,0,0.45)]">
+                    <p className="mb-4 max-w-[19rem] font-body text-xs leading-relaxed text-white/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.35)] sm:mb-5 sm:max-w-sm sm:text-sm">
                       {slide.description}
                     </p>
-                    <div className="group/cta relative inline-flex">
-                      <span
-                        className="pointer-events-none absolute -inset-x-3 -inset-y-2 rounded-full bg-primary/50 opacity-60 blur-xl transition-all duration-300 ease-out group-hover/cta:opacity-90 group-hover/cta:blur-2xl"
-                        aria-hidden
-                      />
-                      <Link
-                        to={slide.ctaLink}
-                        className="relative inline-flex h-11 items-center justify-center overflow-visible rounded-full bg-gradient-to-b from-accent/95 via-primary to-primary/95 px-7 font-body text-sm font-semibold text-primary-foreground shadow-[0_10px_28px_-8px_hsl(var(--primary)/0.55),0_4px_12px_-4px_hsl(var(--accent)/0.35)] ring-offset-background transition-all duration-300 ease-out hover:-translate-y-1 hover:from-accent hover:via-primary hover:to-primary/90 hover:shadow-[0_14px_36px_-6px_hsl(var(--primary)/0.6),0_0_40px_-6px_hsl(var(--accent)/0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      >
-                        <span
-                          className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-t from-white/10 to-transparent opacity-40"
-                          aria-hidden
-                        />
-                        <span className="relative">{slide.cta}</span>
-                      </Link>
-                    </div>
+                    <Link
+                      to={slide.ctaLink}
+                      className="group/cta inline-flex h-10 items-center justify-center gap-2 rounded-full bg-brand-gold px-5 font-body text-[13px] font-bold text-brand-deep shadow-[0_10px_24px_-12px_rgba(0,0,0,0.55)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-brand-gold/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 sm:h-11 sm:px-6 sm:text-sm"
+                    >
+                      {slide.cta}
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-smooth group-hover/cta:translate-x-0.5" />
+                    </Link>
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -208,8 +197,8 @@ const OffersSection = memo(() => {
                   onClick={() => handleDot(i)}
                   className={`h-1.5 rounded-full transition-all duration-300 ease-smooth ${
                     i === current
-                      ? "w-7 bg-gradient-to-r from-accent to-primary shadow-sm shadow-accent/40"
-                      : "w-1.5 bg-white/45 hover:scale-y-150 hover:bg-white/70"
+                      ? "w-7 bg-brand-gold shadow-sm shadow-black/20"
+                      : "w-1.5 bg-white/50 hover:scale-y-150 hover:bg-white/80"
                   }`}
                   aria-label={`Go to offer ${i + 1}`}
                   aria-current={i === current}
@@ -222,27 +211,25 @@ const OffersSection = memo(() => {
             <motion.div
               key={i}
               variants={revealTile}
-              className={`card-interactive group relative flex items-center gap-5 overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br ${offer.cardTint} p-6 shadow-card md:p-7`}
+              className={`card-interactive group relative flex items-center gap-4 overflow-hidden rounded-[1.5rem] border border-border/70 p-6 shadow-card md:gap-5 md:p-7 ${offer.surface}`}
             >
-              {/* Sheen sweep across the tile on hover */}
               <span
-                className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:animate-sheen-sweep dark:via-white/10"
+                className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-primary/15 to-transparent"
                 aria-hidden
               />
               <div
-                className={`glow-gold flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl font-display text-2xl font-extrabold transition-transform duration-300 ease-smooth group-hover:scale-105 ${offer.circleClass}`}
+                className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl font-brand text-2xl font-semibold shadow-sm transition-transform duration-300 ease-smooth group-hover:-rotate-3 group-hover:scale-105 ${offer.circleClass}`}
               >
                 {offer.value}
               </div>
               <div className="min-w-0">
-                <h4 className="mb-1 font-display text-base font-bold tracking-[-0.02em] text-foreground transition-colors duration-300 group-hover:text-primary">
+                <h4 className="mb-1 font-brand text-lg font-semibold tracking-[-0.015em] text-primary">
                   {offer.title}
                 </h4>
                 <p className="font-body text-xs leading-relaxed text-muted-foreground">
                   {offer.subtitle}
                 </p>
               </div>
-              <ArrowRight className="ml-auto h-5 w-5 shrink-0 text-muted-foreground opacity-0 transition-all duration-300 ease-smooth group-hover:translate-x-0.5 group-hover:text-primary group-hover:opacity-100" />
             </motion.div>
           ))}
         </motion.div>
