@@ -572,3 +572,91 @@
     transform: none !important;
   }
 }
+
+@layer components {
+  .admin-shell,
+  .admin-login,
+  .admin-dialog {
+    --background: 40 67% 96%;
+    --foreground: 293 9% 19%;
+    --card: 38 100% 98%;
+    --card-foreground: 293 9% 19%;
+    --popover: 38 100% 98%;
+    --popover-foreground: 293 9% 19%;
+    --primary: 301 43% 27%;
+    --primary-foreground: 40 67% 96%;
+    --secondary: 88 50% 53%;
+    --secondary-foreground: 90 50% 10%;
+    --muted: 36 64% 89%;
+    --muted-foreground: 291 6% 43%;
+    --accent: 44 90% 59%;
+    --accent-foreground: 293 9% 19%;
+    --destructive: 0 68% 46%;
+    --destructive-foreground: 40 67% 96%;
+    --border: 33 38% 86%;
+    --input: 33 38% 86%;
+    --ring: 301 43% 27%;
+    --surface-subtle: 40 67% 96%;
+    --surface-muted: 36 64% 89%;
+    --surface-green: 78 37% 93%;
+    --surface-purple: 311 35% 94%;
+    --surface-yellow: 44 100% 89%;
+    --surface-cream: 36 64% 89%;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', sans-serif;
+    --font-brand: 'Fraunces', Georgia, serif;
+    color: hsl(var(--foreground));
+    font-family: var(--font-body);
+  }
+
+  .admin-dialog {
+    color: hsl(var(--foreground));
+  }
+
+  .admin-shell {
+    background-image:
+      radial-gradient(ellipse 100% 65% at 100% 0%, hsl(var(--primary) / 0.055), transparent 58%),
+      radial-gradient(ellipse 85% 55% at 0% 100%, hsl(var(--secondary) / 0.06), transparent 55%);
+    background-attachment: fixed;
+  }
+
+  .admin-shell :is(h1, h2, h3),
+  .admin-dialog :is(h1, h2, h3) {
+    color: hsl(var(--foreground));
+    font-family: var(--font-brand);
+    letter-spacing: -0.025em;
+  }
+
+  .admin-login .admin-hero-title {
+    color: hsl(var(--primary-foreground));
+    font-family: var(--font-body);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    text-shadow: 0 2px 18px hsl(var(--brand-purple-deep) / 0.35);
+  }
+
+  .admin-login .admin-form-title {
+    color: hsl(var(--primary));
+    font-family: var(--font-body);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  .admin-shell table thead {
+    background-color: hsl(var(--surface-cream) / 0.3);
+  }
+
+  .admin-shell table tbody tr {
+    transition: background-color 160ms ease;
+  }
+
+  .admin-shell table tbody tr:hover {
+    background-color: hsl(var(--surface-purple) / 0.55);
+  }
+
+  .admin-shell input[type="checkbox"] {
+    border-radius: 0.3rem;
+    accent-color: hsl(var(--primary));
+  }
+
+}

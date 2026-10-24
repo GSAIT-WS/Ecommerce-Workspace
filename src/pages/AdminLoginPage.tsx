@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePageTitle } from "@/hooks/usePageTitle";
+import logo from "@/assets/logo-trimmed.png";
+import logoCream from "@/assets/logo-cream.png";
 
 const ADMIN_AUTH_KEY = "purvita_admin_authenticated";
 const ADMIN_EMAIL = "admin@gmail.com";
@@ -37,23 +39,20 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-background lg:grid lg:grid-cols-2">
+    <main className="admin-login min-h-screen bg-background lg:grid lg:grid-cols-2">
       <section className="relative hidden min-h-screen overflow-hidden lg:block">
         <img
           src="/banner-ingredients.png"
           alt=""
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/75 via-primary/65 to-green-900/70" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#352036]/80 via-primary/65 to-[#34552d]/70" />
         <div className="relative flex min-h-screen flex-col justify-between p-12">
-          <Link
-            to="/"
-            className="font-display text-3xl font-extrabold tracking-tight text-white"
-          >
-            PURVITA
+          <Link to="/" aria-label="PURVITA home" className="inline-flex w-fit rounded-xl bg-[#352036]/20 p-2">
+            <img src={logoCream} alt="PURVITA" className="h-14 w-auto" />
           </Link>
           <div className="max-w-md text-white">
-            <h1 className="mb-3 text-4xl font-extrabold">PURVITA Admin</h1>
+            <h1 className="admin-hero-title mb-3 font-display text-4xl font-extrabold">PURVITA Admin</h1>
             <p className="text-lg text-white/80">
               Sign in to access the administration portal.
             </p>
@@ -64,17 +63,14 @@ const AdminLoginPage = () => {
 
       <section className="flex min-h-screen items-center justify-center px-5 py-12 sm:px-8">
         <div className="w-full max-w-md">
-          <Link
-            to="/"
-            className="mb-10 inline-block font-display text-3xl font-extrabold tracking-tight text-primary lg:hidden"
-          >
-            PURVITA
+          <Link to="/" aria-label="PURVITA home" className="mb-10 inline-flex lg:hidden">
+            <img src={logo} alt="PURVITA" className="h-14 w-auto" />
           </Link>
 
           <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <ShieldCheck className="h-6 w-6" />
           </div>
-          <h1 className="font-display text-3xl font-extrabold tracking-tight text-foreground">
+          <h1 className="admin-form-title font-display text-3xl font-extrabold tracking-tight text-foreground">
             PURVITA Admin
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
