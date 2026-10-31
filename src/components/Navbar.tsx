@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, ShoppingCart, User, Menu, X, LogOut } from "lucide-react";
@@ -14,17 +14,17 @@ import logo from "@/assets/logo-trimmed.png";
 import logoCream from "@/assets/logo-cream.png";
 
 const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Shop", href: "/search" },
-  { label: "My Orders", href: "/orders" },
-  { label: "Contact", href: "/contact" },
+  { label: "Home", href: "/#home", id: "home" },
+  { label: "About", href: "/#about", id: "about" },
+  { label: "Shop", href: "/#shop", id: "shop" },
+  { label: "Contact", href: "/#contact", id: "contact" },
 ];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
   const location = useLocation();
   const navigate = useNavigate();
   const { items: cartItems } = useCart();
@@ -32,6 +32,17 @@ const Navbar = () => {
   const { resolvedTheme } = useTheme();
   const cartCount = cartItems.reduce((sum, i) => sum + i.quantity, 0);
   const brandLogo = resolvedTheme === "dark" ? logoCream : logo;
+
+  const scrollToSection = useCallback((id: string, behavior?: ScrollBehavior) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const headerHeight = document.querySelector("header")?.getBoundingClientRect().height ?? 0;
+    const top = window.scrollY + target.getBoundingClientRect().top - headerHeight;
+    const scrollBehavior =
+      behavior ??
+      (window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth");
+    window.scrollTo({ top, behavior: scrollBehavior });
+  }, []);
 
   /** Header gains a little depth once the page has moved — toggles a boolean
       rather than a scroll value, so it never re-renders mid-scroll. */
@@ -51,6 +62,84 @@ const Navbar = () => {
       if (frame) cancelAnimationFrame(frame);
     };
   }, []);
+
+  useEffect(() => {
+    if (location.pathname !== "/" && location.pathname !== "/home") {
+      const currentSectionByPath: Record<string, string> = {
+        "/about": "about",
+        "/search": "shop",
+        "/contact": "contact",
+      };
+      setActiveSection(currentSectionByPath[location.pathname] ?? "");
+      return;
+    }
+
+    const updateActiveSection = () => {
+      const headerHeight = document.querySelector("header")?.getBoundingClientRect().height ?? 0;
+      const marker = window.scrollY + headerHeight + 8;
+      let active = navLinks[0].id;
+
+      for (const link of navLinks) {
+        const section = document.getElementById(link.id);
+        if (section && section.getBoundingClientRect().top + window.scrollY <= marker) {
+          active = link.id;
+        }
+      }
+
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+        active = "contact";
+      }
+      setActiveSection(active);
+    };
+
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        updateActiveSection();
+        frame = 0;
+      });
+    };
+    updateActiveSection();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if ((location.pathname !== "/" && location.pathname !== "/home") || !location.hash) return;
+    const id = location.hash.slice(1);
+    let firstFrame = 0;
+    let secondFrame = 0;
+    firstFrame = requestAnimationFrame(() => {
+      secondFrame = requestAnimationFrame(() => scrollToSection(id));
+    });
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      cancelAnimationFrame(secondFrame);
+    };
+  }, [location.hash, location.pathname, scrollToSection]);
+
+  const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    setMobileOpen(false);
+    if (location.pathname !== "/" && location.pathname !== "/home") {
+      event.preventDefault();
+      const link = navLinks.find((item) => item.id === id);
+      if (link) navigate(link.href);
+      return;
+    }
+    event.preventDefault();
+    window.history.replaceState(null, "", `/#${id}`);
+    if (mobileOpen) {
+      window.setTimeout(() => scrollToSection(id), 280);
+    } else {
+      scrollToSection(id);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -95,18 +184,19 @@ const Navbar = () => {
           {/* Centre: desktop navigation */}
           <nav aria-label="Primary" className="hidden items-center gap-5 lg:flex xl:gap-7">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.label}
-                to={link.href}
-                data-active={location.pathname === link.href}
+                href={link.href}
+                onClick={(event) => handleNavClick(event, link.id)}
+                data-active={activeSection === link.id}
                 className={`link-underline font-body text-[13px] font-semibold tracking-[0.01em] ${
-                  location.pathname === link.href
+                  activeSection === link.id
                     ? "text-primary"
                     : "text-foreground/70 hover:text-primary"
                 }`}
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
           </nav>
 
@@ -235,19 +325,20 @@ const Navbar = () => {
 
               <div className="grid gap-1">
                 {navLinks.map((link) => (
-                  <Link
+                  <a
                     key={link.label}
-                    to={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    aria-current={location.pathname === link.href ? "page" : undefined}
-                    className={`rounded-xl px-3 py-2.5 font-body text-sm font-semibold transition-all duration-300 ease-smooth ${
-                      location.pathname === link.href
+                    href={link.href}
+                    onClick={(event) => handleNavClick(event, link.id)}
+                    aria-current={activeSection === link.id ? "location" : undefined}
+                    data-active={activeSection === link.id}
+                    className={`link-underline block rounded-xl px-3 py-2.5 font-body text-sm font-semibold transition-all duration-300 ease-smooth ${
+                      activeSection === link.id
                         ? "bg-primary/10 text-primary"
                         : "text-foreground/75 hover:bg-muted/70 hover:text-primary"
                     }`}
                   >
                     {link.label}
-                  </Link>
+                  </a>
                 ))}
               </div>
 

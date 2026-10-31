@@ -132,6 +132,7 @@ const HeroSection = () => {
 
   return (
     <section
+      id="home"
       className="relative isolate overflow-hidden border-b border-border/60 bg-brand-deep"
       aria-roledescription="carousel"
       aria-label="PURVITA featured chikki"
@@ -200,7 +201,7 @@ const HeroSection = () => {
                     className="group h-11 w-full rounded-full bg-[color:var(--hero-accent)] px-6 text-sm text-[color:var(--hero-accent-foreground)] shadow-lg shadow-black/25 hover:bg-[color:var(--hero-accent-hover)] hover:shadow-black/30 sm:h-12 sm:w-auto sm:px-7 sm:text-[15px]"
                     asChild
                   >
-                    <Link to="/search">
+                    <Link to="/#shop">
                       {slide.ctaLabel}
                       <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-smooth group-hover:translate-x-0.5" />
                     </Link>

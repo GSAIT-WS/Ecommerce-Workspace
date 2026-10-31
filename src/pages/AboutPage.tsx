@@ -1,107 +1,70 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Heart, Leaf, Shield } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const AboutPage = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+const AboutPage = ({ embedded = false }: { embedded?: boolean }) => (
+  <div className="min-h-screen bg-background">
+    {!embedded && <Navbar />}
 
-      <main className="container mx-auto px-4 py-8 md:py-12">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 font-body text-sm text-muted-foreground hover:text-primary"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Home
-        </Link>
+    <main
+      id={embedded ? "about" : undefined}
+      className={`relative isolate overflow-hidden px-4 py-10 md:py-16 ${
+        embedded ? "scroll-mt-28" : ""
+      }`}
+    >
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] bg-[radial-gradient(ellipse_65%_75%_at_50%_0%,hsl(var(--primary)/0.08),transparent_68%)]"
+        aria-hidden
+      />
+      <div className="mx-auto max-w-4xl">
+        {!embedded && (
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 font-body text-sm text-muted-foreground transition-colors hover:text-primary"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
+          </Link>
+        )}
 
-        <div className="mx-auto mt-8 max-w-3xl space-y-12">
-          {/* Hero */}
-          <section className="text-center">
-            <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
-              About <span className="text-primary">PURVITA</span>
-            </h1>
-            <p className="mt-4 font-body text-lg text-muted-foreground">
-              Fueling India with wholesome, crunchy goodness — one bar at a time.
+        <article className="mx-auto mt-10 max-w-3xl rounded-[2rem] border border-border/70 bg-card/80 px-6 py-9 shadow-card sm:px-10 sm:py-12 md:mt-14 md:px-16 md:py-16">
+          <header className="mb-8 border-b border-border/70 pb-7 sm:mb-10 sm:pb-9">
+            <p className="mb-3 font-brand text-xs font-bold uppercase tracking-[0.2em] text-primary/75">
+              PURVITA
             </p>
-          </section>
-
-          {/* Brand Story */}
-          <section className="rounded-2xl border border-border bg-card p-6 md:p-8">
-            <h2 className="mb-4 font-display text-2xl font-bold text-foreground">
+            <h1 className="font-brand text-4xl font-semibold leading-tight tracking-[-0.035em] text-foreground sm:text-5xl md:text-6xl">
               Our Story
-            </h2>
-            <div className="space-y-4 font-body text-sm leading-relaxed text-muted-foreground md:text-base">
-              <p>
-                PURVITA was born out of a simple frustration — finding healthy snacks in India that actually taste great. In 2023, our founders, a group of fitness enthusiasts from Bangalore, set out to create protein bars and multigrain snacks using locally-sourced millets, nuts, and superfoods.
-              </p>
-              <p>
-                What started as a weekend kitchen experiment quickly grew into a movement. Today, PURVITA serves thousands of health-conscious snackers across India — from gym-goers and office warriors to school kids and busy parents.
-              </p>
-              <p>
-                Every product is crafted with care — no refined sugar, no artificial preservatives, just clean ingredients backed by traditional Indian wisdom and modern nutrition science.
-              </p>
-            </div>
-          </section>
+            </h1>
+          </header>
 
-          {/* Mission */}
-          <section className="rounded-2xl border border-border bg-card p-6 md:p-8">
-            <h2 className="mb-6 font-display text-2xl font-bold text-foreground">
-              Our Mission
-            </h2>
-            <div className="grid gap-6 md:grid-cols-3">
-              {[
-                {
-                  icon: Heart,
-                  title: "Health First",
-                  description: "Every product is designed to nourish, not just fill. We prioritize real nutrition over empty calories.",
-                },
-                {
-                  icon: Leaf,
-                  title: "Sustainably Sourced",
-                  description: "We partner with local farmers to source millets, ragi, and nuts — supporting communities while staying sustainable.",
-                },
-                {
-                  icon: Shield,
-                  title: "Transparency",
-                  description: "No hidden ingredients, no misleading labels. What you see is exactly what you get — clean and honest.",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="flex flex-col items-center rounded-xl bg-background p-6 text-center"
-                >
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                    <item.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="mb-2 font-display text-base font-bold text-foreground">
-                    {item.title}
-                  </h3>
-                  <p className="font-body text-xs text-muted-foreground">
-                    {item.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Fun Fact */}
-          <section className="rounded-2xl bg-primary/5 p-6 text-center md:p-8">
-            <p className="font-display text-lg font-bold text-primary md:text-xl">
-              🎉 Over 1,00,000 bars sold across India!
+          <div className="space-y-6 font-brand text-base leading-[1.9] text-foreground/80 sm:space-y-7 sm:text-lg sm:leading-[1.95]">
+            <p>
+              At PURVITA, we believe that some of life’s best things come from our roots.
+              Inspired by India’s rich food traditions, we bring together familiar flavours,
+              thoughtfully chosen ingredients and a fresh perspective on everyday eating.
             </p>
-            <p className="mt-2 font-body text-sm text-muted-foreground">
-              Thank you for being part of the PURVITA family.
+            <p>
+              Our journey begins with chikki—a much-loved Indian treat reimagined with
+              traditional grains and delicious combinations. We aim to bring the tastes we
+              grew up with into the lives of today’s generation, creating simple moments of
+              joy with every bite.
             </p>
-          </section>
-        </div>
-      </main>
+            <p>
+              As we grow, our commitment remains the same: celebrating our food heritage
+              while creating products that fit today’s lifestyles.
+            </p>
+          </div>
 
-      <Footer />
-    </div>
-  );
-};
+          <p className="mt-9 font-brand text-xl font-semibold italic leading-snug text-primary sm:mt-11 sm:text-2xl">
+            PURVITA — Goodness from the Roots.
+          </p>
+        </article>
+      </div>
+    </main>
+
+    {!embedded && <Footer />}
+  </div>
+);
 
 export default AboutPage;

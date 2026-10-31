@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const ContactPage = () => {
+const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -36,16 +36,21 @@ const ContactPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      {!embedded && <Navbar />}
 
-      <main className="container mx-auto px-4 py-8 md:py-12">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 font-body text-sm text-muted-foreground hover:text-primary"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Home
-        </Link>
+      <main
+        id={embedded ? "contact" : undefined}
+        className={`container mx-auto px-4 py-8 md:py-12 ${embedded ? "scroll-mt-28" : ""}`}
+      >
+        {!embedded && (
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 font-body text-sm text-muted-foreground hover:text-primary"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
+          </Link>
+        )}
 
         <div className="mx-auto mt-8 max-w-3xl">
           <h1 className="mb-2 font-display text-3xl font-bold text-foreground md:text-4xl">
@@ -164,7 +169,7 @@ const ContactPage = () => {
         </div>
       </main>
 
-      <Footer />
+      {!embedded && <Footer />}
     </div>
   );
 };

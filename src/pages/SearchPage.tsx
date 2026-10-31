@@ -27,7 +27,7 @@ const sortOptions = [
   "Newest",
 ];
 
-const SearchPage = () => {
+const SearchPage = ({ embedded = false }: { embedded?: boolean }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const categoryParam = searchParams.get("category") || "";
@@ -118,7 +118,8 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      {!embedded && <Navbar />}
+      <main id={embedded ? "shop" : undefined} className={embedded ? "scroll-mt-28" : undefined}>
 
       {/* Search Header */}
       <section className="relative overflow-hidden border-b border-border bg-surface-subtle/50 py-10 md:py-12">
@@ -128,6 +129,13 @@ const SearchPage = () => {
           aria-hidden
         />
         <div className="container relative mx-auto px-4 md:px-8">
+          {embedded && (
+            <div className="mb-6 text-center">
+              <h2 className="font-brand text-3xl font-semibold tracking-[-0.03em] text-foreground sm:text-4xl">
+                Shop
+              </h2>
+            </div>
+          )}
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="mb-6">
             <div className="group relative mx-auto max-w-2xl">
@@ -364,7 +372,8 @@ const SearchPage = () => {
         </div>
       </section>
 
-      <Footer />
+      </main>
+      {!embedded && <Footer />}
     </div>
   );
 };
