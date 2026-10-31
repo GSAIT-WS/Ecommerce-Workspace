@@ -16,7 +16,6 @@ import SearchPage from "./pages/SearchPage";
 import CategoryPage from "./pages/CategoryPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
-import CategoriesPage from "./pages/CategoriesPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import PaymentPage from "./pages/PaymentPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
@@ -41,7 +40,6 @@ import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import ShippingInfoPage from "./pages/ShippingInfoPage";
 import ReturnsRefundsPage from "./pages/ReturnsRefundsPage";
-import BuildComboPage from "./pages/BuildComboPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
@@ -76,15 +74,12 @@ const App = () => (
               <Route path="/category/:slug" element={<CategoryPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/cart" element={<CartPage />} />
-              <Route path="/categories" element={<CategoriesPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/terms-of-service" element={<TermsOfServicePage />} />
               <Route path="/shipping-info" element={<ShippingInfoPage />} />
               <Route path="/returns-refunds" element={<ReturnsRefundsPage />} />
-              <Route path="/build-combo" element={<BuildComboPage />} />
-
               {/* Auth routes — redirect to / when already logged in */}
               <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
               <Route path="/signup" element={<PublicRoute><SignupPage /></PublicRoute>} />

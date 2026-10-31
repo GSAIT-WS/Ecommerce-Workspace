@@ -7,7 +7,6 @@ const testimonials = [
   { name: "Rahul Verma", rating: 5, text: "Finally a brand that doesn't compromise on quality. My whole family loves these." },
   { name: "Ananya Patel", rating: 5, text: "The protein bars keep me energized throughout my busy workday. Highly recommend!" },
   { name: "Vikram Joshi", rating: 4, text: "Great taste, honest nutrition. PURVITA has replaced all my unhealthy snacking habits." },
-  { name: "Sneha Reddy", rating: 5, text: "I ordered the combo pack and every single item was delicious. Will order again!" },
   { name: "Arjun Nair", rating: 5, text: "Best healthy snacks I've found in India. The multigrain crunch is addictive!" },
   { name: "Meera Iyer", rating: 4, text: "Love that they use natural ingredients. My kids enjoy them as school snacks." },
   { name: "Karan Singh", rating: 5, text: "Premium quality at a fair price. PURVITA delivers what it promises every time." },

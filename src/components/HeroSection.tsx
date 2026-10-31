@@ -1,7 +1,7 @@
 import { type CSSProperties, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Compass, Pause, Play } from "lucide-react";
+import { ArrowRight, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EASE } from "@/lib/motion";
 import bannerRange from "@/assets/product_images/product_banner_1.jpeg";
@@ -203,17 +203,6 @@ const HeroSection = () => {
                     <Link to="/search">
                       {slide.ctaLabel}
                       <ArrowRight className="h-4 w-4 transition-transform duration-300 ease-smooth group-hover:translate-x-0.5" />
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="xl"
-                    className="group h-11 w-full rounded-full border-white/35 bg-white/10 px-6 text-sm text-white shadow-sm backdrop-blur-sm hover:border-white/50 hover:bg-white/20 hover:text-white sm:h-12 sm:w-auto sm:px-7 sm:text-[15px]"
-                    asChild
-                  >
-                    <Link to="/categories">
-                      Explore Categories
-                      <Compass className="h-4 w-4 transition-transform duration-300 ease-smooth group-hover:rotate-12" />
                     </Link>
                   </Button>
                 </div>

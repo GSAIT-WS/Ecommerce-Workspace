@@ -175,13 +175,6 @@ export const recentlyViewed: SavedProduct[] = [
     price: 79,
     originalPrice: 99,
   },
-  {
-    id: "6",
-    name: "Combo Pack",
-    image: PRODUCT_IMAGE_PLACEHOLDER,
-    price: 499,
-    originalPrice: 649,
-  },
 ];
 
 export const notificationSettings: NotificationSettings = {

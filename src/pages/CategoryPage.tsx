@@ -31,10 +31,6 @@ const categoryData: Record<string, { title: string; subtitle: string }> = {
     title: "Healthy Foods",
     subtitle: "Nutrient-rich superfoods sourced from Indian farms",
   },
-  "combos": {
-    title: "Value Combos",
-    subtitle: "Curated bundles for maximum savings and variety",
-  },
 };
 
 const CategoryPage = () => {

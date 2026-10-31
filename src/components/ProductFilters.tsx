@@ -45,7 +45,6 @@ const ratingFilters = [
 
 const packFilters = [
   { id: "single", label: "Single Pack" },
-  { id: "combo", label: "Combo Pack" },
   { id: "bulk", label: "Bulk / Family Pack" },
 ];
 

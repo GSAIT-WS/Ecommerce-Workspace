@@ -12,7 +12,6 @@ export const searchKeywords: Record<string, string[]> = {
   protein: ["protein", "pro", "whey", "power", "energy"],
   multigrain: ["multigrain", "multi", "grain", "millet", "ragi", "jowar", "bajra"],
   healthy: ["healthy", "health", "natural", "organic", "nuts", "seeds", "trail"],
-  combos: ["combo", "pack", "value", "bundle", "bulk"],
   "sugar-free": ["sugar", "sugarfree", "no sugar", "low sugar", "diabetic"],
   vegan: ["vegan", "plant", "dairy-free"],
   "gluten-free": ["gluten", "celiac"],

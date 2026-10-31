@@ -83,7 +83,9 @@ const SearchPage = () => {
 
   const { data: apiCategories } = useCategories();
   const categoryList = apiCategories?.length
-    ? apiCategories.map((c) => ({ slug: c.slug, name: c.name }))
+    ? apiCategories
+        .filter((category) => category.slug !== "combos")
+        .map((category) => ({ slug: category.slug, name: category.name }))
     : categories;
 
   const getCategoryName = () => {

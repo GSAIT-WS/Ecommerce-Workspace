@@ -11,7 +11,6 @@ import type { Product } from "@/lib/productsApi";
 import categoryProteinImg from "@/assets/category-protein-bars.jpg";
 import categoryMultigrainImg from "@/assets/category-multigrain.jpg";
 import categoryHealthyImg from "@/assets/category-healthy-foods.jpg";
-import categoryCombosImg from "@/assets/category-combos.jpg";
 // Trending images
 import trendingMilletImg from "@/assets/trending-millet.jpg";
 import trendingSugarfreeImg from "@/assets/trending-sugarfree.jpg";
@@ -27,7 +26,6 @@ const categories = [
   { name: "Protein Bars", slug: "protein-bars", count: 24, image: categoryProteinImg },
   { name: "Multigrain Snacks", slug: "multigrain", count: 18, image: categoryMultigrainImg },
   { name: "Healthy Foods", slug: "healthy-foods", count: 32, image: categoryHealthyImg },
-  { name: "Combos & Value Packs", slug: "combos", count: 12, image: categoryCombosImg },
 ];
 
 const healthKeywords = [
@@ -54,7 +52,6 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
   const [recentSearches, setRecentSearches] = useState([
     "Peanut butter protein",
     "Multigrain cookies",
-    "Healthy snacks combo",
   ]);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -418,7 +415,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                       <h3 className="mb-3 font-body text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                         Popular Categories
                       </h3>
-                      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                         {categories.map((cat, index) => (
                           <motion.button
                             key={cat.slug}

@@ -8,24 +8,15 @@
 
 - **Home Page** – Hero section, featured products, category grid, offers, trust points, and customer reviews carousel
 - **Search** – `/search` for product search
-- **Categories** – `/categories` and `/category/:slug` for browsing by category (Protein Bars, Multigrain Snacks, Health Mix, Chikki & Sweets)
+- **Product Categories** – `/category/:slug` for browsing products by category (Protein Bars, Multigrain Snacks, Health Mix, Chikki & Sweets)
 - **Product Detail** – `/product/:id` for individual product pages
 - **Featured Products** – Highlighted products on the home page
 
 ---
 
-## 2. Build Combo
+## 2. Shopping Cart
 
-- **Build Combo** – `/build-combo` to create custom combos with:
-  - Multiple products and quantities
-  - Optional gift wrap and gift message
-  - Combo-specific pricing
-
----
-
-## 3. Shopping Cart
-
-- Add products and combos to cart
+- Add products to cart
 - Update quantity and remove items
 - Subtotal, delivery charge (₹49; free above ₹499), and savings display
 - Cart badge in navbar showing item count
@@ -33,7 +24,7 @@
 
 ---
 
-## 4. Checkout
+## 3. Checkout
 
 - **Address Selection** – Choose from saved addresses or add new
 - **Delivery Slot** – Date and time selection (Morning, Afternoon, Evening)
@@ -43,7 +34,7 @@
 
 ---
 
-## 5. Address Management
+## 4. Address Management
 
 - **Addresses Page** – `/profile/addresses`
 - Add, edit, delete addresses
@@ -53,7 +44,7 @@
 
 ---
 
-## 6. Orders
+## 5. Orders
 
 - **My Orders** – `/orders` with filters (All, Active, Delivered)
 - **Order Detail** – `/order/:orderId` with:
@@ -67,7 +58,7 @@
 
 ---
 
-## 7. Payments
+## 6. Payments
 
 - **Payment Page** – `/payment` for completing payment
 - **Stripe Integration** – `create-payment-intent` and `payment-webhook` Edge Functions
@@ -76,7 +67,7 @@
 
 ---
 
-## 8. User Account & Profile
+## 7. User Account & Profile
 
 - **Auth** – `/auth` (Supabase Auth, JWT-based)
 - **Profile** – `/profile` hub
@@ -91,7 +82,7 @@
 
 ---
 
-## 9. Backend (Supabase Edge Functions)
+## 8. Backend (Supabase Edge Functions)
 
 | Function | Purpose |
 |----------|---------|
@@ -119,7 +110,7 @@
 
 ---
 
-## 10. UX & Design
+## 9. UX & Design
 
 - **Theme Toggle** – Light/dark mode
 - **Responsive Layout** – Mobile bottom nav, desktop top nav
@@ -130,7 +121,7 @@
 
 ---
 
-## 11. Info & Legal Pages
+## 10. Info & Legal Pages
 
 - About, Contact, Privacy Policy, Terms of Service
 - Shipping info, Returns & refunds
