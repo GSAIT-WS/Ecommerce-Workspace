@@ -132,7 +132,6 @@ const HeroSection = () => {
 
   return (
     <section
-      id="home"
       className="relative isolate overflow-hidden border-b border-border/60 bg-brand-deep"
       aria-roledescription="carousel"
       aria-label="PURVITA featured chikki"

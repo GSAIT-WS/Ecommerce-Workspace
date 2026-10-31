@@ -7,6 +7,28 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import FeedbackHighlights from "@/components/FeedbackHighlights";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+const contactFaqs = [
+  {
+    question: "How can I share product feedback?",
+    answer: "Use the contact form and include the product name along with your feedback.",
+  },
+  {
+    question: "Where can I view my order history?",
+    answer: "Sign in to your account and open My Orders to view your orders.",
+  },
+  {
+    question: "How can I browse PURVITA products?",
+    answer: "Use the Shop section to browse products, search, and apply filters.",
+  },
+];
 
 const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -40,7 +62,9 @@ const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
 
       <main
         id={embedded ? "contact" : undefined}
-        className={`container mx-auto px-4 py-8 md:py-12 ${embedded ? "scroll-mt-28" : ""}`}
+        className={`w-full px-4 py-8 sm:px-6 md:px-8 md:py-12 lg:px-12 ${
+          embedded ? "scroll-mt-28" : ""
+        }`}
       >
         {!embedded && (
           <Link
@@ -52,13 +76,15 @@ const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
           </Link>
         )}
 
-        <div className="mx-auto mt-8 max-w-3xl">
-          <h1 className="mb-2 font-display text-3xl font-bold text-foreground md:text-4xl">
-            Contact Us
+        <div className="mt-8 w-full">
+          <h1 className="mb-2 text-center font-brand text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-4xl">
+            Contact &amp; Feedback
           </h1>
-          <p className="mb-10 font-body text-muted-foreground">
-            We'd love to hear from you. Reach out anytime!
+          <p className="mb-10 text-center font-body text-muted-foreground">
+            Contact our team, share product feedback, or browse answers to common questions.
           </p>
+
+          <FeedbackHighlights />
 
           <div className="grid gap-8 md:grid-cols-2">
             {/* Contact Info */}
@@ -94,6 +120,9 @@ const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
 
             {/* Contact Form */}
             <div className="rounded-2xl border border-border bg-card p-6">
+              <h2 className="mb-5 font-brand text-xl font-semibold text-foreground">
+                Send us a message
+              </h2>
               {submitted ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary/10">
@@ -144,10 +173,12 @@ const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
                     {errors.email && <p className="font-body text-xs text-destructive">{errors.email}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="message" className="font-body text-sm">Message</Label>
+                    <Label htmlFor="message" className="font-body text-sm">
+                      Message or product feedback
+                    </Label>
                     <Textarea
                       id="message"
-                      placeholder="How can we help?"
+                      placeholder="Include the product name if you’re sharing product feedback."
                       maxLength={1000}
                       rows={4}
                       value={formData.message}
@@ -166,6 +197,27 @@ const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
               )}
             </div>
           </div>
+
+          <section className="mt-10 rounded-2xl border border-border/70 bg-card/80 p-5 shadow-card sm:p-7" aria-labelledby="contact-faq-heading">
+            <h2
+              id="contact-faq-heading"
+              className="mb-3 font-brand text-2xl font-semibold text-foreground sm:text-3xl"
+            >
+              Frequently Asked Questions
+            </h2>
+            <Accordion type="single" collapsible className="w-full">
+              {contactFaqs.map((faq, index) => (
+                <AccordionItem key={faq.question} value={`contact-faq-${index}`}>
+                  <AccordionTrigger className="text-left font-body text-sm sm:text-base">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="font-body leading-relaxed text-muted-foreground">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </section>
         </div>
       </main>
 
