@@ -10,7 +10,7 @@ const FeaturedProducts = () => {
   return (
     <section className="relative overflow-hidden border-y border-border/50 bg-background py-14 md:py-20">
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_55%_at_50%_0%,hsl(var(--accent)/0.11),transparent_65%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_0%,hsl(var(--accent)/0.13),transparent_68%)]"
         aria-hidden
       />
       <div className="container relative mx-auto px-4 md:px-8">
@@ -23,13 +23,13 @@ const FeaturedProducts = () => {
         </Reveal>
 
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6" aria-label="Loading products">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 xl:gap-7" aria-label="Loading products">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="overflow-hidden rounded-[1.5rem] border border-border/70 bg-card shadow-card"
+                className="overflow-hidden rounded-[1.6rem] border border-border/70 bg-card shadow-card"
               >
-                <div className="aspect-square animate-pulse bg-muted/80" />
+                <div className="aspect-[4/4.15] animate-pulse bg-muted/80" />
                 <div className="space-y-3 p-4 md:p-5">
                   <div className="h-4 w-4/5 animate-pulse rounded-full bg-muted/80" />
                   <div className="h-4 w-2/5 animate-pulse rounded-full bg-muted/80" />
@@ -49,7 +49,7 @@ const FeaturedProducts = () => {
           </div>
         ) : products.length > 0 ? (
           <Reveal distance={14} amount={0.1}>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 xl:gap-7">
               {products.map((product) => (
                 <ProductCard key={product.id} {...product} />
               ))}

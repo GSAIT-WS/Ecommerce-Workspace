@@ -43,16 +43,16 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, image }: Produ
   return (
     <Link
       to={`/product/${id}`}
-      className="card-interactive group relative flex flex-col overflow-hidden rounded-[1.5rem] border border-border/80 bg-card shadow-card"
+      className="card-interactive group relative flex h-full min-h-[420px] flex-col overflow-hidden rounded-[1.6rem] border border-border/80 bg-card shadow-card"
     >
-      <div className="relative aspect-square overflow-hidden bg-surface-cream/45 dark:bg-surface-cream">
+      <div className="relative aspect-[4/4.15] overflow-hidden bg-surface-cream/50 dark:bg-surface-cream">
         <img
           src={image}
           alt={name}
           loading="lazy"
           decoding="async"
           draggable={false}
-          className="h-full w-full object-cover transition-transform duration-500 ease-smooth group-hover:scale-[1.045]"
+          className="h-full w-full object-cover transition-transform duration-500 ease-smooth group-hover:scale-[1.04]"
         />
         <div
           className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/15"
@@ -72,12 +72,12 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, image }: Produ
       </div>
 
       <div className="flex flex-1 flex-col p-4 md:p-5">
-        <h3 className="mb-3 line-clamp-2 min-h-[2.5rem] font-body text-sm font-semibold leading-snug text-primary transition-colors duration-300 group-hover:text-primary/80 md:text-base">
+        <h3 className="mb-3 line-clamp-2 min-h-[2.8rem] font-body text-sm font-semibold leading-snug text-primary transition-colors duration-300 group-hover:text-primary/80 md:text-base">
           {name}
         </h3>
 
         <div className="mt-auto space-y-3">
-          <div className="flex items-baseline gap-2">
+          <div className="flex min-h-[2.25rem] items-end gap-2">
             <span className="font-brand text-[1.35rem] font-semibold tracking-tight text-primary md:text-2xl">
               ₹{price}
             </span>
