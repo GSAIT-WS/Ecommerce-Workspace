@@ -1,10 +1,14 @@
-import { useEffect, useMemo, useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
 import {
-  Activity, AlertTriangle, ArrowRight, ArrowUpRight, Bell, Check,
+  Activity, AlertTriangle, ArrowRight, ArrowUpRight, Bell, Check, ChevronDown,
   CircleDollarSign, CreditCard, LayoutDashboard, LogOut, Menu, Package, Pencil,
-  Plus, Search, Settings, ShoppingBag, ShoppingCart, Users, X,
+  Plus, Search, Settings, ShoppingBag, ShoppingCart, UserRound, Users, X,
 } from "lucide-react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip,
   XAxis, YAxis,
@@ -39,8 +43,18 @@ import {
   type AdminOrderSummary,
   type AdminOrderStatus,
 } from "@/services/adminOrderData";
+import {
+  AdminChangePasswordPage, AdminProfilePage, AdminProfileSettingsPage,
+  type AdminProfile,
+} from "@/pages/admin/AdminProfilePages";
 
 const ADMIN_AUTH_KEY = "purvita_admin_authenticated";
+const initialAdminProfile: AdminProfile = { name: "Admin", phone: "", avatar: null };
+const adminProfileRouteTitles: Record<string, string> = {
+  "/admin-dashboard/profile": "My Profile",
+  "/admin-dashboard/profile/settings": "Profile Settings",
+  "/admin-dashboard/profile/change-password": "Change Password",
+};
 const currency = (amount: number) => `₹${amount.toLocaleString("en-IN")}`;
 const navItems = [
   { title: "Overview", path: "/admin-dashboard", icon: LayoutDashboard },
@@ -382,10 +396,19 @@ const AdminDashboardPage = () => {
   const [products, setProducts] = useState(() => adminProducts.map((item) => ({ ...item })));
   const [orders, setOrders] = useState(() => adminOrders.map((item) => ({ ...item })));
   const [notifications, setNotifications] = useState(() => adminNotifications.map((item) => ({ ...item })));
+  const [adminProfile, setAdminProfile] = useState(initialAdminProfile);
   const unreadNotifications = notifications.filter((item) => !item.read).length;
   const isAuthenticated = sessionStorage.getItem(ADMIN_AUTH_KEY) === "1";
   const currentPath = location.pathname.replace(/\/+$/, "") || "/admin-dashboard";
-  const activeItem = navItems.find((item) => item.path === currentPath) ?? navItems[0];
+  const activeItem = navItems.find((item) => item.path === currentPath) ?? {
+    title: adminProfileRouteTitles[currentPath] ?? navItems[0].title,
+    path: "",
+    icon: UserRound,
+  };
+  const logout = useCallback(() => {
+    sessionStorage.removeItem(ADMIN_AUTH_KEY);
+    navigate("/admin-login", { replace: true });
+  }, [navigate]);
   const page = useMemo(() => {
     switch (currentPath) {
       case "/admin-dashboard/orders": return <OrdersPage dataSource={demoAdminOrderDataSource} />;
@@ -395,16 +418,15 @@ const AdminDashboardPage = () => {
       case "/admin-dashboard/payments": return <PaymentsPage />;
       case "/admin-dashboard/notifications": return <NotificationsPage notifications={notifications} setNotifications={setNotifications} />;
       case "/admin-dashboard/settings": return <SettingsPage />;
+      case "/admin-dashboard/profile": return <AdminProfilePage profile={adminProfile} onLogout={logout} />;
+      case "/admin-dashboard/profile/settings": return <AdminProfileSettingsPage profile={adminProfile} onSave={setAdminProfile} onLogout={logout} />;
+      case "/admin-dashboard/profile/change-password": return <AdminChangePasswordPage onLogout={logout} />;
       case "/admin-dashboard": return <Overview orders={orders} products={products} onNavigate={navigate} />;
       default: return <Navigate to="/admin-dashboard" replace />;
     }
-  }, [currentPath, navigate, orders, products, notifications]);
+  }, [currentPath, navigate, orders, products, notifications, adminProfile, logout]);
   if (!isAuthenticated) return <Navigate to="/admin-login" replace />;
 
-  const logout = () => {
-    sessionStorage.removeItem(ADMIN_AUTH_KEY);
-    navigate("/admin-login", { replace: true });
-  };
   const sidebar = (
     <div className="flex min-h-full flex-col">
       <Link to="/admin-dashboard" onClick={() => setMobileNavOpen(false)} className="flex shrink-0 items-center gap-3 border-b border-border px-5 py-5">
@@ -426,7 +448,7 @@ const AdminDashboardPage = () => {
         <header className="sticky top-0 z-20 border-b border-border/80 bg-background/90 backdrop-blur-xl">
           <div className="flex min-h-16 min-w-0 items-center justify-between gap-2 px-3 py-2 sm:px-7">
             <div className="flex min-w-0 items-center gap-3"><Button variant="ghost" size="icon" className="shrink-0 lg:hidden" onClick={() => setMobileNavOpen(true)} aria-label="Open navigation"><Menu className="h-5 w-5" /></Button><div className="min-w-0"><p className="truncate text-sm font-bold">{activeItem.title}</p><p className="hidden truncate text-[11px] text-muted-foreground sm:block">PURVITA · Admin workspace / {activeItem.title}</p></div></div>
-            <div className="flex items-center gap-3"><span className="hidden rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold text-primary sm:inline-flex">SAMPLE DATA</span><Link to="/admin-dashboard/notifications" aria-label={`${unreadNotifications} unread sample notifications`} className="relative rounded-full p-2 text-muted-foreground transition hover:bg-muted"><Bell className="h-5 w-5" />{unreadNotifications > 0 && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />}</Link><div className="grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-sm font-bold text-primary">A</div><div className="hidden sm:block"><p className="text-xs font-semibold">Admin</p><p className="text-[10px] text-muted-foreground">Prototype account</p></div></div>
+            <div className="flex min-w-0 items-center gap-1 sm:gap-3"><span className="hidden rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold text-primary sm:inline-flex">SAMPLE DATA</span><Link to="/admin-dashboard/notifications" aria-label={`${unreadNotifications} unread sample notifications`} className="relative rounded-full p-2 text-muted-foreground transition hover:bg-muted"><Bell className="h-5 w-5" />{unreadNotifications > 0 && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />}</Link><DropdownMenu><DropdownMenuTrigger asChild><button type="button" aria-label="Open admin profile menu" className="flex min-w-0 items-center gap-2 rounded-xl p-1.5 text-left transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-primary/15 text-sm font-bold text-primary">{adminProfile.avatar ? <img src={adminProfile.avatar} alt="" className="h-full w-full object-cover" /> : adminProfile.name.trim().charAt(0).toUpperCase() || "A"}</span><span className="hidden min-w-0 sm:block"><span className="block max-w-32 truncate text-xs font-semibold">{adminProfile.name}</span><span className="block text-[10px] text-muted-foreground">Prototype account</span></span><ChevronDown className="hidden h-4 w-4 shrink-0 text-muted-foreground sm:block" /></button></DropdownMenuTrigger><DropdownMenuContent align="end" sideOffset={10} className="w-[min(20rem,calc(100vw-1.5rem))] min-w-0 rounded-2xl border-border/80 bg-card p-2 shadow-card-elevated"><div className="flex min-w-0 items-center gap-3 px-3 py-3"><span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full bg-primary/15 text-base font-bold text-primary">{adminProfile.avatar ? <img src={adminProfile.avatar} alt="" className="h-full w-full object-cover" /> : adminProfile.name.trim().charAt(0).toUpperCase() || "A"}</span><span className="min-w-0"><span className="block truncate text-sm font-semibold">{adminProfile.name}</span><span className="block break-all text-xs text-muted-foreground">admin@gmail.com</span></span></div><DropdownMenuSeparator className="bg-border/80" /><DropdownMenuItem asChild className="min-h-10 cursor-pointer rounded-lg focus:bg-surface-purple focus:text-primary"><Link to="/admin-dashboard/profile"><UserRound className="mr-2 h-4 w-4" />My Profile</Link></DropdownMenuItem><DropdownMenuItem asChild className="min-h-10 cursor-pointer rounded-lg focus:bg-surface-purple focus:text-primary"><Link to="/admin-dashboard/profile/settings"><Pencil className="mr-2 h-4 w-4" />Profile Settings</Link></DropdownMenuItem><DropdownMenuItem asChild className="min-h-10 cursor-pointer rounded-lg focus:bg-surface-purple focus:text-primary"><Link to="/admin-dashboard/profile/change-password"><Settings className="mr-2 h-4 w-4" />Change Password</Link></DropdownMenuItem><DropdownMenuSeparator className="bg-border/80" /><DropdownMenuItem onSelect={logout} className="min-h-10 cursor-pointer rounded-lg text-destructive focus:bg-destructive/10 focus:text-destructive"><LogOut className="mr-2 h-4 w-4" />Logout</DropdownMenuItem></DropdownMenuContent></DropdownMenu></div>
           </div>
         </header>
         <main className="mx-auto w-full min-w-0 max-w-[1500px] p-3 sm:p-5 lg:p-7">{page}<p className="mt-7 border-t border-border/70 pt-4 text-center text-[11px] text-muted-foreground">PURVITA admin prototype · sample values only · frontend route guard is not production authorization.</p></main>
