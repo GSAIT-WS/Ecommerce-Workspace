@@ -33,10 +33,10 @@ const MSG_NO_USER_EMAIL = "No account found with this email.";
 const MSG_NO_USER_PHONE = "No account found with this number.";
 
 const FEATURES = [
-  { icon: Leaf, text: "100% Natural Ingredients", color: "text-emerald-300" },
-  { icon: Zap, text: "Delivered in 24 Hours", color: "text-amber-300" },
-  { icon: Star, text: "Curated by Nutritionists", color: "text-yellow-300" },
-  { icon: ShieldCheck, text: "Safe & Quality Assured", color: "text-sky-300" },
+  { icon: Leaf, text: "100% Natural Ingredients", color: "text-brand-green" },
+  { icon: Zap, text: "Delivered in 24 Hours", color: "text-brand-gold" },
+  { icon: Star, text: "Curated by Nutritionists", color: "text-brand-gold" },
+  { icon: ShieldCheck, text: "Safe & Quality Assured", color: "text-brand-green" },
 ];
 
 async function rpcEmailRegistered(email: string): Promise<{ ok: true; registered: boolean } | { ok: false }> {
@@ -270,11 +270,11 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
   const dir = step === "choose" ? -1 : 1;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-background text-foreground">
 
       {/* ── Left Panel ──────────────────────────────────────────────────────── */}
       <motion.div
-        className="hidden lg:flex lg:w-[52%] relative overflow-hidden"
+        className="relative hidden overflow-hidden lg:flex lg:w-1/2"
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
@@ -284,23 +284,20 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
           src="/banner-ingredients.png"
           alt="Multigrain bars with nuts, seeds and grains"
           className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{ filter: "saturate(1.18) contrast(1.06) brightness(0.92)" }}
           initial={{ opacity: 0, scale: 1.06 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.1, ease: "easeOut" }}
         />
-        {/* Gradient overlays — unchanged */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/75 via-primary/65 to-green-900/70" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#352036]/80 via-primary/65 to-[#34552d]/70" />
 
         {/* Decorative floating circles */}
         <motion.div
-          className="absolute top-16 right-16 w-32 h-32 rounded-full bg-amber-400/20 blur-2xl"
+          className="absolute top-16 right-16 w-32 h-32 rounded-full bg-brand-gold/15 blur-2xl"
           animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-32 left-12 w-48 h-48 rounded-full bg-green-400/15 blur-3xl"
+          className="absolute bottom-32 left-12 w-48 h-48 rounded-full bg-brand-green/15 blur-3xl"
           animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         />
@@ -329,7 +326,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
             >
               <h2 className="text-5xl font-extrabold leading-[1.12] text-white drop-shadow-md">
                 Snack Smart,<br />
-                <span className="text-amber-300">Live Healthy.</span>
+                <span className="text-brand-gold">Live Healthy.</span>
               </h2>
               <p className="mt-4 text-white/75 text-lg leading-relaxed max-w-xs">
                 Discover wholesome snacks packed with nutrition and incredible taste — delivered fresh to your door.

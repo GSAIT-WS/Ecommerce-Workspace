@@ -212,8 +212,9 @@ export function useScrollRubberBand<T extends HTMLElement>() {
     const write = () => {
       const ratio = Math.min(1, Math.abs(pull) / MAX_PULL);
       el.style.transformOrigin = edge === "bottom" ? "center bottom" : "center top";
+      const translateY = edge === "bottom" ? 0 : pull;
       el.style.transform =
-        `translate3d(0, ${pull.toFixed(2)}px, 0) scaleY(${(1 + ratio * MAX_STRETCH).toFixed(5)})`;
+        `translate3d(0, ${translateY.toFixed(2)}px, 0) scaleY(${(1 + ratio * MAX_STRETCH).toFixed(5)})`;
     };
 
     const settle = () => {

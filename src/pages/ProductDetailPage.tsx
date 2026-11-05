@@ -597,7 +597,7 @@ const ProductDetailPage = () => {
               </Button>
 
               <Button
-                className="flex-1 rounded-full bg-secondary px-8 py-6 font-body text-base font-semibold text-secondary-foreground hover:bg-secondary/90 sm:flex-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-full bg-brand-gold bg-none px-8 py-6 font-display text-base font-bold text-brand-deep shadow-md shadow-brand-gold/25 hover:bg-brand-gold/90 hover:shadow-lg sm:flex-none disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleBuyNow}
                 disabled={!product.isActive}
               >
@@ -1230,4 +1230,3 @@ const ProductDetailPage = () => {
 };
 
 export default ProductDetailPage;
-

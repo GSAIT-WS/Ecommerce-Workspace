@@ -65,15 +65,15 @@ const CartPage = () => {
                   </Link>
 
                   {/* Product Details */}
-                  <div className="flex flex-1 flex-col justify-between">
+                  <div className="flex min-w-0 flex-1 flex-col justify-between">
                     <div>
                       <Link
                         to={`/product/${item.id}`}
-                        className="font-display font-semibold text-foreground hover:text-primary text-sm md:text-base"
+                        className="break-words font-display text-sm font-semibold text-foreground hover:text-primary md:text-base"
                       >
                         {item.name}
                       </Link>
-                      <div className="mt-2 flex items-baseline gap-2">
+                      <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
                         <span className="font-body text-lg font-bold text-foreground">
                           ₹{item.price}
                         </span>

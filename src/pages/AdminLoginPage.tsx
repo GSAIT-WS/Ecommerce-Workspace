@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ const AdminLoginPage = () => {
   usePageTitle("Admin Login");
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(
     () => sessionStorage.getItem(ADMIN_AUTH_KEY) === "1",
   );
@@ -94,17 +95,28 @@ const AdminLoginPage = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="admin-password">Password</Label>
-              <Input
-                id="admin-password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="Enter your password"
-                required
-                className="h-11 rounded-xl"
-                aria-invalid={!!error}
-                onChange={() => setError("")}
-              />
+              <div className="relative">
+                <Input
+                  id="admin-password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                  required
+                  className="h-11 rounded-xl pr-11"
+                  aria-invalid={!!error}
+                  onChange={() => setError("")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
             {error && (
               <p role="alert" className="text-sm font-medium text-destructive">

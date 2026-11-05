@@ -54,10 +54,10 @@ const ProductListCard = ({
   return (
     <Link 
       to={`/product/${id}`}
-      className="card-interactive group flex gap-4 overflow-hidden rounded-2xl border border-border/80 bg-card p-4 shadow-card md:gap-6 md:p-5"
+      className="card-interactive group flex flex-col gap-4 overflow-hidden rounded-2xl border border-border/80 bg-card p-4 shadow-card sm:flex-row md:gap-6 md:p-5"
     >
       {/* Product Image */}
-      <div className="relative h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl bg-muted ring-1 ring-inset ring-border/50 md:h-36 md:w-36">
+      <div className="relative h-40 w-full flex-shrink-0 overflow-hidden rounded-xl bg-muted ring-1 ring-inset ring-border/50 sm:h-28 sm:w-28 md:h-36 md:w-36">
         <img
           src={image}
           alt={name}
@@ -74,7 +74,7 @@ const ProductListCard = ({
       </div>
 
       {/* Product Details */}
-      <div className="flex flex-1 flex-col justify-between">
+      <div className="flex min-w-0 flex-1 flex-col justify-between">
         <div>
           <h3 className="mb-1.5 font-display text-base font-bold tracking-[-0.02em] text-foreground transition-colors duration-300 group-hover:text-primary md:text-lg">
             {name}
@@ -115,8 +115,8 @@ const ProductListCard = ({
         </div>
 
         {/* Price & Action */}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-baseline gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-2">
             <span className="font-display text-xl font-extrabold tracking-tight text-foreground text-glow-gold">
               ₹{price}
             </span>
@@ -131,10 +131,10 @@ const ProductListCard = ({
               </span>
             )}
           </div>
-          <div className="flex gap-2">
+          <div className="flex w-full gap-2 sm:w-auto">
             <Button
               size="sm"
-              className={`rounded-full px-4 transition-all duration-200 ${added ? "bg-secondary hover:bg-secondary" : ""}`}
+              className={`flex-1 rounded-full px-4 transition-all duration-200 sm:flex-none ${added ? "bg-secondary hover:bg-secondary" : ""}`}
               onClick={handleAddToCart}
             >
               {added ? (
@@ -152,7 +152,7 @@ const ProductListCard = ({
             <Button
               size="sm"
               variant="outline"
-              className="rounded-full px-4"
+              className="flex-1 rounded-full px-4 sm:flex-none"
               onClick={handleBuyNow}
             >
               <span className="text-sm">Buy</span>

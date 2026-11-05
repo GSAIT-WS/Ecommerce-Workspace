@@ -433,11 +433,11 @@ const AdminDashboardPage = () => {
         <img src={logo} alt="PURVITA" className="h-14 w-auto" />
         <span className="text-[10px] font-bold uppercase tracking-[.16em] text-muted-foreground">Admin<br />workspace</span>
       </Link>
-      <div className="shrink-0 px-4 pt-6"><p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.2em] text-muted-foreground">Workspace</p><nav className="space-y-1">{navItems.map((item) => {
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-6"><p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[.2em] text-muted-foreground">Workspace</p><nav className="space-y-1">{navItems.map((item) => {
         const isActive = activeItem.path === item.path;
         return <Link key={item.path} to={item.path} onClick={() => setMobileNavOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${isActive ? "bg-surface-purple text-primary shadow-sm" : "text-foreground/70 hover:bg-muted hover:text-primary"}`}><item.icon className="h-4 w-4 shrink-0" /><span className="truncate">{item.title}</span>{item.title === "Notifications" && unreadNotifications > 0 && <span className="ml-auto rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">{unreadNotifications}</span>}</Link>;
       })}</nav></div>
-      <div className="mt-auto shrink-0 p-4"><div className="mb-3 rounded-xl border border-border bg-surface-cream/60 p-3"><p className="text-xs font-semibold">Demo mode</p><p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">All dashboard records are sample data held in this browser session.</p></div><button onClick={logout} className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground/70 transition hover:bg-muted hover:text-primary"><LogOut className="h-4 w-4" />Logout</button></div>
+      <div className="shrink-0 border-t border-border/70 bg-card p-4"><div className="mb-3 rounded-xl border border-border bg-surface-cream/60 p-3"><p className="text-xs font-semibold">Demo mode</p><p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">All dashboard records are sample data held in this browser session.</p></div><button onClick={logout} className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground/70 transition hover:bg-muted hover:text-primary"><LogOut className="h-4 w-4" />Logout</button></div>
     </div>
   );
   return (

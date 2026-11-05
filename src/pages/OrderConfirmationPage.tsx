@@ -189,14 +189,14 @@ const OrderConfirmationPage = () => {
               <h2 className="mb-4 font-display text-xl font-bold text-foreground">Order Items</h2>
               <div className="space-y-4">
                 {placed.items.map((item) => (
-                  <div key={`${item.id}-${item.name}`} className="flex gap-4">
+                  <div key={`${item.id}-${item.name}`} className="flex min-w-0 items-center gap-4">
                     <img
                       src={item.image || PRODUCT_PLACEHOLDER}
                       alt={item.name}
-                      className="h-16 w-16 rounded-lg object-cover"
+                      className="h-16 w-16 shrink-0 rounded-lg object-cover"
                     />
-                    <div className="flex-1">
-                      <p className="font-display font-semibold text-foreground">{item.name}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="break-words font-display font-semibold text-foreground">{item.name}</p>
                       {item.tag && (
                         <p className="font-body text-xs text-muted-foreground">
                           {item.tag} × {item.quantity}
@@ -206,7 +206,7 @@ const OrderConfirmationPage = () => {
                         <p className="font-body text-xs text-muted-foreground">× {item.quantity}</p>
                       )}
                     </div>
-                    <p className="font-display font-bold text-foreground">₹{item.lineTotal}</p>
+                    <p className="shrink-0 font-display font-bold text-foreground">₹{item.lineTotal}</p>
                   </div>
                 ))}
               </div>

@@ -81,7 +81,15 @@ const Navbar = () => {
 
       for (const link of navLinks) {
         const section = document.getElementById(link.id);
-        if (section && section.getBoundingClientRect().top + window.scrollY <= marker) {
+        const sectionTop = section?.getBoundingClientRect().top;
+        const hasReachedSection =
+          sectionTop !== undefined &&
+          (link.id === "contact"
+            ? (document.getElementById("contact-details")?.getBoundingClientRect().top ?? Infinity) <
+              window.innerHeight
+            : sectionTop + window.scrollY <= marker);
+
+        if (hasReachedSection) {
           active = link.id;
         }
       }

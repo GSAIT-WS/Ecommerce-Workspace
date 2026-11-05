@@ -228,10 +228,10 @@ const OrderDetailPage = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Orders
           </Link>
-          <div className="mt-4 flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="font-display text-2xl font-bold text-foreground md:text-3xl">{orderNumber}</h1>
+          <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="break-words font-display text-2xl font-bold text-foreground md:text-3xl">{orderNumber}</h1>
                 <Badge className={`${getStatusColor(currentStatus)} border-0 font-body`}>
                   {getStatusLabel(currentStatus)}
                 </Badge>
@@ -240,7 +240,7 @@ const OrderDetailPage = () => {
                 <p className="mt-1 font-body text-muted-foreground">Ordered on {formatDate(placedAt)}</p>
               )}
             </div>
-            <Button variant="outline" size="icon" onClick={() => void handleRefresh()} className="rounded-full">
+            <Button variant="outline" size="icon" onClick={() => void handleRefresh()} className="shrink-0 rounded-full">
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
             </Button>
           </div>
@@ -257,9 +257,9 @@ const OrderDetailPage = () => {
                   : "border-primary/30 bg-primary/5"
               }`}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <div
-                  className={`flex h-14 w-14 items-center justify-center rounded-full ${
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${
                     currentStatus === "delivered"
                       ? "bg-secondary text-secondary-foreground"
                       : "bg-primary text-primary-foreground"
@@ -267,12 +267,12 @@ const OrderDetailPage = () => {
                 >
                   {currentStatus === "delivered" ? <Package className="h-7 w-7" /> : <Clock className="h-7 w-7" />}
                 </div>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <p className="font-body text-sm text-muted-foreground">
                     {currentStatus === "delivered" ? "Delivered" : "Estimated / status"}
                   </p>
                   <p
-                    className={`font-display text-xl font-bold md:text-2xl ${
+                    className={`break-words font-display text-xl font-bold md:text-2xl ${
                       currentStatus === "delivered" ? "text-secondary" : "text-primary"
                     }`}
                   >
@@ -284,7 +284,7 @@ const OrderDetailPage = () => {
                   </p>
                 </div>
                 {currentStatus !== "delivered" && currentStatus !== "cancelled" && (
-                  <Button variant="outline" size="sm" onClick={scrollToTimeline} className="gap-1 rounded-xl font-body">
+                  <Button variant="outline" size="sm" onClick={scrollToTimeline} className="ml-auto shrink-0 gap-1 rounded-xl font-body">
                     Track
                     <ChevronDown className="h-4 w-4" />
                   </Button>
@@ -310,11 +310,11 @@ const OrderDetailPage = () => {
                 className="rounded-2xl border border-border bg-card p-6"
               >
                 <h2 className="mb-4 font-display text-lg font-bold text-foreground">Delivery</h2>
-                <div className="flex items-center justify-between">
-                  <div>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
                     <p className="font-display font-semibold text-foreground">{deliveryPartner.name}</p>
                     {deliveryPartner.vehicleNumber ? (
-                      <p className="font-body text-sm text-muted-foreground">{deliveryPartner.vehicleNumber}</p>
+                      <p className="break-words font-body text-sm text-muted-foreground">{deliveryPartner.vehicleNumber}</p>
                     ) : null}
                   </div>
                   <div className="flex gap-2">
@@ -342,17 +342,17 @@ const OrderDetailPage = () => {
               <h2 className="mb-4 font-display text-lg font-bold text-foreground">Order Items</h2>
               <div className="space-y-4">
                 {items.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 rounded-xl border border-border bg-background p-3">
+                  <div key={item.id} className="flex min-w-0 items-center gap-4 rounded-xl border border-border bg-background p-3">
                     <img
                       src={PRODUCT_PLACEHOLDER}
                       alt={item.name}
-                      className="h-16 w-16 rounded-xl object-cover"
+                      className="h-16 w-16 shrink-0 rounded-xl object-cover"
                     />
-                    <div className="flex-1">
-                      <p className="font-display font-semibold text-foreground">{item.name}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="break-words font-display font-semibold text-foreground">{item.name}</p>
                       <p className="font-body text-sm text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
-                    <p className="font-display font-bold text-foreground">₹{item.lineTotal}</p>
+                    <p className="shrink-0 font-display font-bold text-foreground">₹{item.lineTotal}</p>
                   </div>
                 ))}
               </div>

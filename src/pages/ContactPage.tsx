@@ -77,19 +77,18 @@ const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
         )}
 
         <div className="mt-8 w-full">
-          <h1 className="mb-2 text-center font-brand text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-4xl">
-            Contact &amp; Feedback
-          </h1>
-          <p className="mb-10 text-center font-body text-muted-foreground">
-            Contact our team, share product feedback, or browse answers to common questions.
-          </p>
-
           <FeedbackHighlights />
 
           <div className="grid gap-8 md:grid-cols-2">
             {/* Contact Info */}
             <div className="space-y-6">
-              <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
+              <h2
+                id="contact-heading"
+                className="mb-2 scroll-mt-28 font-brand text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-4xl"
+              >
+                Contact
+              </h2>
+              <div id="contact-details" className="rounded-2xl border border-border bg-card p-6 space-y-5">
                 {[
                   { icon: Mail, label: "Email", value: "hello@purvita.in" },
                   { icon: Phone, label: "Phone", value: "+91 80 1234 5678" },
