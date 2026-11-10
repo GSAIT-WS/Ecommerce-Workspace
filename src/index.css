@@ -561,18 +561,6 @@
   }
 }
 
-/**
- * The scroll rubber band in `hooks/useScrollRubberBand` writes its transform
- * inline from a rAF loop, so CSS can't disable it — the hook itself checks this
- * query and never attaches. These two rules are the belt-and-braces backstop for
- * the short window before hydration, and for any stray inline transform.
- */
-@media (prefers-reduced-motion: reduce) {
-  #scroll-rubber-band {
-    transform: none !important;
-  }
-}
-
 @layer components {
   .admin-shell,
   .admin-login,
