@@ -100,7 +100,7 @@ const CategoryPage = () => {
       </section>
 
       {/* Sticky Filter & Sort Bar */}
-      <div className="sticky top-[61px] z-30 border-b border-border/70 bg-background/90 shadow-[0_8px_20px_-16px_hsl(var(--foreground)/0.4)] backdrop-blur-xl md:top-[94px]">
+      <div className="sticky top-[61px] z-30 border-b border-border/70 bg-background/90 shadow-[0_8px_20px_-16px_hsl(var(--foreground)/0.4)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3">
           {/* Left: Filter Button & Results Count */}
           <div className="flex shrink-0 items-center gap-3">

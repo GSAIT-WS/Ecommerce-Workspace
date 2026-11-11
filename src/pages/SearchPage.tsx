@@ -199,11 +199,11 @@ const SearchPage = ({ embedded = false }: { embedded?: boolean }) => {
       </section>
 
       {/* Filters Bar */}
-      <section className="sticky top-[61px] z-40 border-b border-border/70 bg-background/90 py-3 shadow-[0_8px_20px_-16px_hsl(var(--foreground)/0.4)] backdrop-blur-xl md:top-[94px]">
+      <section className="border-b border-border/70 bg-background/90 py-3 shadow-[0_8px_20px_-16px_hsl(var(--foreground)/0.4)] backdrop-blur-xl">
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between gap-4">
             {/* Filter Tags */}
-            <div className="flex-1 overflow-x-auto scrollbar-hide">
+            <div className="min-w-0 flex-1 overflow-x-auto scrollbar-hide">
               <div className="flex items-center gap-2">
                 {filterTags.map((tag) => (
                   <Badge

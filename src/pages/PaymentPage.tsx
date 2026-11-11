@@ -366,7 +366,7 @@ const PaymentPage = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="surface-card sticky top-32 p-6 shadow-card-elevated">
+            <div className="surface-card p-6 shadow-card-elevated lg:sticky lg:top-32">
               <h2 className="mb-4 font-display text-lg font-bold text-foreground">
                 Order summary
               </h2>

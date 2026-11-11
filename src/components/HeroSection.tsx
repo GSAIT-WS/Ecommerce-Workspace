@@ -140,14 +140,14 @@ const HeroSection = () => {
       onFocusCapture={() => setIsFocused(true)}
       onBlurCapture={handleBlur}
     >
-      <div className="relative h-[520px] w-full sm:h-[540px] md:h-[clamp(460px,38vw,620px)]">
+      <div className="relative w-full md:h-[clamp(460px,38vw,620px)]">
         {heroSlides.map((item, index) => (
           <motion.img
             key={item.id}
             src={item.image}
             alt={index === current ? item.alt : ""}
             aria-hidden={index !== current}
-            className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[clamp(11rem,45vw,15rem)] w-full select-none object-cover md:inset-0 md:h-full"
             style={{ objectPosition: item.imagePosition }}
             initial={false}
             animate={{ opacity: index === current ? 1 : 0 }}
@@ -161,7 +161,7 @@ const HeroSection = () => {
           />
         ))}
 
-        <div className="container relative z-10 mx-auto flex h-full items-end px-4 pb-7 sm:px-6 sm:pb-9 md:px-8 lg:items-center lg:pb-0">
+        <div className="container relative z-10 mx-auto flex w-full flex-col px-4 pb-6 pt-[clamp(11rem,45vw,15rem)] sm:px-6 sm:pb-8 md:h-full md:flex-row md:items-end md:justify-start md:px-8 md:pb-9 md:pt-0 lg:items-center lg:pb-0">
           <div className="flex w-full max-w-[34rem] flex-col items-start">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
@@ -182,10 +182,10 @@ const HeroSection = () => {
                 }
                 className="w-full"
               >
-                <p className="eyebrow eyebrow-inverse mb-4 text-white/85 sm:mb-5">
+                <p className="eyebrow eyebrow-inverse mb-3 text-white/85 sm:mb-5">
                   {slide.eyebrow}
                 </p>
-                <h1 className="max-w-[13ch] text-balance font-brand text-[2.55rem] font-semibold leading-[0.98] tracking-[-0.035em] text-white drop-shadow-[0_2px_22px_rgba(0,0,0,0.36)] sm:text-[3.15rem] lg:text-[3.65rem] xl:text-[4rem]">
+                <h1 className="max-w-[13ch] text-balance font-brand text-[clamp(2rem,8vw,2.55rem)] font-semibold leading-[0.98] tracking-[-0.035em] text-white drop-shadow-[0_2px_22px_rgba(0,0,0,0.36)] sm:text-[3.15rem] lg:text-[3.65rem] xl:text-[4rem]">
                   {slide.titleLead}{" "}
                   <span className="italic text-[color:var(--hero-accent)]">{slide.titleAccent}</span>
                 </h1>
@@ -193,11 +193,11 @@ const HeroSection = () => {
                   {slide.description}
                 </p>
 
-                <div className="mt-6 flex flex-col gap-2.5 sm:mt-7 sm:flex-row sm:items-center">
+                <div className="mt-5 flex flex-col gap-2.5 sm:mt-7 sm:flex-row sm:items-center">
                   <Button
                     variant="cta"
                     size="xl"
-                    className="group h-11 w-full rounded-full bg-[color:var(--hero-accent)] px-6 text-sm text-[color:var(--hero-accent-foreground)] shadow-lg shadow-black/25 hover:bg-[color:var(--hero-accent-hover)] hover:shadow-black/30 sm:h-12 sm:w-auto sm:px-7 sm:text-[15px]"
+                    className="group h-11 w-fit rounded-full bg-[color:var(--hero-accent)] px-6 text-sm text-[color:var(--hero-accent-foreground)] shadow-lg shadow-black/25 hover:bg-[color:var(--hero-accent-hover)] hover:shadow-black/30 sm:h-12 sm:w-auto sm:px-7 sm:text-[15px]"
                     asChild
                   >
                     <Link to="/#shop">
@@ -209,7 +209,7 @@ const HeroSection = () => {
               </motion.div>
             </AnimatePresence>
 
-            <div className="mt-6 flex items-center gap-2.5 sm:mt-7">
+            <div className="mt-4 flex items-center gap-2.5 sm:mt-7">
               <div className="flex items-center" role="group" aria-label="Choose a banner">
                 {heroSlides.map((item, index) => (
                   <button

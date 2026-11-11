@@ -51,7 +51,7 @@ const packFilters = [
 const ProductFilters = ({ isOpen, onClose }: ProductFiltersProps) => {
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="left" className="w-80 overflow-y-auto bg-card">
+      <SheetContent side="left" className="w-[min(20rem,90vw)] overflow-y-auto bg-card">
         <SheetHeader className="mb-6">
           <SheetTitle className="font-display text-xl text-foreground">
             Filters

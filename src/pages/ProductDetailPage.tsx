@@ -380,12 +380,12 @@ const ProductDetailPage = () => {
 
       <main className="container mx-auto px-4 py-6 md:py-10">
         {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-2 font-body text-sm text-muted-foreground">
+        <nav className="mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 font-body text-sm text-muted-foreground">
           <Link to="/" className="hover:text-primary transition-colors">Home</Link>
           <ChevronLeft className="h-4 w-4 rotate-180" />
           <Link to="/category/protein-bars" className="hover:text-primary transition-colors">Protein Bars</Link>
           <ChevronLeft className="h-4 w-4 rotate-180" />
-          <span className="text-foreground">{product.name}</span>
+          <span className="min-w-0 break-words text-foreground">{product.name}</span>
         </nav>
 
         {/* Unavailable Banner */}
@@ -569,7 +569,7 @@ const ProductDetailPage = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 rounded-full"
+                  className="h-11 w-11 rounded-full"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   disabled={!product.isActive}
                 >
@@ -579,7 +579,7 @@ const ProductDetailPage = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 rounded-full"
+                  className="h-11 w-11 rounded-full"
                   onClick={() => setQuantity(quantity + 1)}
                   disabled={!product.isActive}
                 >

@@ -137,7 +137,7 @@ const OffersSection = memo(() => {
               setIsPaused(false);
             }}
           >
-            <div className="relative h-[21rem] md:h-[26rem]">
+            <div className="relative aspect-[16/9] w-full md:aspect-auto md:h-[26rem]">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={current}
@@ -158,7 +158,7 @@ const OffersSection = memo(() => {
               <div className="pointer-events-none absolute inset-0 z-[1] bg-offers-carousel-overlay" aria-hidden />
             </div>
 
-            <div className="pointer-events-none absolute inset-0 z-[2] flex items-end p-5 sm:items-center sm:p-9 md:p-12">
+            <div className="pointer-events-none relative z-[2] flex items-start bg-brand-deep p-5 pb-14 md:absolute md:inset-0 md:items-center md:bg-transparent md:p-12">
               <div className="pointer-events-auto max-w-xl">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div

@@ -141,13 +141,13 @@
   /** Smooth programmatic/anchor scrolling — never affects wheel or trackpad */
   html {
     scroll-behavior: smooth;
-    /* Clears the sticky navbar + announcement strip for anchor targets */
+    /* Clears the sticky navbar for anchor targets */
     scroll-padding-top: calc(61px + 1rem);
   }
 
   @media (min-width: 768px) {
     html {
-      scroll-padding-top: calc(94px + 1rem);
+      scroll-padding-top: calc(61px + 1rem);
     }
   }
 

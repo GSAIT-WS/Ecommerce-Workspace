@@ -94,7 +94,8 @@ const CartPage = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2">
                         <button 
-                          className="p-1 hover:bg-muted rounded transition-colors"
+                          className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-muted"
+                          aria-label={`Decrease quantity of ${item.name}`}
                           onClick={() => {
                             if (item.quantity > 1) {
                               updateQuantity(item.id, item.quantity - 1);
@@ -108,7 +109,8 @@ const CartPage = () => {
                           {item.quantity}
                         </span>
                         <button 
-                          className="p-1 hover:bg-muted rounded transition-colors"
+                          className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-muted"
+                          aria-label={`Increase quantity of ${item.name}`}
                           onClick={() => {
                             updateQuantity(item.id, item.quantity + 1);
                             toast.success("Quantity updated");
@@ -134,7 +136,7 @@ const CartPage = () => {
 
             {/* Order Summary Sidebar */}
             <div className="lg:col-span-1">
-              <div className="surface-card sticky top-32 p-6 shadow-card-elevated md:p-8">
+              <div className="surface-card p-6 shadow-card-elevated md:p-8 lg:sticky lg:top-32">
                 <h2 className="mb-6 font-display text-xl font-bold text-foreground">
                   Order Summary
                 </h2>

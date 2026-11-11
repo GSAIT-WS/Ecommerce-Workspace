@@ -292,22 +292,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Announcement strip */}
-        <div className="hidden overflow-hidden border-t border-border/50 bg-surface-cream/60 md:block dark:bg-surface-cream/30">
-          <div className="container mx-auto px-4 md:px-8">
-            <div className="flex h-8 items-center justify-center gap-5 font-body text-[10px] font-semibold uppercase tracking-[0.16em] text-primary/80">
-              <span className="inline-flex items-center gap-2">
-                <span className="h-1 w-1 rounded-full bg-secondary" aria-hidden />
-                Free shipping over ₹499
-              </span>
-              <span className="hidden h-3 w-px bg-border lg:block" aria-hidden />
-              <span className="hidden lg:inline">Farm sourced in Lambasingi, Andhra Pradesh</span>
-              <span className="hidden h-3 w-px bg-border lg:block" aria-hidden />
-              <span className="hidden lg:inline">100% Natural · No Preservatives</span>
-            </div>
-          </div>
-        </div>
-
         {/* Mobile drawer */}
         <AnimatePresence initial={false}>
           {mobileOpen && (

@@ -120,7 +120,7 @@ const CheckoutPage = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className="container mx-auto px-4 py-8 md:py-12"
+        className="container mx-auto px-4 pb-36 pt-8 md:pb-40 md:pt-12 lg:py-12"
       >
         {/* Header */}
         <div className="mb-8">
@@ -142,7 +142,7 @@ const CheckoutPage = () => {
 
             {/* ── Delivery Address Section ── */}
             <section className="rounded-2xl border border-border bg-card p-6">
-              <div className="mb-6 flex items-center justify-between">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
                 <h2 className="font-display text-xl font-bold text-foreground">
                   Delivery Address
                 </h2>
@@ -268,13 +268,13 @@ const CheckoutPage = () => {
                       alt={item.name}
                       className="h-20 w-20 rounded-lg object-cover"
                     />
-                    <div className="flex flex-1 flex-col justify-between">
+                    <div className="flex min-w-0 flex-1 flex-col justify-between">
                       <div>
                         <div className="flex items-start justify-between gap-2">
-                          <p className="font-display font-semibold text-foreground">{item.name}</p>
+                          <p className="min-w-0 break-words font-display font-semibold text-foreground">{item.name}</p>
                           <Badge
                             variant="secondary"
-                            className="rounded-full bg-secondary/10 text-xs font-medium text-secondary"
+                            className="shrink-0 rounded-full bg-secondary/10 text-xs font-medium text-secondary"
                           >
                             {item.tag}
                           </Badge>
@@ -284,7 +284,8 @@ const CheckoutPage = () => {
                         <div className="flex items-center gap-2 rounded-full border border-border bg-card px-2 py-1">
                           <button
                             onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                            className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-muted"
+                            className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted"
+                            aria-label={`Decrease quantity of ${item.name}`}
                           >
                             −
                           </button>
@@ -293,7 +294,8 @@ const CheckoutPage = () => {
                           </span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-muted"
+                            className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted"
+                            aria-label={`Increase quantity of ${item.name}`}
                           >
                             +
                           </button>
@@ -318,7 +320,7 @@ const CheckoutPage = () => {
 
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
-            <div className="surface-card sticky top-32 p-6 shadow-card-elevated">
+            <div className="surface-card p-6 shadow-card-elevated lg:sticky lg:top-32">
               <h2 className="mb-6 font-display text-xl font-bold text-foreground">
                 Order Summary
               </h2>
