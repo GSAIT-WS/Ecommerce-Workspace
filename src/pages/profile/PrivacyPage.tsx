@@ -82,7 +82,7 @@ const PrivacyPage = () => {
               <p className="text-sm text-muted-foreground">
                 You have the right to access, update, or delete your personal
                 information. You can opt out of marketing communications at any
-                time. To exercise these rights, contact us at privacy@purvita.in
+                time. To exercise these rights, contact us at admin@purvita.in
               </p>
             </section>
 
@@ -107,7 +107,7 @@ const PrivacyPage = () => {
               <h2 className="mb-2 font-semibold">Contact Us</h2>
               <p className="text-sm text-muted-foreground">
                 For privacy-related questions or concerns, please contact our
-                Data Protection Officer at privacy@purvita.in or write to us at
+                Data Protection Officer at admin@purvita.in or write to us at
                 our registered office address.
               </p>
             </section>

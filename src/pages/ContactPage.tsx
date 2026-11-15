@@ -90,8 +90,8 @@ const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
               </h2>
               <div id="contact-details" className="rounded-2xl border border-border bg-card p-6 space-y-5">
                 {[
-                  { icon: Mail, label: "Email", value: "hello@purvita.in" },
-                  { icon: Phone, label: "Phone", value: "+91 80 1234 5678" },
+                  { icon: Mail, label: "Email", value: "admin@purvita.in" },
+                  { icon: Phone, label: "Phone", value: "7842245679" },
                   { icon: MapPin, label: "Address", value: "123, HSR Layout, Bangalore, Karnataka 560102" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-start gap-4">

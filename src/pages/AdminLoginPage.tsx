@@ -11,7 +11,7 @@ import logo from "@/assets/logo-trimmed.png";
 import logoCream from "@/assets/logo-cream.png";
 
 const ADMIN_AUTH_KEY = "purvita_admin_authenticated";
-const ADMIN_EMAIL = "admin@gmail.com";
+const ADMIN_EMAIL = "admin@purvita.in";
 const ADMIN_PASSWORD = "admin123";
 
 const AdminLoginPage = () => {
@@ -142,7 +142,7 @@ const AdminLoginPage = () => {
                 name="email"
                 type="email"
                 autoComplete="username"
-                placeholder="admin@example.com"
+                placeholder="admin@purvita.in"
                 required
                 className="h-11 rounded-xl"
                 aria-invalid={!!error}

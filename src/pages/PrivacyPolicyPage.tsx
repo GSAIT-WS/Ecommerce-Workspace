@@ -67,7 +67,7 @@ const PrivacyPolicyPage = () => {
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">Your Rights</h3>
                 <p>
-                  You have the right to access, update, or delete your personal information. Contact us at privacy@purvita.in for requests.
+                  You have the right to access, update, or delete your personal information. Contact us at admin@purvita.in for requests.
                 </p>
               </div>
 

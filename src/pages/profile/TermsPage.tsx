@@ -107,7 +107,7 @@ const TermsPage = () => {
               <h2 className="mb-2 font-semibold">8. Contact</h2>
               <p className="text-sm text-muted-foreground">
                 For questions about these Terms, please contact us at
-                legal@purvita.in
+                admin@purvita.in
               </p>
             </section>
           </div>

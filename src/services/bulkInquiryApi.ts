@@ -24,7 +24,7 @@ export function openBulkInquiryMailto(payload: BulkInquiryPayload): void {
   ]
     .filter(Boolean)
     .join("\n");
-  window.location.href = `mailto:hello@purvita.in?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = `mailto:admin@purvita.in?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 type SubmitResult =

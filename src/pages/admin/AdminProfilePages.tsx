@@ -31,7 +31,7 @@ interface AdminProfileSettingsPageProps extends AdminProfilePageProps {
   onSave: (profile: AdminProfile) => void;
 }
 
-const ADMIN_EMAIL = "admin@gmail.com";
+const ADMIN_EMAIL = "admin@purvita.in";
 const ADMIN_ROLE = "Administrator";
 
 function AdminAvatar({ profile, className = "h-20 w-20" }: {

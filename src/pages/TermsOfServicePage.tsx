@@ -67,7 +67,7 @@ const TermsOfServicePage = () => {
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">6. Contact</h3>
                 <p>
-                  For questions about these terms, please contact us at legal@purvita.in
+                  For questions about these terms, please contact us at admin@purvita.in
                 </p>
               </div>
             </div>
