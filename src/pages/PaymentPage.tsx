@@ -437,7 +437,7 @@ const PaymentPage = () => {
               <div className="mt-4 space-y-2 rounded-xl border border-border bg-background p-4">
                 <p className="font-body text-xs font-semibold text-foreground">Need help?</p>
                 <div className="flex flex-wrap gap-3 text-xs">
-                  <a href="tel:+918012345678" className="font-body text-primary underline">
+                  <a href="tel:+917842245679" className="font-body text-primary underline">
                     Call support
                   </a>
                   <Link to="/contact" className="font-body text-primary underline">

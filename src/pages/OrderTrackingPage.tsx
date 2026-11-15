@@ -297,7 +297,7 @@ const OrderTrackingPage = () => {
                       size="icon"
                       className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                     >
-                      <a href="tel:+918012345678" aria-label="Call support">
+                      <a href="tel:+917842245679" aria-label="Call support">
                         <Phone className="h-4 w-4" />
                       </a>
                     </Button>
@@ -382,7 +382,7 @@ const OrderTrackingPage = () => {
               <h2 className="mb-4 font-display text-lg font-bold text-foreground">Need Help?</h2>
               <div className="space-y-3">
                 <Button asChild variant="outline" className="w-full justify-start gap-3 rounded-xl font-body">
-                  <a href="tel:+918012345678">
+                  <a href="tel:+917842245679">
                     <Phone className="h-4 w-4" />
                     Call Support
                   </a>

@@ -124,7 +124,7 @@ const AboutPage = () => {
           <div className="rounded-xl bg-card p-6 shadow-sm">
             <h3 className="mb-3 font-semibold">Get in Touch</h3>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>📧 hello@purvita.in</p>
+              <p>📧 admin@purvita.in</p>
               <p>📞 1800-XXX-XXXX (Toll Free)</p>
               <p>📍 Bengaluru, Karnataka, India</p>
             </div>

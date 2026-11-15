@@ -34,6 +34,7 @@ import { toast } from "@/components/ui/sonner";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImagePlaceholder";
+import { resolveProductDescription } from "@/data/productDescriptions";
 import { validateBulkInquiryForm } from "@/lib/bulkInquiryValidation";
 import { submitBulkInquiry } from "@/services/bulkInquiryApi";
 import { CrunchXDoodleBackground } from "@/components/doodles";
@@ -219,6 +220,7 @@ const ProductDetailPage = () => {
     ? {
         ...baseProduct,
         ...details,
+        description: resolveProductDescription(baseProduct.name),
         images: buildProductGallery(baseProduct.image, baseProduct.galleryImages),
         tags: [baseProduct.tag, ...details.tags.slice(1)],
       }

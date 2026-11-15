@@ -107,10 +107,10 @@ const Footer = () => (
             ))}
           </div>
           <a
-            href="mailto:contact@purvita.in"
+            href="mailto:admin@purvita.in"
             className="mt-5 inline-block font-body text-sm font-medium text-brand-cream/75 underline decoration-brand-cream/20 underline-offset-4 transition-colors duration-200 hover:text-brand-gold hover:decoration-brand-gold/40"
           >
-            contact@purvita.in
+            admin@purvita.in
           </a>
         </div>
       </div>

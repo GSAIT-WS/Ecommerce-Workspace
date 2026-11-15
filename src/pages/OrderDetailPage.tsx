@@ -29,7 +29,7 @@ import { toast } from "sonner";
 
 const PRODUCT_PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
-const SUPPORT_PHONE_TEL = "+918012345678";
+const SUPPORT_PHONE_TEL = "+917842245679";
 
 function parseShippingSnapshot(s: unknown): {
   name: string;

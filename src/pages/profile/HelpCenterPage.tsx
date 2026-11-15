@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/accordion";
 import { faqs } from "@/data/user";
 
-const SUPPORT_PHONE_DISPLAY = "+91 80 1234 5678";
-const SUPPORT_PHONE_TEL = "+918012345678";
+const SUPPORT_PHONE_DISPLAY = "7842245679";
+const SUPPORT_PHONE_TEL = "+917842245679";
 
 const HelpCenterPage = () => {
   const navigate = useNavigate();
@@ -76,11 +76,11 @@ const HelpCenterPage = () => {
               className="h-auto flex-col gap-2 py-4"
               asChild
             >
-              <a href="mailto:hello@purvita.in">
+              <a href="mailto:admin@purvita.in">
                 <Mail className="h-6 w-6 text-primary" />
                 <span>Email</span>
                 <span className="text-xs text-muted-foreground">
-                  hello@purvita.in
+                  admin@purvita.in
                 </span>
               </a>
             </Button>
