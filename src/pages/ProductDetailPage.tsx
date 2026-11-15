@@ -278,21 +278,6 @@ const ProductDetailPage = () => {
     toast.success(`Added ${quantity} item(s) to cart ✓`);
   };
 
-  const handleBuyNow = () => {
-    addToCart(
-      {
-        id: product.id,
-        name: product.name,
-        tag: product.tag,
-        price: product.price,
-        originalPrice: product.originalPrice,
-        image: product.image,
-      },
-      quantity
-    );
-    navigate("/checkout");
-  };
-
   // ── Bulk helpers ─────────────────────────────────────────────────────────
   const parsedBulkQty = parseInt(bulkQty, 10);
   const activeTier = !isNaN(parsedBulkQty) && parsedBulkQty >= 25
@@ -599,9 +584,8 @@ const ProductDetailPage = () => {
               </Button>
 
               <Button
-                className="flex-1 rounded-full bg-brand-gold bg-none px-8 py-6 font-display text-base font-bold text-brand-deep shadow-md shadow-brand-gold/25 hover:bg-brand-gold/90 hover:shadow-lg sm:flex-none disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={handleBuyNow}
-                disabled={!product.isActive}
+                className="flex-1 rounded-full bg-brand-gold bg-none px-8 py-6 font-display text-base font-bold text-brand-deep opacity-60 shadow-md shadow-brand-gold/25 sm:flex-none disabled:cursor-not-allowed"
+                disabled
               >
                 Buy Now
               </Button>
@@ -619,6 +603,13 @@ const ProductDetailPage = () => {
                 <Share2 className="h-5 w-5" />
               </Button>
             </div>
+
+            <p
+              role="status"
+              className="mt-4 rounded-lg border border-border/60 bg-muted/40 px-3 py-2 text-sm text-destructive/80"
+            >
+              Currently not accepting orders.
+            </p>
 
             {/* Trust Badges */}
             <div className="flex flex-wrap gap-4 border-t border-border pt-6">

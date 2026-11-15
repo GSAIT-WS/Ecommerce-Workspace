@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ShoppingCart, Check, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,6 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ id = "1", name, tag, price, originalPrice, image, badgeLabel }: ProductCardProps) => {
-  const navigate = useNavigate();
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
   const displayBadge = badgeLabel ?? tag;
@@ -38,8 +37,6 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, image, badgeLa
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.preventDefault();
-    addToCart({ id, name, tag, price, originalPrice, image });
-    navigate("/checkout");
   };
 
   return (
