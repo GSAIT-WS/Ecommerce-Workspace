@@ -14,12 +14,14 @@ interface ProductCardProps {
   originalPrice?: number;
   rating: number;
   image: string;
+  badgeLabel?: string;
 }
 
-const ProductCard = ({ id = "1", name, tag, price, originalPrice, image }: ProductCardProps) => {
+const ProductCard = ({ id = "1", name, tag, price, originalPrice, image, badgeLabel }: ProductCardProps) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
+  const displayBadge = badgeLabel ?? tag;
 
   const discount =
     originalPrice && originalPrice > price
@@ -60,7 +62,7 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, image }: Produ
         />
 
         <Badge className="absolute left-3 top-3 rounded-full border border-border/70 bg-card/90 px-2.5 py-1 font-body text-[10px] font-bold uppercase tracking-[0.12em] text-primary shadow-sm backdrop-blur-sm">
-          {tag}
+          {displayBadge}
         </Badge>
 
         {discount > 0 && (

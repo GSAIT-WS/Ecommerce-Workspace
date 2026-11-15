@@ -148,7 +148,7 @@ const HeroSection = () => {
             alt={index === current ? item.alt : ""}
             aria-hidden={index !== current}
             className="pointer-events-none absolute inset-x-0 top-0 h-[clamp(11rem,45vw,15rem)] w-full select-none object-cover md:inset-0 md:h-full"
-            style={{ objectPosition: item.imagePosition }}
+            style={{ objectPosition: "center center" }}
             initial={false}
             animate={{ opacity: index === current ? 1 : 0 }}
             transition={{
