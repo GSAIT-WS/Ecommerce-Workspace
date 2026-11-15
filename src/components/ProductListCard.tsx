@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Star, ShoppingCart, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,6 @@ const ProductListCard = ({
   dietType = "Vegetarian",
   packType = "Single",
 }: ProductListCardProps) => {
-  const navigate = useNavigate();
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
 
@@ -47,8 +46,6 @@ const ProductListCard = ({
 
   const handleBuyNow = (e: React.MouseEvent) => {
     e.preventDefault();
-    addToCart({ id, name, tag, price, originalPrice, image });
-    navigate("/checkout");
   };
 
   return (
