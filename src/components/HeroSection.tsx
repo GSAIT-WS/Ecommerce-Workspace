@@ -22,7 +22,7 @@ const heroSlides = [
     description:
       "Traditional chikki flavours, reimagined for everyday snacking.",
     ctaLabel: "Shop Our Chikki",
-    accent: "#4C1450",
+    accent: "#E5B822",
     accentForeground: "#FCF8F0",
     accentHover: "#5D1E63",
     imagePosition: "55% center",
@@ -147,8 +147,7 @@ const HeroSection = () => {
             src={item.image}
             alt={index === current ? item.alt : ""}
             aria-hidden={index !== current}
-            className="pointer-events-none absolute inset-x-0 top-0 h-[clamp(11rem,45vw,15rem)] w-full select-none object-cover md:inset-0 md:h-full"
-            style={{ objectPosition: "center center" }}
+            className="pointer-events-none absolute inset-x-0 top-0 h-[clamp(11rem,45vw,15rem)] w-full select-none object-cover max-md:h-auto max-md:aspect-[4/3] max-md:object-[82%_center] md:inset-0 md:h-full"
             initial={false}
             animate={{ opacity: index === current ? 1 : 0 }}
             transition={{
