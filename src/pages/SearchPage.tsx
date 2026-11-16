@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
+import ShopSectionCarousel from "@/components/ShopSectionCarousel";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -313,42 +314,7 @@ const SearchPage = ({ embedded = false }: { embedded?: boolean }) => {
           ) : filteredProducts.length > 0 ? (
             <div className="space-y-10 md:space-y-12">
               {shopSections.map((section) => (
-                <section
-                  key={section.id}
-                  id={`shop-${section.id}`}
-                  aria-labelledby={`shop-${section.id}-heading`}
-                  className="scroll-mt-28"
-                >
-                  <div className="mb-4 border-b border-border/70 pb-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="eyebrow mb-2">{section.eyebrow}</p>
-                        <h3
-                          id={`shop-${section.id}-heading`}
-                          className="font-brand text-[1.75rem] font-semibold leading-tight tracking-[-0.03em] text-foreground sm:text-[2rem]"
-                        >
-                          {section.title}
-                        </h3>
-                      </div>
-                      <span className="meta-chip mt-0.5 shrink-0">
-                        {section.products.length}{" "}
-                        {section.products.length === 1 ? "product" : "products"}
-                      </span>
-                    </div>
-                    <p className="mt-1 font-body text-sm leading-relaxed text-muted-foreground">
-                      {section.description}
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-5">
-                    {section.products.map((product) => (
-                      <ProductCard
-                        key={product.id}
-                        {...product}
-                        badgeLabel={section.badgeLabel}
-                      />
-                    ))}
-                  </div>
-                </section>
+                <ShopSectionCarousel key={section.id} section={section} />
               ))}
             </div>
           ) : (
