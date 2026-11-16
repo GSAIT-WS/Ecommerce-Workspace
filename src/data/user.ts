@@ -200,8 +200,4 @@ export const faqs = [
     question: "Are your products certified?",
     answer: "Yes, all our products are FSSAI certified and undergo strict quality checks. We source ingredients from certified organic farms.",
   },
-  {
-    question: "Do you offer bulk discounts?",
-    answer: "Yes! For orders above ₹2000, you get 10% off. For corporate orders, please contact our support team.",
-  },
 ];
