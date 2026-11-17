@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Star, 
@@ -38,6 +38,8 @@ import { resolveProductDescription } from "@/data/productDescriptions";
 import { validateBulkInquiryForm } from "@/lib/bulkInquiryValidation";
 import { submitBulkInquiry } from "@/services/bulkInquiryApi";
 import { CrunchXDoodleBackground } from "@/components/doodles";
+import { useAuth } from "@/context/AuthContext";
+import { submitProductReview } from "@/services/productReviewApi";
 
 // ── Bulk Order helpers ──────────────────────────────────────────────────────
 const BULK_TIERS = [
@@ -197,10 +199,16 @@ const YouMayAlsoLike = ({ currentProductId }: { currentProductId: string }) => {
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewBody, setReviewBody] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
   // ── Bulk Order State ────────────────────────────────────────────────────
   const bulkSectionRef = useRef<HTMLDivElement>(null);
@@ -276,6 +284,45 @@ const ProductDetailPage = () => {
       quantity
     );
     toast.success(`Added ${quantity} item(s) to cart ✓`);
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!user) {
+      toast.error("Sign in to submit a review.");
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
+    if (reviewRating < 1 || reviewRating > 5) {
+      toast.error("Choose a rating from 1 to 5 stars.");
+      return;
+    }
+    if (reviewBody.trim().length < 3) {
+      toast.error("Write at least 3 characters in your review.");
+      return;
+    }
+
+    setReviewSubmitting(true);
+    try {
+      await submitProductReview({
+        customerId: user.id,
+        productId: product.id,
+        rating: reviewRating,
+        body: reviewBody,
+      });
+      setReviewOpen(false);
+      setReviewRating(0);
+      setReviewBody("");
+      toast.success("Your review was submitted and is awaiting approval.");
+    } catch (reviewError) {
+      toast.error(
+        reviewError instanceof Error
+          ? reviewError.message
+          : "Unable to submit your review. Please try again."
+      );
+    } finally {
+      setReviewSubmitting(false);
+    }
   };
 
   // ── Bulk helpers ─────────────────────────────────────────────────────────
@@ -822,7 +869,11 @@ const ProductDetailPage = () => {
                       </div>
                     )}
 
-                    <Button className="mt-6 w-full rounded-full" variant="outline">
+                    <Button
+                      className="mt-6 w-full rounded-full"
+                      variant="outline"
+                      onClick={() => setReviewOpen(true)}
+                    >
                       Write a Review
                     </Button>
                   </div>
@@ -903,7 +954,11 @@ const ProductDetailPage = () => {
                       Be the first to share your experience with this product.
                     </p>
                   </div>
-                  <Button variant="outline" className="rounded-full px-8">
+                  <Button
+                    variant="outline"
+                    className="rounded-full px-8"
+                    onClick={() => setReviewOpen(true)}
+                  >
                     Write the First Review
                   </Button>
                 </motion.div>
@@ -1216,6 +1271,73 @@ const ProductDetailPage = () => {
               </motion.form>
             )}
           </AnimatePresence>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={reviewOpen} onOpenChange={setReviewOpen}>
+        <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-3xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-xl font-bold">Write a Review</DialogTitle>
+            <DialogDescription className="font-body text-sm text-muted-foreground">
+              Share your experience with {product.name}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleReviewSubmit} className="space-y-4 pt-2">
+            <fieldset className="space-y-2">
+              <legend className="font-body text-sm font-medium text-foreground">
+                Your rating *
+              </legend>
+              <div className="flex gap-1">
+                {Array.from({ length: 5 }, (_, index) => {
+                  const rating = index + 1;
+                  return (
+                    <button
+                      key={rating}
+                      type="button"
+                      aria-label={`${rating} ${rating === 1 ? "star" : "stars"}`}
+                      aria-pressed={reviewRating === rating}
+                      onClick={() => setReviewRating(rating)}
+                      className="flex h-11 w-11 items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <Star
+                        className={`h-6 w-6 ${
+                          rating <= reviewRating
+                            ? "fill-primary text-primary"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            <div className="space-y-1.5">
+              <label htmlFor="review-body" className="font-body text-sm font-medium text-foreground">
+                Your review *
+              </label>
+              <textarea
+                id="review-body"
+                required
+                minLength={3}
+                maxLength={2000}
+                rows={5}
+                value={reviewBody}
+                onChange={(e) => setReviewBody(e.target.value)}
+                placeholder="What did you think of this product?"
+                className="w-full resize-y rounded-xl border border-input bg-background px-3 py-2 font-body text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={reviewSubmitting}
+              className="w-full rounded-xl py-5 font-body text-base font-semibold"
+            >
+              {reviewSubmitting ? "Submitting…" : "Submit Review"}
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
