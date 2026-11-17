@@ -4,11 +4,13 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
+import ShopSectionCarousel from "@/components/ShopSectionCarousel";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useProducts, useCategories } from "@/hooks/useProducts";
 import { categories } from "@/data/categories";
+import { buildProductSections } from "@/lib/productSections";
 
 const filterTags = [
   { label: "All", value: "all" },
@@ -25,7 +27,9 @@ const sortOptions = [
   "Price: High to Low",
   "Rating",
   "Newest",
-];
+] as const;
+
+type SortOption = (typeof sortOptions)[number];
 
 const SearchPage = ({ embedded = false }: { embedded?: boolean }) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -33,7 +37,7 @@ const SearchPage = ({ embedded = false }: { embedded?: boolean }) => {
   const categoryParam = searchParams.get("category") || "";
   const [localQuery, setLocalQuery] = useState(query);
   const [activeFilter, setActiveFilter] = useState("all");
-  const [activeSort, setActiveSort] = useState("Relevance");
+  const [activeSort, setActiveSort] = useState<SortOption>("Relevance");
   const [showFilters, setShowFilters] = useState(false);
 
   // Sync local query with URL
@@ -49,7 +53,7 @@ const SearchPage = ({ embedded = false }: { embedded?: boolean }) => {
   });
   const apiProducts = productsData?.items ?? [];
 
-  // Client-side: tag filter and sorting
+  // Client-side: tag filter, then dedupe + group into shop sections
   const getFilteredProducts = () => {
     let products = apiProducts;
 
@@ -61,25 +65,15 @@ const SearchPage = ({ embedded = false }: { embedded?: boolean }) => {
       });
     }
 
-    switch (activeSort) {
-      case "Price: Low to High":
-        products = [...products].sort((a, b) => a.price - b.price);
-        break;
-      case "Price: High to Low":
-        products = [...products].sort((a, b) => b.price - a.price);
-        break;
-      case "Rating":
-        products = [...products].sort((a, b) => b.rating - a.rating);
-        break;
-      default:
-        break;
-    }
-
     return products;
   };
 
-  const filteredProducts = getFilteredProducts();
-  const popularProducts = apiProducts.filter((p) => p.rating >= 4.5).slice(0, 6);
+  const shopSections = buildProductSections(getFilteredProducts(), activeSort);
+  const filteredProducts = shopSections.flatMap((section) => section.products);
+  const popularProducts = buildProductSections(apiProducts)
+    .flatMap((section) => section.products)
+    .filter((product) => product.rating >= 4.5)
+    .slice(0, 6);
 
   const { data: apiCategories } = useCategories();
   const categoryList = apiCategories?.length
@@ -318,9 +312,9 @@ const SearchPage = ({ embedded = false }: { embedded?: boolean }) => {
           ) : error ? (
             <p className="py-8 text-center font-body text-muted-foreground">Unable to load products. Please try again later.</p>
           ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} {...product} />
+            <div className="space-y-10 md:space-y-12">
+              {shopSections.map((section) => (
+                <ShopSectionCarousel key={section.id} section={section} />
               ))}
             </div>
           ) : (

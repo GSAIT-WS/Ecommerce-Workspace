@@ -15,8 +15,6 @@ import {
   Shield,
   Package,
   X,
-  BadgePercent,
-  Send,
   MessageSquare,
   AlertCircle
 } from "lucide-react";
@@ -35,31 +33,9 @@ import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImagePlaceholder";
 import { resolveProductDescription } from "@/data/productDescriptions";
-import { validateBulkInquiryForm } from "@/lib/bulkInquiryValidation";
-import { submitBulkInquiry } from "@/services/bulkInquiryApi";
 import { CrunchXDoodleBackground } from "@/components/doodles";
 import { useAuth } from "@/context/AuthContext";
 import { submitProductReview } from "@/services/productReviewApi";
-
-// ── Bulk Order helpers ──────────────────────────────────────────────────────
-const BULK_TIERS = [
-  { min: 25, max: 49, discount: 10, label: "25–49 units" },
-  { min: 50, max: 99, discount: 15, label: "50–99 units" },
-  { min: 100, max: Infinity, discount: 20, label: "100+ units" },
-];
-
-function getBulkTier(qty: number) {
-  return BULK_TIERS.find((t) => qty >= t.min && qty <= t.max) || null;
-}
-
-interface BulkInquiryForm {
-  name: string;
-  business: string;
-  phone: string;
-  email: string;
-  quantity: string;
-  message: string;
-}
 
 function buildProductGallery(primary: string, gallery: string[] | undefined): string[] {
   const main = primary || PRODUCT_IMAGE_PLACEHOLDER;
@@ -214,12 +190,6 @@ const ProductDetailPage = () => {
   const bulkSectionRef = useRef<HTMLDivElement>(null);
   const [bulkQty, setBulkQty] = useState<string>("");
   const [bulkError, setBulkError] = useState<string>("");
-  const [inquiryOpen, setInquiryOpen] = useState(false);
-  const [inquirySubmitted, setInquirySubmitted] = useState(false);
-  const [inquirySubmitting, setInquirySubmitting] = useState(false);
-  const [inquiryForm, setInquiryForm] = useState<BulkInquiryForm>({
-    name: "", business: "", phone: "", email: "", quantity: "", message: "",
-  });
 
   const { data: baseProduct, isLoading, error } = useProduct(id);
   const details = productDetails.default;
@@ -326,17 +296,6 @@ const ProductDetailPage = () => {
   };
 
   // ── Bulk helpers ─────────────────────────────────────────────────────────
-  const parsedBulkQty = parseInt(bulkQty, 10);
-  const activeTier = !isNaN(parsedBulkQty) && parsedBulkQty >= 25
-    ? getBulkTier(parsedBulkQty)
-    : null;
-
-  const bulkOriginalTotal = !isNaN(parsedBulkQty) ? product.price * parsedBulkQty : 0;
-  const bulkDiscountAmount = activeTier
-    ? Math.round(bulkOriginalTotal * activeTier.discount / 100)
-    : 0;
-  const bulkFinalTotal = bulkOriginalTotal - bulkDiscountAmount;
-
   const handleBulkQtyChange = (val: string) => {
     setBulkQty(val);
     const n = parseInt(val, 10);
@@ -350,13 +309,12 @@ const ProductDetailPage = () => {
   const handleBulkAddToCart = () => {
     const n = parseInt(bulkQty, 10);
     if (isNaN(n) || n < 25) { setBulkError("Minimum bulk order is 25 units."); return; }
-    const bulkPrice = activeTier ? Math.round(product.price * (1 - activeTier.discount / 100)) : product.price;
     addToCart(
       {
         id: product.id,
         name: product.name,
         tag: product.tag,
-        price: bulkPrice,
+        price: product.price,
         originalPrice: product.price,
         image: product.image,
       },
@@ -369,40 +327,7 @@ const ProductDetailPage = () => {
     bulkSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const handleInquirySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const validationError = validateBulkInquiryForm(inquiryForm);
-    if (validationError) {
-      toast.error(validationError);
-      return;
-    }
-    setInquirySubmitting(true);
-    const result = await submitBulkInquiry({
-      product_id: product.id,
-      product_name: product.name,
-      name: inquiryForm.name.trim(),
-      business: inquiryForm.business.trim(),
-      phone: inquiryForm.phone.trim(),
-      email: inquiryForm.email.trim(),
-      quantity: inquiryForm.quantity.trim(),
-      message: inquiryForm.message.trim(),
-    });
-    setInquirySubmitting(false);
-    if (result.ok === false) {
-      toast.error(result.error);
-      return;
-    }
-    if (result.viaEmail) {
-      toast.info("We opened your email app with a pre-filled message.");
-    }
-    setInquirySubmitted(true);
-  };
 
-  const handleInquiryClose = () => {
-    setInquiryOpen(false);
-    setInquirySubmitting(false);
-    setTimeout(() => setInquirySubmitted(false), 300);
-  };
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background">
@@ -572,7 +497,7 @@ const ProductDetailPage = () => {
               >
                 <Package className="h-4 w-4" />
                 <span className="underline underline-offset-2 group-hover:no-underline">
-                  Looking to buy in bulk? Get special pricing.
+                  Looking to buy in bulk?
                 </span>
               </button>
             </div>
@@ -967,9 +892,7 @@ const ProductDetailPage = () => {
           </Tabs>
         </motion.div>
 
-        {/* ═══════════════════════════════════════════════
-            BULK ORDER SECTION
-        ════════════════════════════════════════════════ */}
+        {/* Bulk Order Section */}
         <motion.div
           ref={bulkSectionRef}
           initial={{ opacity: 0, y: 24 }}
@@ -986,65 +909,22 @@ const ProductDetailPage = () => {
               </div>
               <div>
                 <h2 className="font-display text-xl font-bold text-foreground md:text-2xl">
-                  Bulk Order &amp; Wholesale Pricing
+                  Want to purchase in bulk?
                 </h2>
-                <p className="font-body text-sm text-muted-foreground">
-                  Minimum order: 25 units · Save more when you order more
-                </p>
+                <p className="font-body text-sm text-muted-foreground">Minimum order: 25 units</p>
               </div>
             </div>
-            <Badge className="rounded-full bg-secondary/10 px-4 py-1.5 font-body text-sm font-semibold text-secondary-foreground">
-              Up to 20% OFF
-            </Badge>
           </div>
 
-          {/* Tier Pricing Table */}
-          <div className="mb-8 grid gap-3 sm:grid-cols-3">
-            {BULK_TIERS.map((tier) => {
-              const isActive = activeTier?.min === tier.min;
-              return (
-                <motion.div
-                  key={tier.min}
-                  animate={{ scale: isActive ? 1.03 : 1 }}
-                  transition={{ duration: 0.25 }}
-                  className={`relative overflow-hidden rounded-2xl border-2 p-5 transition-colors ${
-                    isActive
-                      ? "border-primary bg-primary/5"
-                      : "border-border bg-background"
-                  }`}
-                >
-                  {isActive && (
-                    <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                      <Check className="h-3.5 w-3.5" />
-                    </span>
-                  )}
-                  <div className="flex items-center gap-2">
-                    <BadgePercent className={`h-5 w-5 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-                    <span className="font-body text-sm font-medium text-muted-foreground">{tier.label}</span>
-                  </div>
-                  <div className="mt-2">
-                    <span className={`font-display text-3xl font-bold ${isActive ? "text-primary" : "text-foreground"}`}>
-                      {tier.discount}%
-                    </span>
-                    <span className="ml-1 font-body text-sm text-muted-foreground">OFF</span>
-                  </div>
-                  <p className="mt-1 font-body text-xs text-muted-foreground">
-                    ₹{Math.round(product.price * (1 - tier.discount / 100))} per unit
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Quantity Input + Live Pricing */}
           <div className="grid gap-6 md:grid-cols-2 md:gap-10">
-            {/* Input */}
+            {/* Add quantity */}
             <div className="space-y-3">
-              <label className="font-body text-sm font-semibold text-foreground">
-                Enter Quantity
+              <label htmlFor="bulk-quantity" className="font-body text-sm font-semibold text-foreground">
+                Add quantity
               </label>
               <div className="relative">
                 <Input
+                  id="bulk-quantity"
                   type="number"
                   min={25}
                   placeholder="Min. 25 units"
@@ -1076,203 +956,39 @@ const ProductDetailPage = () => {
               </Button>
             </div>
 
-            {/* Live Price Calculation */}
+            {/* Contact us */}
             <div className="rounded-2xl border border-border bg-background p-5">
               <h3 className="mb-4 font-display text-sm font-semibold uppercase tracking-wide text-foreground">
-                Price Summary
+                Contact us
               </h3>
-              {parsedBulkQty >= 25 && !bulkError ? (
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={`${bulkQty}-${activeTier?.min}`}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-3"
-                  >
-                    <div className="flex justify-between font-body text-sm">
-                      <span className="text-muted-foreground">
-                        {parsedBulkQty} units × ₹{product.price}
-                      </span>
-                      <span className="text-muted-foreground line-through">₹{bulkOriginalTotal.toLocaleString()}</span>
-                    </div>
-                    {activeTier && (
-                      <div className="flex justify-between font-body text-sm text-secondary">
-                        <span>Bulk Discount ({activeTier.discount}%)</span>
-                        <span>− ₹{bulkDiscountAmount.toLocaleString()}</span>
-                      </div>
-                    )}
-                    <div className="border-t border-border pt-3">
-                      <div className="flex items-baseline justify-between">
-                        <span className="font-body font-semibold text-foreground">Total</span>
-                        <span className="font-display text-2xl font-bold text-foreground">
-                          ₹{bulkFinalTotal.toLocaleString()}
-                        </span>
-                      </div>
-                      {activeTier && (
-                        <motion.p
-                          initial={{ scale: 0.9 }}
-                          animate={{ scale: 1 }}
-                          className="mt-2 rounded-lg bg-secondary/10 px-3 py-2 text-center font-body text-sm font-semibold text-secondary"
-                        >
-                          🎉 You save ₹{bulkDiscountAmount.toLocaleString()} on this order!
-                        </motion.p>
-                      )}
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              ) : (
-                <p className="font-body text-sm text-muted-foreground">
-                  Enter a quantity of 25 or more to see your bulk price.
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Inquiry CTA */}
-          <div className="mt-8 flex items-center justify-between rounded-2xl border border-dashed border-primary/30 bg-primary/5 px-6 py-5">
-            <div>
-              <p className="font-body font-semibold text-foreground">Need a custom quote?</p>
-              <p className="font-body text-sm text-muted-foreground">
-                For orders &gt; 500 units or corporate requirements, request a personalised quote.
+              <p className="mb-4 font-body text-sm text-muted-foreground">
+                Have a bulk requirement? Reach out with your email or phone number.
               </p>
+              <div className="space-y-3">
+                <a
+                  href="mailto:admin@purvita.in"
+                  className="block font-body text-sm font-semibold text-primary underline underline-offset-2 transition-colors hover:text-primary/80"
+                >
+                  admin@purvita.in
+                </a>
+                <a
+                  href="tel:+917842245679"
+                  className="block font-body text-sm font-semibold text-primary underline underline-offset-2 transition-colors hover:text-primary/80"
+                >
+                  7842245679
+                </a>
+              </div>
             </div>
-            <Button
-              variant="outline"
-              className="shrink-0 rounded-xl border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-              onClick={() => setInquiryOpen(true)}
-            >
-              <Send className="mr-2 h-4 w-4" />
-              Request Custom Bulk Quote
-            </Button>
           </div>
         </motion.div>
+
+
         {/* You May Also Like */}
         <YouMayAlsoLike currentProductId={product.id} />
       </main>
 
       <Footer />
       </div>
-
-      {/* ── Bulk Inquiry Modal ─────────────────────────────────────────────── */}
-      <Dialog open={inquiryOpen} onOpenChange={handleInquiryClose}>
-        <DialogContent className="max-w-lg rounded-3xl">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl font-bold">Request Custom Bulk Quote</DialogTitle>
-            <DialogDescription className="font-body text-sm text-muted-foreground">
-              Fill in your details and our team will get back to you within 24 hours.
-            </DialogDescription>
-          </DialogHeader>
-
-          <AnimatePresence mode="wait">
-            {inquirySubmitted ? (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center gap-4 py-8 text-center"
-              >
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary/10">
-                  <Check className="h-8 w-8 text-secondary" />
-                </div>
-                <div>
-                  <p className="font-display text-lg font-semibold text-foreground">Request Submitted!</p>
-                  <p className="mt-1 font-body text-sm text-muted-foreground">
-                    Our team will contact you soon.
-                  </p>
-                </div>
-                <Button variant="outline" className="rounded-full mt-2" onClick={handleInquiryClose}>
-                  Close
-                </Button>
-              </motion.div>
-            ) : (
-              <motion.form
-                key="form"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                onSubmit={handleInquirySubmit}
-                className="space-y-4 pt-2"
-              >
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <label className="font-body text-sm font-medium text-foreground">Name *</label>
-                    <Input
-                      required
-                      placeholder="Your name"
-                      value={inquiryForm.name}
-                      onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })}
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="font-body text-sm font-medium text-foreground">Business Name *</label>
-                    <Input
-                      required
-                      placeholder="Company / Store name"
-                      value={inquiryForm.business}
-                      onChange={(e) => setInquiryForm({ ...inquiryForm, business: e.target.value })}
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="font-body text-sm font-medium text-foreground">Phone *</label>
-                    <Input
-                      required
-                      type="tel"
-                      placeholder="+91 XXXXX XXXXX"
-                      value={inquiryForm.phone}
-                      onChange={(e) => setInquiryForm({ ...inquiryForm, phone: e.target.value })}
-                      className="rounded-xl"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="font-body text-sm font-medium text-foreground">Email *</label>
-                    <Input
-                      required
-                      type="email"
-                      placeholder="you@company.com"
-                      value={inquiryForm.email}
-                      onChange={(e) => setInquiryForm({ ...inquiryForm, email: e.target.value })}
-                      className="rounded-xl"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-body text-sm font-medium text-foreground">Required Quantity *</label>
-                  <Input
-                    required
-                    type="number"
-                    min={25}
-                    placeholder="e.g. 500"
-                    value={inquiryForm.quantity}
-                    onChange={(e) => setInquiryForm({ ...inquiryForm, quantity: e.target.value })}
-                    className="rounded-xl"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-body text-sm font-medium text-foreground">Message (optional)</label>
-                  <textarea
-                    rows={3}
-                    placeholder="Any specific requirements, delivery location, etc."
-                    value={inquiryForm.message}
-                    onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
-                    className="w-full rounded-xl border border-input bg-background px-3 py-2 font-body text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={inquirySubmitting}
-                  className="w-full rounded-xl py-5 font-body text-base font-semibold"
-                >
-                  <Send className="mr-2 h-4 w-4" />
-                  {inquirySubmitting ? "Submitting…" : "Submit Inquiry"}
-                </Button>
-              </motion.form>
-            )}
-          </AnimatePresence>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={reviewOpen} onOpenChange={setReviewOpen}>
         <DialogContent className="max-h-[90dvh] overflow-y-auto rounded-3xl">
