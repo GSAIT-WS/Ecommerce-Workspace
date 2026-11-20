@@ -5,7 +5,6 @@ import {
   User,
   Package,
   RefreshCw,
-  Heart,
   MapPin,
   CreditCard,
   Bell,
@@ -306,15 +305,8 @@ const ProfilePage = () => {
             />
           </ProfileSection>
 
-          {/* Saved & Engagement */}
-          <ProfileSection title="Saved & Engagement">
-            <ProfileMenuItem
-              icon={Heart}
-              label="Saved Products"
-              subtitle="Your wishlist & favorites"
-              href="/profile/saved"
-            />
-            <div className="mx-4 border-t border-border" />
+          {/* Engagement */}
+          <ProfileSection title="Engagement">
             <ProfileMenuItem
               icon={Star}
               label="Ratings & Reviews"

@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Star, 
   ShoppingCart, 
-  Heart, 
   Share2, 
   ChevronLeft, 
   Plus, 
@@ -180,7 +179,6 @@ const ProductDetailPage = () => {
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewBody, setReviewBody] = useState("");
@@ -560,15 +558,6 @@ const ProductDetailPage = () => {
                 disabled
               >
                 Buy Now
-              </Button>
-
-              <Button
-                variant="outline"
-                size="icon"
-                className={`h-12 w-12 rounded-full ${isWishlisted ? "border-red-500 text-red-500" : ""}`}
-                onClick={() => setIsWishlisted(!isWishlisted)}
-              >
-                <Heart className={`h-5 w-5 ${isWishlisted ? "fill-red-500" : ""}`} />
               </Button>
 
               <Button variant="outline" size="icon" className="h-12 w-12 rounded-full">

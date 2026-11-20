@@ -26,7 +26,6 @@ import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/profile/EditProfilePage";
 import PreferencesPage from "./pages/profile/PreferencesPage";
 import AddressesPage from "./pages/profile/AddressesPage";
-import SavedProductsPage from "./pages/profile/SavedProductsPage";
 import RatingsPage from "./pages/profile/RatingsPage";
 import RecentlyViewedPage from "./pages/profile/RecentlyViewedPage";
 import PaymentMethodsPage from "./pages/profile/PaymentMethodsPage";
@@ -98,7 +97,6 @@ const App = () => (
                 <Route path="/profile/edit" element={<EditProfilePage />} />
                 <Route path="/profile/preferences" element={<PreferencesPage />} />
                 <Route path="/profile/addresses" element={<AddressesPage />} />
-                <Route path="/profile/saved" element={<SavedProductsPage />} />
                 <Route path="/profile/ratings" element={<RatingsPage />} />
                 <Route path="/profile/recent" element={<RecentlyViewedPage />} />
                 <Route path="/profile/payments" element={<PaymentMethodsPage />} />

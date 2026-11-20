@@ -73,7 +73,6 @@
 - **Profile** – `/profile` hub
 - **Edit Profile** – `/profile/edit`
 - **Preferences** – `/profile/preferences`
-- **Saved Products** – `/profile/saved`
 - **Ratings** – `/profile/ratings`
 - **Recently Viewed** – `/profile/recent`
 - **Payment Methods** – `/profile/payments`

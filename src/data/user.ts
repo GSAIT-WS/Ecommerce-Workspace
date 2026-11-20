@@ -35,7 +35,7 @@ export interface PaymentMethod {
   isDefault: boolean;
 }
 
-export interface SavedProduct {
+export interface RecentlyViewedProduct {
   id: string;
   name: string;
   image: string;
@@ -124,30 +124,6 @@ export const paymentMethods: PaymentMethod[] = [
   },
 ];
 
-export const savedProducts: SavedProduct[] = [
-  {
-    id: "1",
-    name: "Protein Power Bar",
-    image: PRODUCT_IMAGE_PLACEHOLDER,
-    price: 149,
-    originalPrice: 199,
-  },
-  {
-    id: "2",
-    name: "Multigrain Crunch",
-    image: PRODUCT_IMAGE_PLACEHOLDER,
-    price: 99,
-    originalPrice: 129,
-  },
-  {
-    id: "3",
-    name: "Healthy Trail Mix",
-    image: PRODUCT_IMAGE_PLACEHOLDER,
-    price: 249,
-    originalPrice: 299,
-  },
-];
-
 export const ratedProducts: RatedProduct[] = [
   {
     id: "1",
@@ -167,7 +143,7 @@ export const ratedProducts: RatedProduct[] = [
   },
 ];
 
-export const recentlyViewed: SavedProduct[] = [
+export const recentlyViewed: RecentlyViewedProduct[] = [
   {
     id: "4",
     name: "Peanut Chikki Bar",
