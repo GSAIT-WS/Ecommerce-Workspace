@@ -113,7 +113,7 @@ const OffersSection = memo(() => {
       <div className="container mx-auto px-4 md:px-8">
         <Reveal distance={14} amount={0.2}>
           <div className="section-heading mb-9 md:mb-12">
-            <span className="eyebrow eyebrow-centered mb-3">Limited time</span>
+            <span className="eyebrow eyebrow-readable eyebrow-centered mb-3">Limited time</span>
             <h2 className="section-title">Offers</h2>
             <p className="section-subtitle">
               Save more on your favourites

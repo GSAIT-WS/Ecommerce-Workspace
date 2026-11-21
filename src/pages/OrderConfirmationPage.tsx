@@ -10,6 +10,7 @@ import AnimatedCheckmark from "@/components/AnimatedCheckmark";
 import type { ApiAddress } from "@/services/addressApi";
 import type { OrderStatus } from "@/data/orders";
 import { normalizeOrderStatus } from "@/data/orders";
+import { formatProductName } from "@/lib/productName";
 
 type PaymentMethodId = "upi" | "card" | "netbanking" | "cod";
 
@@ -192,11 +193,11 @@ const OrderConfirmationPage = () => {
                   <div key={`${item.id}-${item.name}`} className="flex min-w-0 items-center gap-4">
                     <img
                       src={item.image || PRODUCT_PLACEHOLDER}
-                      alt={item.name}
+                      alt={formatProductName(item.name)}
                       className="h-16 w-16 shrink-0 rounded-lg object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="break-words font-display font-semibold text-foreground">{item.name}</p>
+                      <p className="break-words font-display font-semibold text-foreground">{formatProductName(item.name)}</p>
                       {item.tag && (
                         <p className="font-body text-xs text-muted-foreground">
                           {item.tag} × {item.quantity}

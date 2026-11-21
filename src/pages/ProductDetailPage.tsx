@@ -433,7 +433,7 @@ const ProductDetailPage = () => {
                 <Badge 
                   key={tag} 
                   variant="outline" 
-                  className="rounded-full border-secondary bg-secondary/10 px-3 py-1 font-body text-xs text-secondary-foreground"
+                  className="rounded-full border-secondary bg-secondary/10 px-3 py-1 font-body text-sm text-secondary-foreground dark:text-secondary"
                 >
                   {tag}
                 </Badge>
@@ -579,8 +579,8 @@ const ProductDetailPage = () => {
                   <Leaf className="h-5 w-5 text-secondary" />
                 </div>
                 <div>
-                  <p className="font-body text-xs font-semibold text-foreground">100% Natural</p>
-                  <p className="font-body text-xs text-muted-foreground">No preservatives</p>
+                  <p className="font-body text-sm font-semibold text-foreground">100% Natural</p>
+                  <p className="font-body text-sm text-muted-foreground">No preservatives</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -588,8 +588,8 @@ const ProductDetailPage = () => {
                   <Zap className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-body text-xs font-semibold text-foreground">Fast Delivery</p>
-                  <p className="font-body text-xs text-muted-foreground">Within 2-3 days</p>
+                  <p className="font-body text-sm font-semibold text-foreground">Fast Delivery</p>
+                  <p className="font-body text-sm text-muted-foreground">Within 2-3 days</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -597,8 +597,8 @@ const ProductDetailPage = () => {
                   <Shield className="h-5 w-5 text-accent" />
                 </div>
                 <div>
-                  <p className="font-body text-xs font-semibold text-foreground">Quality Assured</p>
-                  <p className="font-body text-xs text-muted-foreground">FSSAI certified</p>
+                  <p className="font-body text-sm font-semibold text-foreground">Quality Assured</p>
+                  <p className="font-body text-sm text-muted-foreground">FSSAI certified</p>
                 </div>
               </div>
             </div>
@@ -693,12 +693,12 @@ const ProductDetailPage = () => {
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {product.dietInfo.isGlutenFree && (
-                        <Badge className="rounded-full bg-secondary/10 px-3 py-1 font-body text-secondary-foreground">
+                        <Badge className="rounded-full bg-secondary/10 px-3 py-1 font-body text-secondary-foreground dark:text-secondary">
                           Gluten-Free
                         </Badge>
                       )}
                       {product.dietInfo.isVegan && (
-                        <Badge className="rounded-full bg-secondary/10 px-3 py-1 font-body text-secondary-foreground">
+                        <Badge className="rounded-full bg-secondary/10 px-3 py-1 font-body text-secondary-foreground dark:text-secondary">
                           Vegan
                         </Badge>
                       )}
@@ -812,7 +812,7 @@ const ProductDetailPage = () => {
                                   {review.name}
                                 </span>
                                 {review.verified && (
-                                  <Badge className="rounded bg-secondary/10 px-1.5 py-0.5 font-body text-xs text-secondary-foreground">
+                                  <Badge className="rounded bg-secondary/10 px-1.5 py-0.5 font-body text-xs text-secondary-foreground dark:text-secondary">
                                     Verified
                                   </Badge>
                                 )}

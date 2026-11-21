@@ -19,6 +19,7 @@ import { PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImagePlaceholder";
 import { useAuth } from "@/context/AuthContext";
 import { getOrderByIdApi } from "@/services/orderApi";
 import { normalizeOrderStatus, type OrderStatus } from "@/data/orders";
+import { formatProductName } from "@/lib/productName";
 
 function parseShippingSnapshot(s: unknown): {
   name: string;
@@ -331,11 +332,11 @@ const OrderTrackingPage = () => {
                   >
                     <img
                       src={item.image}
-                      alt={item.name}
+                      alt={formatProductName(item.name)}
                       className="h-10 w-10 rounded-lg object-cover"
                     />
                     <div>
-                      <p className="font-body text-sm font-medium text-foreground">{item.name}</p>
+                      <p className="font-body text-sm font-medium text-foreground">{formatProductName(item.name)}</p>
                       <p className="font-body text-xs text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
                   </div>

@@ -16,7 +16,7 @@ const FeaturedProducts = () => {
       <div className="container relative mx-auto px-4 md:px-8">
         <Reveal distance={14} amount={0.2}>
           <div className="section-heading mb-9 md:mb-12">
-            <span className="eyebrow eyebrow-centered mb-3">Shop the range</span>
+            <span className="eyebrow eyebrow-readable eyebrow-centered mb-3">Shop the range</span>
             <h2 className="section-title">Best Sellers</h2>
             <p className="section-subtitle">Discover the flavours you&apos;ll love.</p>
           </div>

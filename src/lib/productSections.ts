@@ -27,7 +27,7 @@ const SECTION_DETAILS: Record<
 > = {
   singles: {
     eyebrow: "Everyday",
-    title: "Single pieces",
+    title: "Single Pieces",
     description: "Jowar, kurmura and sesame peanut chikki, sold individually.",
     badgeLabel: "Single",
   },

@@ -255,6 +255,10 @@
     @apply inline-flex items-center gap-2.5 font-body text-[10px] font-bold uppercase tracking-[0.16em] text-primary/90 sm:text-[11px] sm:tracking-[0.2em];
   }
 
+  .eyebrow-readable {
+    @apply text-xs sm:text-[13px];
+  }
+
   .eyebrow::before {
     content: "";
     @apply block h-px w-7 rounded-full bg-gradient-to-r from-secondary/80 to-primary/15;
@@ -317,13 +321,6 @@
       inset 0 1px 0 0 hsl(var(--sheen) / 0.06),
       0 18px 40px -20px hsl(var(--primary) / 0.38),
       0 4px 12px -6px hsl(0 0% 0% / 0.5);
-  }
-
-  /* Marquee (customer reviews) — compositor-only transform, pauses on hover/focus.
-     Duration is the Tailwind `animate-marquee` token; this only adds play-state. */
-  .marquee-track:hover,
-  .marquee-track:focus-within {
-    animation-play-state: paused;
   }
 
   /** Frosted panel for chips / bars over imagery */
@@ -502,7 +499,7 @@
 
   /** Number/label chip — small uppercase meta */
   .meta-chip {
-    @apply inline-flex items-center gap-1 rounded-full bg-muted/70 px-2 py-0.5 font-body text-[11px] font-semibold uppercase tracking-wider text-muted-foreground;
+    @apply inline-flex items-center gap-1 rounded-full bg-muted/70 px-2 py-0.5 font-body text-xs font-semibold uppercase tracking-wider text-muted-foreground;
   }
 
   /** Consistent icon tile for feature cards */
@@ -556,11 +553,6 @@
     scroll-behavior: auto !important;
   }
 
-  /* Kill the marquee outright — a 0.01ms duration would snap it to the
-     loop end-point and leave the strip parked mid-offset. */
-  .marquee-track {
-    animation: none !important;
-  }
 }
 
 @layer components {

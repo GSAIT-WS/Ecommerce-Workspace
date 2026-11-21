@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { ratedProducts } from "@/data/user";
+import { formatProductName } from "@/lib/productName";
 
 const RatingsPage = () => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const RatingsPage = () => {
                     <div className="h-20 w-20 overflow-hidden rounded-lg bg-muted">
                       <img
                         src={product.image}
-                        alt={product.name}
+                        alt={formatProductName(product.name)}
                         className="h-full w-full object-cover"
                       />
                     </div>
@@ -56,7 +57,7 @@ const RatingsPage = () => {
                   <div className="flex-1">
                     <Link to={`/product/${product.id}`}>
                       <h3 className="font-semibold hover:text-primary">
-                        {product.name}
+                        {formatProductName(product.name)}
                       </h3>
                     </Link>
                     <div className="mt-1 flex items-center gap-1">

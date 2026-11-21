@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { toast } from "@/components/ui/sonner";
 import emptyCartIllustration from "@/assets/empty-cart-illustration.jpg";
 import { getAmountLeftForFreeShipping } from "@/lib/shipping";
+import { formatProductName } from "@/lib/productName";
 
 const trustBadges = [
   { icon: Leaf, label: "100% Natural" },
@@ -56,7 +57,7 @@ const CartPage = () => {
                   >
                     <img
                       src={item.image}
-                      alt={item.name}
+                      alt={formatProductName(item.name)}
                       className="h-full w-full object-cover transition-transform group-hover:scale-105"
                     />
                     <Badge className="absolute left-2 top-2 rounded-full bg-secondary/90 text-xs font-semibold text-secondary-foreground">
@@ -71,7 +72,7 @@ const CartPage = () => {
                         to={`/product/${item.id}`}
                         className="break-words font-display text-sm font-semibold text-foreground hover:text-primary md:text-base"
                       >
-                        {item.name}
+                        {formatProductName(item.name)}
                       </Link>
                       <div className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1">
                         <span className="font-body text-lg font-bold text-foreground">
@@ -95,7 +96,7 @@ const CartPage = () => {
                       <div className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2">
                         <button 
                           className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-muted"
-                          aria-label={`Decrease quantity of ${item.name}`}
+                          aria-label={`Decrease quantity of ${formatProductName(item.name)}`}
                           onClick={() => {
                             if (item.quantity > 1) {
                               updateQuantity(item.id, item.quantity - 1);
@@ -110,7 +111,7 @@ const CartPage = () => {
                         </span>
                         <button 
                           className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-muted"
-                          aria-label={`Increase quantity of ${item.name}`}
+                          aria-label={`Increase quantity of ${formatProductName(item.name)}`}
                           onClick={() => {
                             updateQuantity(item.id, item.quantity + 1);
                             toast.success("Quantity updated");

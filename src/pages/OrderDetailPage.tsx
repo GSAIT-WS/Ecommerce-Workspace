@@ -26,6 +26,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getOrderByIdApi } from "@/services/orderApi";
 import { getStatusLabel, getStatusColor, normalizeOrderStatus, type OrderStatus } from "@/data/orders";
 import { toast } from "sonner";
+import { formatProductName } from "@/lib/productName";
 
 const PRODUCT_PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e5e7eb' width='400' height='400'/%3E%3C/svg%3E";
@@ -345,11 +346,11 @@ const OrderDetailPage = () => {
                   <div key={item.id} className="flex min-w-0 items-center gap-4 rounded-xl border border-border bg-background p-3">
                     <img
                       src={PRODUCT_PLACEHOLDER}
-                      alt={item.name}
+                      alt={formatProductName(item.name)}
                       className="h-16 w-16 shrink-0 rounded-xl object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="break-words font-display font-semibold text-foreground">{item.name}</p>
+                      <p className="break-words font-display font-semibold text-foreground">{formatProductName(item.name)}</p>
                       <p className="font-body text-sm text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
                     <p className="shrink-0 font-display font-bold text-foreground">₹{item.lineTotal}</p>

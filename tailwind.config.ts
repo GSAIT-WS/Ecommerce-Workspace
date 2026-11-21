@@ -196,11 +196,6 @@ export default {
           "0%, 100%": { transform: "translate3d(0, 0, 0)" },
           "50%": { transform: "translate3d(0, -14px, 0)" },
         },
-        /** Horizontal marquee for testimonial / logo strips */
-        marquee: {
-          from: { transform: "translateX(0)" },
-          to: { transform: "translateX(-50%)" },
-        },
         /** Fade + rise used by scroll-reveal wrappers */
         "reveal-up": {
           from: { opacity: "0", transform: "translateY(24px)" },
@@ -225,9 +220,6 @@ export default {
         "underline-grow": "underline-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "badge-pop": "badge-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1)",
         drift: "drift 7s ease-in-out infinite",
-        /** Seamless loop for the customer-reviews strip.
-            42s ≈ 70px/s on the current 8-card width — slow enough to read. */
-        marquee: "marquee 42s linear infinite",
         "reveal-up": "reveal-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards",
       },
     },

@@ -52,7 +52,7 @@ const AddressCard = ({
       <div className="mb-3 flex items-center gap-2">
         <Badge
           variant="secondary"
-          className="rounded-full bg-secondary/20 px-3 py-1 font-body text-xs font-semibold uppercase text-secondary-foreground"
+          className="rounded-full bg-secondary/20 px-3 py-1 font-body text-xs font-semibold uppercase text-secondary-foreground dark:text-secondary"
         >
           {address.type}
         </Badge>

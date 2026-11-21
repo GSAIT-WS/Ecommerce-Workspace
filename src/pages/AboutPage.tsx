@@ -49,7 +49,7 @@ const AboutPage = ({ embedded = false }: { embedded?: boolean }) => (
         <article className="mx-auto mt-5 max-w-5xl overflow-hidden rounded-[1.75rem] border border-border/70 bg-card/90 shadow-card sm:mt-7 sm:rounded-[2rem]">
           <div className="relative overflow-hidden border-b border-border/70 bg-[linear-gradient(110deg,hsl(var(--surface-green)/0.8),hsl(var(--card))_54%,hsl(var(--surface-purple)/0.8))] px-6 py-7 sm:px-9 sm:py-8 md:px-12">
             <div className="pointer-events-none absolute -right-8 -top-20 h-52 w-52 rounded-full border-[24px] border-primary/[0.04]" aria-hidden />
-            <p className="mb-2 inline-flex items-center gap-2 font-body text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green-deep dark:text-secondary">
+            <p className="mb-2 inline-flex items-center gap-2 font-body text-xs font-bold uppercase tracking-[0.2em] text-brand-green-deep dark:text-secondary sm:text-[13px]">
               <Leaf className="h-4 w-4" aria-hidden="true" />
               The roots of PURVITA
             </p>
@@ -77,7 +77,7 @@ const AboutPage = ({ embedded = false }: { embedded?: boolean }) => (
                 </p>
                 <p>
                   As we grow, our commitment remains the same: celebrating our food heritage
-                  while creating products that fit today’s lifestyles.
+                  while creating products supporting healthier lifestyles with the goodness of fibre and protein.
                 </p>
               </div>
               <p className="mt-5 border-t border-border/70 pt-4 font-brand text-lg font-semibold italic leading-snug text-primary sm:mt-6 sm:pt-5 sm:text-xl">
@@ -105,7 +105,7 @@ const AboutPage = ({ embedded = false }: { embedded?: boolean }) => (
                       </span>
                       <span>
                         <span className="block font-body text-sm font-bold text-foreground">{title}</span>
-                        <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">{description}</span>
+                        <span className="mt-0.5 block text-sm leading-relaxed text-muted-foreground">{description}</span>
                       </span>
                     </li>
                   ))}

@@ -89,23 +89,23 @@ const ProductListCard = ({
                 }`}
               />
             ))}
-            <span className="ml-1 font-body text-xs text-muted-foreground">
+            <span className="ml-1 font-body text-sm text-muted-foreground">
               {rating.toFixed(1)}
             </span>
           </div>
 
           {/* Nutrition Info Grid */}
           <div className="mb-3 grid grid-cols-2 gap-x-4 gap-y-1 md:grid-cols-4">
-            <div className="font-body text-xs text-muted-foreground">
+            <div className="font-body text-sm text-muted-foreground">
               <span className="font-medium text-foreground">Protein:</span> {protein}
             </div>
-            <div className="font-body text-xs text-muted-foreground">
+            <div className="font-body text-sm text-muted-foreground">
               <span className="font-medium text-foreground">Calories:</span> {typeof calories === 'number' ? `${calories} kcal` : calories}
             </div>
-            <div className="font-body text-xs text-muted-foreground">
+            <div className="font-body text-sm text-muted-foreground">
               <span className="font-medium text-foreground">Diet:</span> {dietType}
             </div>
-            <div className="font-body text-xs text-muted-foreground">
+            <div className="font-body text-sm text-muted-foreground">
               <span className="font-medium text-foreground">Pack:</span> {packType}
             </div>
           </div>

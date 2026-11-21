@@ -52,7 +52,7 @@ const ShopSectionCarousel = ({ section }: { section: ProductSection }) => {
       <div className="mb-4 border-b border-border/70 pb-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="eyebrow mb-2">{section.eyebrow}</p>
+            <p className="eyebrow eyebrow-readable mb-2">{section.eyebrow}</p>
             <h3
               id={`shop-${section.id}-heading`}
               className="font-brand text-[1.75rem] font-semibold leading-tight tracking-[-0.03em] text-foreground sm:text-[2rem]"
@@ -92,7 +92,7 @@ const ShopSectionCarousel = ({ section }: { section: ProductSection }) => {
           </div>
         </div>
 
-        <p className="mt-1 font-body text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-1 font-body text-base leading-relaxed text-muted-foreground">
           {section.description}
           <span className="sr-only"> {productCountLabel}.</span>
         </p>

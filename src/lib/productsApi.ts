@@ -5,6 +5,7 @@
 
 import { apiCall, hasApiConfig } from "./api";
 import { PRODUCT_IMAGE_PLACEHOLDER } from "./productImagePlaceholder";
+import { formatProductName } from "./productName";
 import { supabase } from "./supabaseClient";
 
 /** Raw product from list-products / get-product-by-id */
@@ -53,7 +54,7 @@ export function mapApiProductToProduct(row: ApiProduct): Product {
     : [];
   return {
     id: row.id,
-    name: row.name,
+    name: formatProductName(row.name),
     tag,
     price: row.price,
     originalPrice: row.compare_at_price ?? undefined,

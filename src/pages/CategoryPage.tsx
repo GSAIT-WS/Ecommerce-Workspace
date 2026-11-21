@@ -77,7 +77,7 @@ const CategoryPage = () => {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
-            className="eyebrow eyebrow-centered mb-3"
+            className="eyebrow eyebrow-readable eyebrow-centered mb-3"
           >
             Shop
           </motion.span>
@@ -92,7 +92,7 @@ const CategoryPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="mx-auto mt-2 max-w-xl font-body text-sm text-muted-foreground md:text-base"
+            className="mx-auto mt-2 max-w-xl font-body text-base text-muted-foreground"
           >
             {category.subtitle}
           </motion.p>

@@ -61,10 +61,7 @@ const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
       {!embedded && <Navbar />}
 
       <main
-        id={embedded ? "contact" : undefined}
-        className={`w-full px-4 py-8 sm:px-6 md:px-8 md:py-12 lg:px-12 ${
-          embedded ? "scroll-mt-28" : ""
-        }`}
+        className="w-full px-4 py-8 sm:px-6 md:px-8 md:py-12 lg:px-12"
       >
         {!embedded && (
           <Link
@@ -77,7 +74,7 @@ const ContactPage = ({ embedded = false }: { embedded?: boolean }) => {
         )}
 
         <div className="mt-8 w-full">
-          <FeedbackHighlights />
+          <FeedbackHighlights id={embedded ? "contact" : undefined} />
 
           <div className="grid gap-8 md:grid-cols-2">
             {/* Contact Info */}

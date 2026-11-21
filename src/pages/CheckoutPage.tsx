@@ -15,6 +15,7 @@ import { useAddress } from "@/context/AddressContext";
 import type { ApiAddress } from "@/services/addressApi";
 import { toast } from "sonner";
 import { canProceedFromCheckout, getCheckoutCtaLabel } from "@/lib/checkoutFlow";
+import { formatProductName } from "@/lib/productName";
 
 const labelIcon = (label?: string) => {
   switch (label?.toLowerCase()) {
@@ -265,13 +266,13 @@ const CheckoutPage = () => {
                   >
                     <img
                       src={item.image}
-                      alt={item.name}
+                      alt={formatProductName(item.name)}
                       className="h-20 w-20 rounded-lg object-cover"
                     />
                     <div className="flex min-w-0 flex-1 flex-col justify-between">
                       <div>
                         <div className="flex items-start justify-between gap-2">
-                          <p className="min-w-0 break-words font-display font-semibold text-foreground">{item.name}</p>
+                          <p className="min-w-0 break-words font-display font-semibold text-foreground">{formatProductName(item.name)}</p>
                           <Badge
                             variant="secondary"
                             className="shrink-0 rounded-full bg-secondary/10 text-xs font-medium text-secondary"
@@ -285,7 +286,7 @@ const CheckoutPage = () => {
                           <button
                             onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                             className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted"
-                            aria-label={`Decrease quantity of ${item.name}`}
+                            aria-label={`Decrease quantity of ${formatProductName(item.name)}`}
                           >
                             −
                           </button>
@@ -295,7 +296,7 @@ const CheckoutPage = () => {
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-muted"
-                            aria-label={`Increase quantity of ${item.name}`}
+                            aria-label={`Increase quantity of ${formatProductName(item.name)}`}
                           >
                             +
                           </button>

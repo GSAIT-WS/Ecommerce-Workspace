@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { recentlyViewed } from "@/data/user";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
+import { formatProductName } from "@/lib/productName";
 
 const RecentlyViewedPage = () => {
   const navigate = useNavigate();
@@ -62,7 +63,7 @@ const RecentlyViewedPage = () => {
                     <div className="aspect-[4/3] overflow-hidden bg-muted">
                       <img
                         src={product.image}
-                        alt={product.name}
+                        alt={formatProductName(product.name)}
                         className="h-full w-full object-cover transition-transform hover:scale-105"
                       />
                     </div>
@@ -70,7 +71,7 @@ const RecentlyViewedPage = () => {
                   <div className="p-4">
                     <Link to={`/product/${product.id}`}>
                       <h3 className="font-semibold hover:text-primary">
-                        {product.name}
+                        {formatProductName(product.name)}
                       </h3>
                     </Link>
                     <div className="mt-1 flex items-center gap-2">

@@ -43,7 +43,7 @@ const Footer = () => (
         </div>
 
         <div>
-          <h4 className="mb-4 font-body text-[11px] font-bold uppercase tracking-[0.18em] text-brand-green">
+          <h4 className="mb-4 font-body text-xs font-bold uppercase tracking-[0.18em] text-brand-green">
             Quick Links
           </h4>
           <ul className="space-y-2.5">
@@ -66,7 +66,7 @@ const Footer = () => (
         </div>
 
         <div>
-          <h4 className="mb-4 font-body text-[11px] font-bold uppercase tracking-[0.18em] text-brand-green">
+          <h4 className="mb-4 font-body text-xs font-bold uppercase tracking-[0.18em] text-brand-green">
             Policies
           </h4>
           <ul className="space-y-2.5">
@@ -89,7 +89,7 @@ const Footer = () => (
         </div>
 
         <div>
-          <h4 className="mb-4 font-body text-[11px] font-bold uppercase tracking-[0.18em] text-brand-green">
+          <h4 className="mb-4 font-body text-xs font-bold uppercase tracking-[0.18em] text-brand-green">
             Follow Us
           </h4>
           <div className="flex gap-2.5">
@@ -117,7 +117,7 @@ const Footer = () => (
 
       <Reveal distance={8} amount={0.15} delay={0.08}>
         <div className="mt-12 flex flex-col items-center gap-3 border-t border-brand-cream/10 pt-7 md:flex-row md:justify-between">
-          <p className="text-center font-body text-xs text-brand-cream/55 md:text-left">
+          <p className="text-center font-body text-sm text-brand-cream/55 md:text-left">
             © 2026 PURVITA. All rights reserved. A product of Giri Sree Agro Industries Pvt. Ltd.
           </p>
           <p className="font-brand text-sm italic text-brand-green">Goodness from the Roots</p>

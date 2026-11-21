@@ -58,12 +58,12 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, image, badgeLa
           aria-hidden
         />
 
-        <Badge className="absolute left-3 top-3 rounded-full border border-border/70 bg-card/90 px-2.5 py-1 font-body text-[10px] font-bold uppercase tracking-[0.12em] text-primary shadow-sm backdrop-blur-sm">
+        <Badge className="absolute left-3 top-3 rounded-full border border-border/70 bg-card/90 px-2.5 py-1 font-body text-xs font-bold uppercase tracking-[0.12em] text-primary shadow-sm backdrop-blur-sm">
           {displayBadge}
         </Badge>
 
         {discount > 0 && (
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 font-body text-[11px] font-bold text-accent-foreground shadow-sm ring-1 ring-inset ring-white/35">
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 font-body text-xs font-bold text-accent-foreground shadow-sm ring-1 ring-inset ring-white/35">
             <Zap className="h-3 w-3" aria-hidden />
             {discount}% OFF
           </span>
@@ -71,7 +71,7 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, image, badgeLa
       </div>
 
       <div className="flex flex-1 flex-col p-4 md:p-5">
-        <h3 className="mb-3 line-clamp-2 min-h-[2.8rem] font-body text-sm font-semibold leading-snug text-primary transition-colors duration-300 group-hover:text-primary/80 md:text-base">
+        <h3 className="mb-3 line-clamp-2 min-h-[2.8rem] font-body text-base font-semibold leading-snug text-primary transition-colors duration-300 group-hover:text-primary/80 md:text-lg">
           {name}
         </h3>
 
@@ -99,12 +99,12 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, image, badgeLa
               {added ? (
                 <>
                   <Check className="h-3.5 w-3.5 animate-pop-in" aria-hidden />
-                  <span className="text-[13px]">Added</span>
+                  <span className="text-sm">Added</span>
                 </>
               ) : (
                 <>
                   <ShoppingCart className="h-3.5 w-3.5" aria-hidden />
-                  <span className="text-[13px]">Add</span>
+                  <span className="text-sm">Add</span>
                 </>
               )}
             </Button>
@@ -116,7 +116,7 @@ const ProductCard = ({ id = "1", name, tag, price, originalPrice, image, badgeLa
               onClick={handleBuyNow}
               aria-label={`Buy ${name} now`}
             >
-              <span className="text-[13px]">Buy</span>
+              <span className="text-sm">Buy</span>
             </Button>
           </div>
         </div>
