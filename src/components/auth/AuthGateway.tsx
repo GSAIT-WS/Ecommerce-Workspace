@@ -354,7 +354,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
 
           {/* Footer trust text */}
           <motion.p
-            className="text-white/50 text-sm font-medium"
+            className="text-white/75 text-sm font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.1 }}
@@ -764,7 +764,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
               <button
                 type="button"
                 onClick={() => setShowTestLogin((v) => !v)}
-                className="mx-auto flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground/50 transition-colors hover:text-muted-foreground"
+                className="mx-auto flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 <FlaskConical className="h-3 w-3" />
                 Login for testing
@@ -847,7 +847,7 @@ export function AuthGateway({ mode }: AuthGatewayProps) {
           )}
 
           {/* Terms note */}
-          <p className="mt-3 text-center text-xs text-muted-foreground/70">
+          <p className="mt-3 text-center text-xs text-muted-foreground">
             By continuing, you agree to our{" "}
             <Link to="/terms-of-service" className="underline hover:text-muted-foreground">Terms</Link>
             {" "}and{" "}

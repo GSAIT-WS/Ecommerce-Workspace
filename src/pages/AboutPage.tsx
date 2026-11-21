@@ -49,7 +49,7 @@ const AboutPage = ({ embedded = false }: { embedded?: boolean }) => (
         <article className="mx-auto mt-5 max-w-5xl overflow-hidden rounded-[1.75rem] border border-border/70 bg-card/90 shadow-card sm:mt-7 sm:rounded-[2rem]">
           <div className="relative overflow-hidden border-b border-border/70 bg-[linear-gradient(110deg,hsl(var(--surface-green)/0.8),hsl(var(--card))_54%,hsl(var(--surface-purple)/0.8))] px-6 py-7 sm:px-9 sm:py-8 md:px-12">
             <div className="pointer-events-none absolute -right-8 -top-20 h-52 w-52 rounded-full border-[24px] border-primary/[0.04]" aria-hidden />
-            <p className="mb-2 inline-flex items-center gap-2 font-body text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green-deep">
+            <p className="mb-2 inline-flex items-center gap-2 font-body text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green-deep dark:text-secondary">
               <Leaf className="h-4 w-4" aria-hidden="true" />
               The roots of PURVITA
             </p>
@@ -100,7 +100,7 @@ const AboutPage = ({ embedded = false }: { embedded?: boolean }) => (
                 <ul className="mt-5 space-y-3">
                   {brandPillars.map(({ icon: Icon, title, description }) => (
                     <li key={title} className="flex gap-3 rounded-xl border border-border/60 bg-card/65 p-3">
-                      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-surface-green text-brand-green-deep">
+                      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-surface-green text-brand-green-deep dark:text-secondary">
                         <Icon className="h-4 w-4" aria-hidden="true" />
                       </span>
                       <span>

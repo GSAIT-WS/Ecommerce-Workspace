@@ -387,7 +387,7 @@ const ProductDetailPage = () => {
               </AnimatePresence>
               {!product.isActive && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="rounded-full bg-amber-500/90 px-5 py-2 font-body text-sm font-bold uppercase tracking-widest text-white shadow-lg">
+                  <span className="rounded-full bg-brand-gold px-5 py-2 font-body text-sm font-bold uppercase tracking-widest text-brand-deep shadow-lg">
                     Temporarily Unavailable
                   </span>
                 </div>

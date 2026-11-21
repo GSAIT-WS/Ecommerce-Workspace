@@ -30,6 +30,7 @@
 
     --destructive: 0 68% 46%;
     --destructive-foreground: 40 67% 96%;
+    --destructive-text: 0 68% 34%;
 
     --border: 33 38% 86%; /* Subtle warm border #E9DDCE */
     --input: 33 38% 86%;
@@ -106,6 +107,7 @@
     --accent-foreground: 293 10% 10%;
     --destructive: 0 55% 40%;
     --destructive-foreground: 40 67% 96%;
+    --destructive-text: 0 78% 70%;
     --border: 300 11% 25%;
     --input: 300 11% 23%;
     --ring: 88 45% 58%;
@@ -581,6 +583,7 @@
     --accent-foreground: 293 9% 19%;
     --destructive: 0 68% 46%;
     --destructive-foreground: 40 67% 96%;
+    --destructive-text: 0 68% 34%;
     --border: 33 38% 86%;
     --input: 33 38% 86%;
     --ring: 301 43% 27%;
@@ -662,4 +665,13 @@
     accent-color: hsl(var(--primary));
   }
 
+}
+
+@layer utilities {
+  .dark .text-destructive,
+  .dark [class~="text-destructive/80"],
+  .dark [class~="hover:text-destructive"]:hover,
+  .dark [class~="hover:text-destructive/80"]:hover {
+    color: hsl(var(--destructive-text));
+  }
 }

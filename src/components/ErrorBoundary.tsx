@@ -20,30 +20,17 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError && this.state.error) {
       return (
         <div
-          style={{
-            padding: "2rem",
-            fontFamily: "system-ui, sans-serif",
-            maxWidth: "600px",
-            margin: "2rem auto",
-            background: "#fef2f2",
-            border: "1px solid #fecaca",
-            borderRadius: "8px",
-          }}
+          className="mx-auto my-8 max-w-xl rounded-lg border border-destructive/30 bg-destructive/5 p-8 font-sans"
         >
-          <h2 style={{ color: "#b91c1c", marginBottom: "1rem" }}>
+          <h2 className="mb-4 text-destructive">
             Something went wrong
           </h2>
           <pre
-            style={{
-              overflow: "auto",
-              fontSize: "0.875rem",
-              color: "#991b1b",
-              whiteSpace: "pre-wrap",
-            }}
+            className="overflow-auto whitespace-pre-wrap text-sm text-foreground"
           >
             {this.state.error.message}
           </pre>
-          <p style={{ marginTop: "1rem", color: "#6b7280", fontSize: "0.875rem" }}>
+          <p className="mt-4 text-sm text-muted-foreground">
             Open DevTools (F12) → Console for full stack trace.
           </p>
         </div>

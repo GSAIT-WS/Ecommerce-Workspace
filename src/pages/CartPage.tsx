@@ -120,7 +120,7 @@ const CartPage = () => {
                         </button>
                       </div>
                       <button 
-                        className="p-2 hover:bg-red-50 rounded-lg transition-colors text-muted-foreground hover:text-red-500"
+                        className="p-2 rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                         onClick={() => {
                           removeFromCart(item.id);
                           toast.success("Item removed from cart");
