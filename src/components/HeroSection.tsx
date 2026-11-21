@@ -25,7 +25,7 @@ const heroSlides = [
     accent: "#E5B822",
     accentForeground: "#FCF8F0",
     accentHover: "#5D1E63",
-    imagePosition: "55% center",
+    imagePosition: "60% center",
   },
   {
     id: "jowar",
@@ -39,7 +39,7 @@ const heroSlides = [
     accent: "#1B4223",
     accentForeground: "#FCF8F0",
     accentHover: "#25562F",
-    imagePosition: "68% center",
+    imagePosition: "82% center",
   },
   {
     id: "kurumura",
@@ -53,7 +53,7 @@ const heroSlides = [
     accent: "#FFE9A8",
     accentForeground: "#3B163D",
     accentHover: "#FFDE82",
-    imagePosition: "68% center",
+    imagePosition: "82% center",
   },
   {
     id: "sesame",
@@ -67,7 +67,7 @@ const heroSlides = [
     accent: "#612760",
     accentForeground: "#FCF8F0",
     accentHover: "#743174",
-    imagePosition: "55% center",
+    imagePosition: "82% center",
   },
 ] as const;
 
@@ -140,14 +140,15 @@ const HeroSection = () => {
       onFocusCapture={() => setIsFocused(true)}
       onBlurCapture={handleBlur}
     >
-      <div className="relative w-full md:h-[clamp(460px,38vw,620px)]">
+      <div className="relative h-[clamp(22rem,102vw,26rem)] w-full md:h-[clamp(460px,38vw,620px)]">
         {heroSlides.map((item, index) => (
           <motion.img
             key={item.id}
             src={item.image}
             alt={index === current ? item.alt : ""}
             aria-hidden={index !== current}
-            className="pointer-events-none absolute inset-x-0 top-0 h-[clamp(11rem,45vw,15rem)] w-full select-none object-cover max-md:h-auto max-md:aspect-[4/3] max-md:object-[82%_center] md:inset-0 md:h-full"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[clamp(11rem,45vw,15rem)] w-full select-none object-cover max-md:inset-0 max-md:h-full max-md:aspect-auto max-md:object-[var(--hero-mobile-image-position)] md:inset-0 md:h-full"
+            style={{ "--hero-mobile-image-position": item.imagePosition } as CSSProperties}
             initial={false}
             animate={{ opacity: index === current ? 1 : 0 }}
             transition={{
@@ -160,8 +161,13 @@ const HeroSection = () => {
           />
         ))}
 
-        <div className="container relative z-10 mx-auto flex w-full flex-col px-4 pb-6 pt-[clamp(11rem,45vw,15rem)] sm:px-6 sm:pb-8 md:h-full md:flex-row md:items-end md:justify-start md:px-8 md:pb-9 md:pt-0 lg:items-center lg:pb-0">
-          <div className="flex w-full max-w-[34rem] flex-col items-start">
+        <div
+          className="absolute inset-0 z-[1] bg-[linear-gradient(to_top,rgba(53,32,54,0.96)_0%,rgba(53,32,54,0.78)_35%,rgba(53,32,54,0.18)_62%,transparent_80%)] md:hidden"
+          aria-hidden
+        />
+
+        <div className="container absolute inset-0 z-10 mx-auto flex h-full w-full flex-col justify-end px-4 pb-4 pt-0 sm:px-6 sm:pb-8 md:relative md:flex-row md:items-end md:justify-start md:px-8 md:pb-9 md:pt-0 lg:items-center lg:pb-0">
+          <div className="flex w-full max-w-[34rem] flex-col items-start max-md:max-w-[48%]">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={slide.id}
@@ -196,7 +202,7 @@ const HeroSection = () => {
                   <Button
                     variant="cta"
                     size="xl"
-                    className="group h-11 w-fit rounded-full bg-[color:var(--hero-accent)] px-6 text-sm text-[color:var(--hero-accent-foreground)] shadow-lg shadow-black/25 hover:bg-[color:var(--hero-accent-hover)] hover:shadow-black/30 sm:h-12 sm:w-auto sm:px-7 sm:text-[15px]"
+                    className="group h-11 w-fit max-md:max-w-full rounded-full bg-[color:var(--hero-accent)] px-6 text-sm text-[color:var(--hero-accent-foreground)] shadow-lg shadow-black/25 hover:bg-[color:var(--hero-accent-hover)] hover:shadow-black/30 max-md:px-3 max-md:text-xs sm:h-12 sm:w-auto sm:px-7 sm:text-[15px]"
                     asChild
                   >
                     <Link to="/#shop">
